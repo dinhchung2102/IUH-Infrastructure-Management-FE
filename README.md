@@ -190,8 +190,8 @@ This project is licensed under the MIT License.
 
 ## 👥 Team
 
-- **IUH Development Team**
-- **Infrastructure Management System**
+- **Vo Dinh Chung**
+- **Huynh Thi Luu Ly**
 
 ---
 
