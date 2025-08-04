@@ -1,0 +1,105 @@
+{
+  "common": {
+    "home": "Trang chủ",
+    "login": "Đăng nhập",
+    "register": "Đăng ký",
+    "logout": "Đăng xuất",
+    "loading": "Đang tải...",
+    "error": "Lỗi",
+    "success": "Thành công",
+    "cancel": "Hủy",
+    "save": "Lưu",
+    "delete": "Xóa",
+    "edit": "Sửa",
+    "view": "Xem",
+    "search": "Tìm kiếm",
+    "filter": "Lọc",
+    "clear": "Xóa",
+    "back": "Quay lại",
+    "next": "Tiếp theo",
+    "previous": "Trước",
+    "submit": "Gửi",
+    "reset": "Đặt lại"
+  },
+  "navigation": {
+    "title": "Quản lý Hạ tầng IUH",
+    "dashboard": "Bảng điều khiển",
+    "infrastructure": "Hạ tầng",
+    "reports": "Báo cáo",
+    "settings": "Cài đặt",
+    "profile": "Hồ sơ"
+  },
+  "theme": {
+    "light": "Sáng",
+    "dark": "Tối",
+    "system": "Hệ thống",
+    "changeTheme": "Thay đổi giao diện"
+  },
+  "home": {
+    "welcome": "Chào mừng đến với Hệ thống Quản lý Hạ tầng IUH",
+    "subtitle": "Quản lý và giám sát hạ tầng một cách hiệu quả",
+    "dashboardCard": {
+      "title": "Bảng điều khiển",
+      "description": "Xem thống kê thời gian thực và dữ liệu giám sát cho hạ tầng của bạn.",
+      "button": "Đi đến Bảng điều khiển"
+    },
+    "infrastructureCard": {
+      "title": "Hạ tầng",
+      "description": "Quản lý máy chủ, mạng và các thành phần hạ tầng khác.",
+      "button": "Quản lý Hạ tầng"
+    },
+    "reportsCard": {
+      "title": "Báo cáo",
+      "description": "Tạo và xem báo cáo chi tiết về hạ tầng của bạn.",
+      "button": "Xem Báo cáo"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "subtitle": "Đăng nhập vào tài khoản của bạn",
+      "email": "Địa chỉ Email",
+      "password": "Mật khẩu",
+      "forgotPassword": "Quên mật khẩu?",
+      "noAccount": "Chưa có tài khoản?",
+      "signUp": "Đăng ký",
+      "signIn": "Đăng nhập"
+    },
+    "register": {
+      "title": "Đăng ký",
+      "subtitle": "Tạo tài khoản mới",
+      "firstName": "Tên",
+      "lastName": "Họ",
+      "email": "Địa chỉ Email",
+      "phone": "Số điện thoại",
+      "company": "Công ty",
+      "position": "Chức vụ",
+      "address": "Địa chỉ",
+      "password": "Mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "agreeToTerms": "Tôi đồng ý với các điều khoản và điều kiện",
+      "subscribeNewsletter": "Đăng ký nhận bản tin",
+      "termsText": "Bằng việc tạo tài khoản, bạn đồng ý với Điều khoản Dịch vụ và Chính sách Bảo mật của chúng tôi.",
+      "hasAccount": "Đã có tài khoản?",
+      "signIn": "Đăng nhập",
+      "signUp": "Đăng ký"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "404",
+      "subtitle": "Không tìm thấy trang",
+      "description": "Trang bạn đang tìm kiếm không tồn tại.",
+      "button": "Về trang chủ"
+    },
+    "serverError": {
+      "title": "500",
+      "subtitle": "Lỗi máy chủ",
+      "description": "Đã xảy ra lỗi. Vui lòng thử lại sau.",
+      "button": "Về trang chủ"
+    }
+  },
+  "footer": {
+    "copyright": "© 2024 Hệ thống Quản lý Hạ tầng IUH. Tất cả quyền được bảo lưu."
+  }
+}

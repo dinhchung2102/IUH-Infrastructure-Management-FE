@@ -1,0 +1,105 @@
+{
+  "common": {
+    "home": "Home",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "clear": "Clear",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "submit": "Submit",
+    "reset": "Reset"
+  },
+  "navigation": {
+    "title": "IUH Infrastructure Management",
+    "dashboard": "Dashboard",
+    "infrastructure": "Infrastructure",
+    "reports": "Reports",
+    "settings": "Settings",
+    "profile": "Profile"
+  },
+  "theme": {
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "changeTheme": "Change theme"
+  },
+  "home": {
+    "welcome": "Welcome to IUH Infrastructure Management",
+    "subtitle": "Manage and monitor your infrastructure efficiently",
+    "dashboardCard": {
+      "title": "Dashboard",
+      "description": "View real-time statistics and monitoring data for your infrastructure.",
+      "button": "Go to Dashboard"
+    },
+    "infrastructureCard": {
+      "title": "Infrastructure",
+      "description": "Manage servers, networks, and other infrastructure components.",
+      "button": "Manage Infrastructure"
+    },
+    "reportsCard": {
+      "title": "Reports",
+      "description": "Generate and view detailed reports about your infrastructure.",
+      "button": "View Reports"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Login",
+      "subtitle": "Sign in to your account",
+      "email": "Email Address",
+      "password": "Password",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "signIn": "Sign In"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Create your account",
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "company": "Company",
+      "position": "Position",
+      "address": "Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "agreeToTerms": "I agree to the terms and conditions",
+      "subscribeNewsletter": "Subscribe to newsletter",
+      "termsText": "By creating an account, you agree to our Terms of Service and Privacy Policy.",
+      "hasAccount": "Already have an account?",
+      "signIn": "Sign in",
+      "signUp": "Sign Up"
+    }
+  },
+  "errors": {
+    "notFound": {
+      "title": "404",
+      "subtitle": "Page Not Found",
+      "description": "The page you are looking for does not exist.",
+      "button": "Go to Home"
+    },
+    "serverError": {
+      "title": "500",
+      "subtitle": "Internal Server Error",
+      "description": "Something went wrong. Please try again later.",
+      "button": "Go to Home"
+    }
+  },
+  "footer": {
+    "copyright": "© 2024 IUH Infrastructure Management. All rights reserved."
+  }
+}
