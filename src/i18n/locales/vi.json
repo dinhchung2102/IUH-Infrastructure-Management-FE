@@ -55,16 +55,24 @@
     }
   },
   "auth": {
+    "username": "Tên đăng nhập",
+    "password": "Mật khẩu",
+    "loginFailed": "Đăng nhập thất bại. Vui lòng kiểm tra thông tin đăng nhập.",
+    "loginError": "Đã xảy ra lỗi khi đăng nhập. Vui lòng thử lại.",
+    "loginSuccess": "Đăng nhập thành công!",
+    "invalidCredentials": "Tên đăng nhập hoặc mật khẩu không chính xác",
+    "serverError": "Lỗi máy chủ. Vui lòng thử lại sau.",
     "login": {
       "title": "Đăng nhập",
       "subtitle": "Đăng nhập vào tài khoản của bạn",
-      "email": "Địa chỉ Email",
+      "username": "Tên đăng nhập",
       "password": "Mật khẩu",
       "forgotPassword": "Quên mật khẩu?",
       "noAccount": "Chưa có tài khoản?",
       "signUp": "Đăng ký",
       "signIn": "Đăng nhập"
     },
+
     "register": {
       "title": "Đăng ký",
       "subtitle": "Tạo tài khoản mới",

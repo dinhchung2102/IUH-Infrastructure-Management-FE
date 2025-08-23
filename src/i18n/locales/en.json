@@ -55,10 +55,17 @@
     }
   },
   "auth": {
+    "username": "Username",
+    "password": "Password",
+    "loginFailed": "Login failed. Please check your credentials.",
+    "loginError": "An error occurred during login. Please try again.",
+    "loginSuccess": "Login successful!",
+    "invalidCredentials": "Invalid username or password",
+    "serverError": "Server error. Please try again later.",
     "login": {
       "title": "Login",
       "subtitle": "Sign in to your account",
-      "email": "Email Address",
+      "username": "Username",
       "password": "Password",
       "forgotPassword": "Forgot password?",
       "noAccount": "Don't have an account?",
@@ -85,6 +92,7 @@
       "signUp": "Sign Up"
     }
   },
+
   "errors": {
     "notFound": {
       "title": "404",
