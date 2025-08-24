@@ -73,24 +73,42 @@
       "signIn": "Sign In"
     },
     "register": {
-      "title": "Register",
-      "subtitle": "Create your account",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "email": "Email Address",
-      "phone": "Phone Number",
-      "company": "Company",
-      "position": "Position",
-      "address": "Address",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "agreeToTerms": "I agree to the terms and conditions",
-      "subscribeNewsletter": "Subscribe to newsletter",
-      "termsText": "By creating an account, you agree to our Terms of Service and Privacy Policy.",
-      "hasAccount": "Already have an account?",
-      "signIn": "Sign in",
-      "signUp": "Sign Up"
-    }
+  "title": "Register",
+  "subtitle": "Create your account",
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "fullName": "Full Name",
+  "email": "Email Address",
+  "phone": "Phone Number",
+  "company": "Company",
+  "position": "Role",
+  "address": "Address",
+  "password": "Password",
+  "confirmPassword": "Confirm Password",
+  "agreeToTerms": "I agree to the terms and conditions",
+  "subscribeNewsletter": "Subscribe to newsletter",
+  "termsText": "By creating an account, you agree to our Terms of Service and Privacy Policy.",
+  "hasAccount": "Already have an account?",
+  "signIn": "Sign in",
+  "signUp": "Sign Up",
+
+  "role": {
+    "student": "Student",
+    "guest": "Guest",
+    "teacher": "Teacher"
+  },
+
+  "studentFields": {
+    "mssv": "Student ID",
+    "className": "Class",
+    "faculty": "Faculty"
+  },
+
+  "teacherFields": {
+    "mgv": "Lecturer ID",
+    "faculty": "Faculty"
+  }
+}
   },
 
   "errors": {

@@ -78,10 +78,11 @@
       "subtitle": "Tạo tài khoản mới",
       "firstName": "Tên",
       "lastName": "Họ",
+      "fullName": "Họ và tên",
       "email": "Địa chỉ Email",
       "phone": "Số điện thoại",
       "company": "Công ty",
-      "position": "Chức vụ",
+      "position": "Vai trò",
       "address": "Địa chỉ",
       "password": "Mật khẩu",
       "confirmPassword": "Xác nhận mật khẩu",
@@ -90,7 +91,24 @@
       "termsText": "Bằng việc tạo tài khoản, bạn đồng ý với Điều khoản Dịch vụ và Chính sách Bảo mật của chúng tôi.",
       "hasAccount": "Đã có tài khoản?",
       "signIn": "Đăng nhập",
-      "signUp": "Đăng ký"
+      "signUp": "Đăng ký",
+
+      "role": {
+        "student": "Sinh viên",
+        "guest": "Khách",
+        "teacher": "Giảng viên"
+      },
+
+      "studentFields": {
+        "mssv": "Mã số sinh viên",
+        "className": "Lớp danh nghĩa",
+        "faculty": "Khoa"
+      },
+
+      "teacherFields": {
+        "mgv": "Mã giảng viên",
+        "faculty": "Khoa"
+      }
     }
   },
   "errors": {

@@ -5,12 +5,13 @@ import {
   Typography,
   Container,
   Button,
+  Icon,
+  IconButton,
 } from "@mui/material";
 import { Link as RouterLink, Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "../components/LanguageSwitcher";
-import ThemeSwitcher from "../components/ThemeSwitcher";
 
+import AppBarRes from "../components/AppBar";
 export default function MainLayout() {
   const { t } = useTranslation();
 
@@ -23,24 +24,7 @@ export default function MainLayout() {
         width: "100%",
       }}
     >
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            {t("navigation.title")}
-          </Typography>
-          <Button color="inherit" component={RouterLink} to="/">
-            {t("common.home")}
-          </Button>
-          <Button color="inherit" component={RouterLink} to="/login">
-            {t("common.login")}
-          </Button>
-          <Button color="inherit" component={RouterLink} to="/register">
-            {t("common.register")}
-          </Button>
-          <ThemeSwitcher />
-          <LanguageSwitcher />
-        </Toolbar>
-      </AppBar>
+      <AppBarRes />
 
       <Container
         component="main"

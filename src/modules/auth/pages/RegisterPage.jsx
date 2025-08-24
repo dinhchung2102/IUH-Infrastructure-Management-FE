@@ -1,8 +1,10 @@
 import { Box, Typography, Card, CardContent, Link } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import RegisterForm from "../components/RegisterForm";
+import { useTranslation } from "react-i18next";
 
 export default function RegisterPage() {
+   const { t } = useTranslation();
   return (
     <Box
       sx={{
@@ -15,7 +17,7 @@ export default function RegisterPage() {
       <Card sx={{ maxWidth: 400, width: "100%" }}>
         <CardContent sx={{ p: 4 }}>
           <Typography variant="h4" component="h1" gutterBottom align="center">
-            Register
+            {t("auth.register.title")}
           </Typography>
 
           <Typography
@@ -24,7 +26,7 @@ export default function RegisterPage() {
             align="center"
             sx={{ mb: 3 }}
           >
-            Create your account
+           {t("auth.register.subtitle")}
           </Typography>
 
           <RegisterForm />
