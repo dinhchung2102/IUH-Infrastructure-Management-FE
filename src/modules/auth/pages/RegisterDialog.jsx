@@ -12,33 +12,18 @@ import {
 import { useTranslation } from "react-i18next";
 import RegisterForm from "../components/RegisterForm";
 import ErrorAlert from "../../../components/ErrorAlert";
-import LoginDialog from "./LoginDialog"; 
 
-export default function RegisterDialog({ open, onClose }) {
+export default function RegisterDialog({ open, onClose, onSwitchToLogin }) {
   const { t } = useTranslation();
   const [error, setError] = useState("");
-  const [openLogin, setOpenLogin] = useState(false);
-
-  const handleClose = () => {
-    onClose?.();
-  };
 
   const handleErrorClose = () => {
     setError("");
   };
 
-  const handleOpenLogin = () => {
-    handleClose();      
-    setOpenLogin(true);  
-  };
-
-  const handleCloseLogin = () => {
-    setOpenLogin(false);
-  };
-
   return (
     <>
-      <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>
+      <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
         <DialogTitle sx={{ textAlign: "center" }}>
           {t("auth.register.title")}
         </DialogTitle>
@@ -61,7 +46,7 @@ export default function RegisterDialog({ open, onClose }) {
               <Link
                 component="button"
                 variant="body2"
-                onClick={handleOpenLogin}
+                onClick={onSwitchToLogin}
               >
                 {t("auth.login.signIn")}
               </Link>
@@ -70,11 +55,9 @@ export default function RegisterDialog({ open, onClose }) {
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={handleClose}>{t("common.close")}</Button>
+          <Button onClick={onClose}>{t("common.close")}</Button>
         </DialogActions>
       </Dialog>
-
-      <LoginDialog open={openLogin} onClose={handleCloseLogin} />
 
       <ErrorAlert error={error} onClose={handleErrorClose} />
     </>

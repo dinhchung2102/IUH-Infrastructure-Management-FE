@@ -23,13 +23,14 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import LoginDialog from "../modules/auth/pages/LoginDialog";
-
+import RegisterDialog from "../modules/auth/pages/RegisterDialog";
 function AppBarRes() {
   const { t } = useTranslation();
   const [openDrawer, setOpenDrawer] = React.useState(false);
-  const [openLogin, setOpenLogin] = React.useState(false);
   const location = useLocation();
   const [anchorEl, setAnchorEl] = React.useState(null);
+  const [openLogin, setOpenLogin] = React.useState(false);
+  const [openRegister, setOpenRegister] = React.useState(false);
 
   const handleOpenDrawer = () => setOpenDrawer(true);
   const handleCloseDrawer = () => setOpenDrawer(false);
@@ -163,7 +164,6 @@ function AppBarRes() {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            
             <ListItemButton
               onClick={() => {
                 setOpenLogin(true);
@@ -217,8 +217,23 @@ function AppBarRes() {
         </Box>
       </Drawer>
 
-      
-      <LoginDialog open={openLogin} onClose={() => setOpenLogin(false)} />
+      <LoginDialog
+        open={openLogin}
+        onClose={() => setOpenLogin(false)}
+        onSwitchToRegister={() => {
+          setOpenLogin(false);
+          setOpenRegister(true);
+        }}
+      />
+
+      <RegisterDialog
+        open={openRegister}
+        onClose={() => setOpenRegister(false)}
+        onSwitchToLogin={() => {
+          setOpenRegister(false);
+          setOpenLogin(true);
+        }}
+      />
     </>
   );
 }

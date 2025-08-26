@@ -12,24 +12,13 @@ import {
 import { useTranslation } from "react-i18next";
 import LoginForm from "../components/LoginForm";
 import ErrorAlert from "../../../components/ErrorAlert";
-import RegisterDialog from "./RegisterDialog"; // import dialog đăng ký
 
-export default function LoginDialog({ open, onClose }) {
+export default function LoginDialog({ open, onClose, onSwitchToRegister }) {
   const { t } = useTranslation();
   const [error, setError] = useState("");
-  const [openRegister, setOpenRegister] = useState(false);
 
   const handleErrorClose = () => {
     setError("");
-  };
-
-  const handleOpenRegister = () => {
-    onClose?.(); // đóng login dialog
-    setOpenRegister(true); // mở register dialog
-  };
-
-  const handleCloseRegister = () => {
-    setOpenRegister(false);
   };
 
   return (
@@ -54,7 +43,11 @@ export default function LoginDialog({ open, onClose }) {
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Typography variant="body2">
               {t("auth.login.noAccount")}{" "}
-              <Link component="button" variant="body2" onClick={handleOpenRegister}>
+              <Link
+                component="button"
+                variant="body2"
+                onClick={onSwitchToRegister}
+              >
                 {t("auth.login.signUp")}
               </Link>
             </Typography>
@@ -65,8 +58,6 @@ export default function LoginDialog({ open, onClose }) {
           <Button onClick={onClose}>{t("common.close")}</Button>
         </DialogActions>
       </Dialog>
-
-      <RegisterDialog open={openRegister} onClose={handleCloseRegister} />
 
       <ErrorAlert error={error} onClose={handleErrorClose} />
     </>
