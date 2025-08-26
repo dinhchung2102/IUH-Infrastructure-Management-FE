@@ -3,7 +3,6 @@ import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
-import { Link as RouterLink, useLocation } from "react-router-dom";
 import MenuIcon from "@mui/icons-material/Menu";
 import Button from "@mui/material/Button";
 import Drawer from "@mui/material/Drawer";
@@ -19,13 +18,24 @@ import logoIUH from "../assets/logo/iuh_logo-positive-official.png";
 import HomeIcon from "@mui/icons-material/Home";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import EditNoteIcon from "@mui/icons-material/EditNote";
+import SettingsIcon from "@mui/icons-material/Settings";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import { Link as RouterLink, useLocation } from "react-router-dom";
+import LoginDialog from "../modules/auth/pages/LoginDialog";
 
 function AppBarRes() {
   const { t } = useTranslation();
-  const [open, setOpen] = React.useState(false);
-  const location = useLocation(); 
-  const handleOpenDrawer = () => setOpen(true);
-  const handleCloseDrawer = () => setOpen(false);
+  const [openDrawer, setOpenDrawer] = React.useState(false);
+  const [openLogin, setOpenLogin] = React.useState(false);
+  const location = useLocation();
+  const [anchorEl, setAnchorEl] = React.useState(null);
+
+  const handleOpenDrawer = () => setOpenDrawer(true);
+  const handleCloseDrawer = () => setOpenDrawer(false);
+
+  const handleOpenSettings = (event) => setAnchorEl(event.currentTarget);
+  const handleCloseSettings = () => setAnchorEl(null);
 
   const isActive = (path) => location.pathname === path;
 
@@ -70,43 +80,15 @@ function AppBarRes() {
             </Button>
 
             <Button
-              component={RouterLink}
-              to="/login"
+              onClick={() => setOpenLogin(true)}
               sx={(theme) => ({
-                color: isActive("/login")
-                  ? theme.palette.common.white
-                  : "inherit",
-                backgroundColor: isActive("/login")
-                  ? theme.palette.primary.dark
-                  : "inherit",
+                color: "inherit",
                 "&:hover": {
-                  backgroundColor: isActive("/login")
-                    ? theme.palette.primary.main
-                    : theme.palette.action.hover,
+                  backgroundColor: theme.palette.action.hover,
                 },
               })}
             >
               {t("common.login")}
-            </Button>
-
-            <Button
-              component={RouterLink}
-              to="/register"
-              sx={(theme) => ({
-                color: isActive("/register")
-                  ? theme.palette.common.white
-                  : "inherit",
-                backgroundColor: isActive("/register")
-                  ? theme.palette.primary.dark
-                  : "inherit",
-                "&:hover": {
-                  backgroundColor: isActive("/register")
-                    ? theme.palette.primary.main
-                    : theme.palette.action.hover,
-                },
-              })}
-            >
-              {t("common.register")}
             </Button>
 
             <ThemeSwitcher />
@@ -131,7 +113,7 @@ function AppBarRes() {
       {/* Drawer cho mobile */}
       <Drawer
         anchor="right"
-        open={open}
+        open={openDrawer}
         onClose={handleCloseDrawer}
         slotProps={{
           paper: {
@@ -146,19 +128,13 @@ function AppBarRes() {
                   : theme.palette.background.default
               ),
               minWidth: 250,
+              display: "flex",
+              flexDirection: "column",
             }),
           },
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            p: 2,
-            pb: 0,
-          }}
-        >
+        <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
           <Box
             component="img"
             src={logoIUH}
@@ -168,20 +144,8 @@ function AppBarRes() {
               display: "block",
             }}
           />
-          <Box
-            sx={{
-              p: 0,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-            }}
-          >
-            <ThemeSwitcher />
-            <LanguageSwitcher />
-          </Box>
         </Box>
 
-        {/* Menu items */}
         <List>
           <ListItem disablePadding>
             <ListItemButton
@@ -189,7 +153,7 @@ function AppBarRes() {
               to="/"
               sx={{
                 color: "inherit",
-                bgcolor: isActive("/") ? "action.selected" : "transparent", 
+                bgcolor: isActive("/") ? "action.selected" : "transparent",
               }}
             >
               <ListItemIcon sx={{ color: "inherit" }}>
@@ -199,12 +163,14 @@ function AppBarRes() {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
+            {/* 👇 mobile cũng mở modal */}
             <ListItemButton
-              component={RouterLink}
-              to="/login"
+              onClick={() => {
+                setOpenLogin(true);
+                handleCloseDrawer();
+              }}
               sx={{
                 color: "inherit",
-                bgcolor: isActive("/login") ? "action.selected" : "transparent",
               }}
             >
               <ListItemIcon sx={{ color: "inherit" }}>
@@ -213,25 +179,46 @@ function AppBarRes() {
               <ListItemText primary={t("common.login")} />
             </ListItemButton>
           </ListItem>
-          <ListItem disablePadding>
-            <ListItemButton
-              component={RouterLink}
-              to="/register"
-              sx={{
-                color: "inherit",
-                bgcolor: isActive("/register")
-                  ? "action.selected"
-                  : "transparent",
-              }}
-            >
-              <ListItemIcon sx={{ color: "inherit" }}>
-                <EditNoteIcon />
-              </ListItemIcon>
-              <ListItemText primary={t("common.register")} />
-            </ListItemButton>
-          </ListItem>
         </List>
+
+        <Box sx={{ flexGrow: 1 }} />
+
+        <Box sx={{ p: 2, display: "flex", justifyContent: "flex-start" }}>
+          <IconButton color="inherit" onClick={handleOpenSettings}>
+            <SettingsIcon />
+          </IconButton>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            color="inherit"
+            onClose={handleCloseSettings}
+            anchorOrigin={{ vertical: "top", horizontal: "right" }}
+            transformOrigin={{ vertical: "bottom", horizontal: "left" }}
+          >
+            <List>
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon sx={{ color: "inherit" }}>
+                    <ThemeSwitcher />
+                  </ListItemIcon>
+                  <ListItemText primary={t("theme.changeTheme")} />
+                </ListItemButton>
+              </ListItem>
+              <ListItem disablePadding>
+                <ListItemButton>
+                  <ListItemIcon sx={{ color: "inherit" }}>
+                    <LanguageSwitcher />
+                  </ListItemIcon>
+                  <ListItemText primary={t("common.language")} />
+                </ListItemButton>
+              </ListItem>
+            </List>
+          </Menu>
+        </Box>
       </Drawer>
+
+      {/* 👇 gắn LoginDialog */}
+      <LoginDialog open={openLogin} onClose={() => setOpenLogin(false)} />
     </>
   );
 }

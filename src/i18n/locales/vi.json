@@ -19,7 +19,9 @@
     "next": "Tiếp theo",
     "previous": "Trước",
     "submit": "Gửi",
-    "reset": "Đặt lại"
+    "reset": "Đặt lại",
+    "language": "Ngôn ngữ",
+    "close": "Đóng"
   },
   "navigation": {
     "title": "Quản lý Hạ tầng IUH",

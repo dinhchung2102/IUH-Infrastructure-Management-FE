@@ -12,8 +12,9 @@ import {
   Checkbox,
   Typography,
   Divider,
-  MenuItem,
-  Select,
+  Radio,
+  RadioGroup,
+  Grid,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useTranslation } from "react-i18next";
@@ -25,11 +26,7 @@ export default function RegisterForm() {
     fullName: "",
     email: "",
     phone: "",
-    role: "",
-    mssv: "",
-    className: "",
-    faculty: "",
-    mgv: "",
+    role: "student", // mặc định chọn student
     password: "",
     confirmPassword: "",
     agreeToTerms: false,
@@ -53,227 +50,152 @@ export default function RegisterForm() {
     // TODO: Implement registration logic
   };
 
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const handleClickShowConfirmPassword = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
-  const faculties = [
-    "Công nghệ thông tin",
-    "Điện - Điện tử",
-    "Cơ khí",
-    "Quản trị kinh doanh",
-    "Ngôn ngữ Anh",
-  ];
-
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }} title="ly">
-      {/* Full name */}
-      <TextField
-        required
-        fullWidth
-        margin="normal"
-        id="fullName"
-        label={t("auth.register.fullName")}
-        name="fullName"
-        value={formData.fullName}
-        onChange={handleChange}
-      />
-
-      {/* Email */}
-      <TextField
-        required
-        fullWidth
-        margin="normal"
-        id="email"
-        label={t("auth.register.email")}
-        name="email"
-        value={formData.email}
-        onChange={handleChange}
-      />
-
-      {/* Phone */}
-      <TextField
-        fullWidth
-        margin="normal"
-        id="phone"
-        label={t("auth.register.phone")}
-        name="phone"
-        value={formData.phone}
-        onChange={handleChange}
-      />
-
-      {/* Role */}
-      <FormControl fullWidth margin="normal" required>
-        <InputLabel id="role-label">{t("auth.register.position")}</InputLabel>
-        <Select
-          labelId="role-label"
-          id="role"
-          name="role"
-          value={formData.role}
-          onChange={handleChange}
-          label={t("auth.register.position")}
-        >
-          <MenuItem value="student">{t("auth.register.role.student")}</MenuItem>
-          <MenuItem value="guest">{t("auth.register.role.guest")}</MenuItem>
-          <MenuItem value="teacher">{t("auth.register.role.teacher")}</MenuItem>
-        </Select>
-      </FormControl>
-
-      {/* Nếu role là sinh viên */}
-      {formData.role === "student" && (
-        <>
+    <Box
+      component="form"
+      onSubmit={handleSubmit}
+      sx={{ mt: 1, maxWidth: 700, mx: "auto" }}
+    >
+      <Grid container spacing={2} columns={16}>
+        <Grid size={{ xs: 16, sm: 8 }}>
           <TextField
+            required
             fullWidth
             margin="normal"
-            id="mssv"
-            label={t("auth.register.studentFields.mssv")}
-            name="mssv"
-            value={formData.mssv}
+            id="fullName"
+            label={t("auth.register.fullName")}
+            name="fullName"
+            value={formData.fullName}
             onChange={handleChange}
           />
-          <TextField
-            fullWidth
-            margin="normal"
-            id="className"
-            label={t("auth.register.studentFields.className")}
-            name="className"
-            value={formData.className}
-            onChange={handleChange}
-          />
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel id="faculty-student-label">
-              {t("auth.register.studentFields.faculty")}
-            </InputLabel>
-            <Select
-              labelId="faculty-student-label"
-              id="faculty"
-              name="faculty"
-              value={formData.faculty}
+        </Grid>
+        <Grid size={{ xs: 16, sm: 8 }}>
+          <FormControl component="fieldset" margin="normal" required>
+            <RadioGroup
+              row
+              name="role"
+              value={formData.role}
               onChange={handleChange}
             >
-              {faculties.map((f) => (
-                <MenuItem key={f} value={f}>
-                  {f}
-                </MenuItem>
-              ))}
-            </Select>
+              <FormControlLabel
+                value="student"
+                control={<Radio />}
+                label={t("auth.register.role.student")}
+              />
+              <FormControlLabel
+                value="guest"
+                control={<Radio />}
+                label={t("auth.register.role.guest")}
+              />
+            </RadioGroup>
           </FormControl>
-        </>
-      )}
+        </Grid>
 
-      {/* Nếu role là giảng viên */}
-      {formData.role === "teacher" && (
-        <>
+        <Grid size={{ xs: 16, sm: 8 }}>
           <TextField
             fullWidth
             margin="normal"
-            id="mgv"
-            label={t("auth.register.teacherFields.mgv")}
-            name="mgv"
-            value={formData.mgv}
+            id="phone"
+            label={t("auth.register.phone")}
+            name="phone"
+            value={formData.phone}
             onChange={handleChange}
           />
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel id="faculty-teacher-label">
-              {t("auth.register.teacherFields.faculty")}
+        </Grid>
+        <Grid size={{ xs: 16, sm: 8 }}>
+          <TextField
+            required
+            fullWidth
+            margin="normal"
+            id="email"
+            label={t("auth.register.email")}
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+          />
+        </Grid>
+        <Grid size={{ xs: 16, sm: 8 }}>
+          <FormControl margin="normal" required fullWidth>
+            <InputLabel htmlFor="password">
+              {t("auth.register.password")}
             </InputLabel>
-            <Select
-              labelId="faculty-teacher-label"
-              id="faculty"
-              name="faculty"
-              value={formData.faculty}
+            <OutlinedInput
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              value={formData.password}
               onChange={handleChange}
-            >
-              {faculties.map((f) => (
-                <MenuItem key={f} value={f}>
-                  {f}
-                </MenuItem>
-              ))}
-            </Select>
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowPassword(!showPassword)}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label={t("auth.register.password")}
+            />
           </FormControl>
-        </>
-      )}
-
-      {/* Password */}
-      <FormControl margin="normal" required fullWidth>
-        <InputLabel htmlFor="password">{t("auth.register.password")}</InputLabel>
-        <OutlinedInput
-          id="password"
-          name="password"
-          type={showPassword ? "text" : "password"}
-          value={formData.password}
-          onChange={handleChange}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={handleClickShowPassword}
-                edge="end"
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          }
-          label={t("auth.register.password")}
-        />
-      </FormControl>
-
-      {/* Confirm Password */}
-      <FormControl margin="normal" required fullWidth>
-        <InputLabel htmlFor="confirmPassword">
-          {t("auth.register.confirmPassword")}
-        </InputLabel>
-        <OutlinedInput
-          id="confirmPassword"
-          name="confirmPassword"
-          type={showConfirmPassword ? "text" : "password"}
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle confirm password visibility"
-                onClick={handleClickShowConfirmPassword}
-                edge="end"
-              >
-                {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          }
-          label={t("auth.register.confirmPassword")}
-        />
-      </FormControl>
+        </Grid>
+        <Grid size={{ xs: 16, sm: 8 }}>
+          <FormControl margin="normal" required fullWidth>
+            <InputLabel htmlFor="confirmPassword">
+              {t("auth.register.confirmPassword")}
+            </InputLabel>
+            <OutlinedInput
+              id="confirmPassword"
+              name="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              endAdornment={
+                <InputAdornment position="end">
+                  <IconButton
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              }
+              label={t("auth.register.confirmPassword")}
+            />
+          </FormControl>
+        </Grid>
+      </Grid>
 
       <Divider sx={{ my: 2 }} />
-
-      {/* Agree To Terms */}
-      <FormControlLabel
-        control={
-          <Checkbox
-            name="agreeToTerms"
-            checked={formData.agreeToTerms}
-            onChange={handleChange}
-            required
+      <Grid container spacing={2} columns={16}>
+        <Grid size={16}>
+          {/* Agree To Terms */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="agreeToTerms"
+                checked={formData.agreeToTerms}
+                onChange={handleChange}
+                required
+              />
+            }
+            label={t("auth.register.agreeToTerms")}
           />
-        }
-        label={t("auth.register.agreeToTerms")}
-      />
-
-      {/* Subscribe Newsletter */}
-      <FormControlLabel
-        control={
-          <Checkbox
-            name="subscribeNewsletter"
-            checked={formData.subscribeNewsletter}
-            onChange={handleChange}
+        </Grid>
+        <Grid size={16}>
+          {/* Subscribe Newsletter */}
+          <FormControlLabel
+            control={
+              <Checkbox
+                name="subscribeNewsletter"
+                checked={formData.subscribeNewsletter}
+                onChange={handleChange}
+              />
+            }
+            label={t("auth.register.subscribeNewsletter")}
           />
-        }
-        label={t("auth.register.subscribeNewsletter")}
-      />
+        </Grid>
+      </Grid>
 
       <Typography
         variant="caption"
@@ -282,10 +204,20 @@ export default function RegisterForm() {
       >
         {t("auth.register.termsText")}
       </Typography>
+<Grid container spacing={2} columns={16} justifyContent="center">
+  <Grid item size={{ xs: 16, sm: 8 }}>
+    <Button
+      type="submit"
+      fullWidth
+      variant="contained"
+      sx={{ mt: 3, mb: 2 }}
+    >
+      {t("auth.register.signUp")}
+    </Button>
+  </Grid>
+</Grid>
 
-      <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
-        {t("auth.register.signUp")}
-      </Button>
+      
     </Box>
   );
 }

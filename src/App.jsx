@@ -3,8 +3,8 @@ import { ThemeContextProvider } from "./providers/ThemeContext";
 import ThemeProvider from "./providers/ThemeProvider";
 import MainLayout from "./layouts/MainLayout";
 import HomePage from "./pages/HomePage";
-import LoginPage from "./modules/auth/pages/LoginPage";
-import RegisterPage from "./modules/auth/pages/RegisterPage";
+import LoginPage from "./modules/auth/pages/LoginDialog";
+import RegisterPage from "./modules/auth/pages/RegisterDialog";
 import NotFoundPage from "./pages/NotFoundPage";
 import ErrorPage from "./pages/ErrorPage";
 
