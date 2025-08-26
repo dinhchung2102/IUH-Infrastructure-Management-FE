@@ -163,7 +163,7 @@ function AppBarRes() {
             </ListItemButton>
           </ListItem>
           <ListItem disablePadding>
-            {/* 👇 mobile cũng mở modal */}
+            
             <ListItemButton
               onClick={() => {
                 setOpenLogin(true);
@@ -217,7 +217,7 @@ function AppBarRes() {
         </Box>
       </Drawer>
 
-      {/* 👇 gắn LoginDialog */}
+      
       <LoginDialog open={openLogin} onClose={() => setOpenLogin(false)} />
     </>
   );
