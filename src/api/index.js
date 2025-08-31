@@ -7,7 +7,7 @@ const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || "10000");
 
 // axios instance
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: "https://iuh.api.nagentech.com/api",
   timeout: API_TIMEOUT,
   headers: {
     "Content-Type": "application/json",

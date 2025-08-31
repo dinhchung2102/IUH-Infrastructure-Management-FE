@@ -2,6 +2,13 @@ import { apiHelper } from "./index.js";
 
 const AUTH_ENDPOINTS = {
   LOGIN: "/auth/login",
+  SEND_OTP: "/auth/send-otp",
+  RESEND_OTP: "/auth/resend-otp",
+  VERIFY_OTP: "/auth/verify-otp",
+  REFRESH_TOKEN: "/auth/refresh-token",
+  LOGOUT: "/auth/logout",
+  REGISTER: "/auth/register",
+  PROFILE: "/auth/profile",
 };
 
 export const authService = {
@@ -50,6 +57,53 @@ export const authService = {
       };
     }
   },
+
+  /** Gửi OTP */
+async sendOtp(payload) {
+  // payload phải là object { email: "..." }
+  const response = await apiHelper.post(AUTH_ENDPOINTS.SEND_OTP, payload);
+  return response.data;
+},
+/** Gửi lại OTP */
+async resendOtp(payload) {
+  const response = await apiHelper.post(AUTH_ENDPOINTS.RESEND_OTP, payload);
+  return response.data;
+},
+
+/** Xác thực OTP */
+async verifyOtp(payload) {
+  const response = await apiHelper.post(AUTH_ENDPOINTS.VERIFY_OTP, payload);
+  return response.data;
+},
+
+
+  /** Refresh token */
+  async refreshToken(refreshToken) {
+    const response = await apiHelper.post(AUTH_ENDPOINTS.REFRESH_TOKEN, { refreshToken });
+    return response.data;
+  },
+
+  /** Logout */
+  async logout() {
+    try {
+      await apiHelper.post(AUTH_ENDPOINTS.LOGOUT);
+    } catch (e) {
+      console.warn("Logout API failed:", e?.message || e);
+    }
+    authUtils.clearAuth();
+  },
+
+  /** Đăng ký */
+  async register(payload) {
+    const response = await apiHelper.post(AUTH_ENDPOINTS.REGISTER, payload);
+    return response.data;
+  },
+
+  /** Lấy profile user */
+  async getProfile() {
+    const response = await apiHelper.get(AUTH_ENDPOINTS.PROFILE);
+    return response.data;
+  },
 };
 
 export const authUtils = {
@@ -77,6 +131,29 @@ export const authUtils = {
    */
   getAccessToken() {
     return localStorage.getItem("access_token");
+  },
+
+  /**
+   * Get refresh token
+   * @returns {string|null} Refresh token or null
+   */
+  getRefreshToken() {
+    return localStorage.getItem("refresh_token");
+  },
+
+  /**
+   * Set tokens
+   */
+  setTokens({ access_token, refresh_token }) {
+    if (access_token) localStorage.setItem("access_token", access_token);
+    if (refresh_token) localStorage.setItem("refresh_token", refresh_token);
+  },
+
+  /**
+   * Set user info
+   */
+  setUser(user) {
+    if (user) localStorage.setItem("user", JSON.stringify(user));
   },
 
   /**

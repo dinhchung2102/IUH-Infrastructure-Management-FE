@@ -21,7 +21,8 @@
     "submit": "Gửi",
     "reset": "Đặt lại",
     "language": "Ngôn ngữ",
-    "close": "Đóng"
+    "close": "Đóng",
+    "profile": "Hồ sơ"
   },
   "navigation": {
     "title": "Quản lý Hạ tầng IUH",
@@ -100,7 +101,14 @@
         "guest": "Khách",
         "teacher": "Giảng viên"
       },
-
+      "otp": {
+        "verifyEmail": "Xác thực email",
+        "sentTo": "Mã OTP đã được gửi đến {{email}}",
+        "enterOtp": "Nhập mã OTP",
+        "confirm": "Xác nhận",
+        "resendIn": "Gửi lại trong",
+        "resend": "Gửi lại"
+      },
       "studentFields": {
         "mssv": "Mã số sinh viên",
         "className": "Lớp danh nghĩa",
@@ -111,7 +119,13 @@
         "mgv": "Mã giảng viên",
         "faculty": "Khoa"
       }
-    }
+    },
+    "forgotPassword": {
+        "title": "Quên mật khẩu",
+        "subtitle": "Nhập email để nhận liên kết đặt lại mật khẩu.",
+        "send": "Gửi",
+        "emailSent": "Liên kết đặt lại mật khẩu đã được gửi đến {{email}}."
+      }
   },
   "errors": {
     "notFound": {

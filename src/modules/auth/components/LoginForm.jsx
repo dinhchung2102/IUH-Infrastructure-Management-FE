@@ -11,14 +11,19 @@ import {
   InputAdornment,
   IconButton,
   CircularProgress,
+  Typography,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { authService } from "../../../api/auth.js";
+import ForgotPasswordDialog from "./ForgotPasswordDialog";
+import { useAuth } from "../../../providers/AuthContext.jsx"; // 👈 dùng context
 
-export default function LoginForm({ onError }) {
+export default function LoginForm({ onError, onClose }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { login } = useAuth(); // lấy function login từ context
 
+  const [forgotOpen, setForgotOpen] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
@@ -33,105 +38,123 @@ export default function LoginForm({ onError }) {
       [name]: value,
     }));
 
-    if (onError) {
-      onError("");
-    }
+    if (onError) onError("");
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setLoading(true);
 
-    if (onError) {
-      onError("");
+  if (onError) onError("");
+
+  try {
+    const result = await authService.login(formData);
+
+    if (result.success && result.data) {
+      console.log("Login successful:", result.message);
+
+    login(result.data.account, result.data.access_token);
+
+    login(
+      result.data.account,
+      result.data.access_token,
+      result.data.refresh_token
+    );
+
+      if (onClose) onClose();
+
+      navigate("/");
+    } else {
+      if (onError) onError(result.message || t("auth.loginError"));
+      console.log("Login failed:", result);
     }
+  } catch (error) {
+    console.error("Unexpected error:", error);
+    if (onError) onError(t("auth.loginError"));
+  } finally {
+    setLoading(false);
+  }
+};
 
-    try {
-      const result = await authService.login(formData);
 
-      if (result.success) {
-        console.log("Login successful:", result.message);
-
-        navigate("/");
-      } else {
-        if (onError) {
-          onError(result.message);
-        }
-
-        console.log("Login failed:", {
-          message: result.message,
-          statusCode: result.statusCode,
-          errorCode: result.errorCode,
-        });
-      }
-    } catch (error) {
-      console.error("Unexpected error:", error);
-      if (onError) {
-        onError(t("auth.loginError"));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleClickShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
+  const handleClickShowPassword = () => setShowPassword(!showPassword);
 
   return (
-    <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
-      <TextField
-        margin="normal"
-        required
-        fullWidth
-        id="username"
-        label={t("auth.username")}
-        name="username"
-        autoComplete="username"
-        autoFocus
-        value={formData.username}
-        onChange={handleChange}
-        disabled={loading}
-      />
-
-      <FormControl margin="normal" required fullWidth>
-        <InputLabel htmlFor="password">{t("auth.password")}</InputLabel>
-        <OutlinedInput
-          id="password"
-          name="password"
-          type={showPassword ? "text" : "password"}
-          value={formData.password}
+    <>
+      <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
+        <TextField
+          margin="normal"
+          required
+          fullWidth
+          id="username"
+          label={t("auth.username")}
+          name="username"
+          autoComplete="username"
+          autoFocus
+          value={formData.username}
           onChange={handleChange}
           disabled={loading}
-          endAdornment={
-            <InputAdornment position="end">
-              <IconButton
-                aria-label="toggle password visibility"
-                onClick={handleClickShowPassword}
-                edge="end"
-                disabled={loading}
-              >
-                {showPassword ? <VisibilityOff /> : <Visibility />}
-              </IconButton>
-            </InputAdornment>
-          }
-          label={t("auth.password")}
         />
-      </FormControl>
 
-      <Button
-        type="submit"
-        fullWidth
-        variant="contained"
-        sx={{ mt: 3, mb: 2 }}
-        disabled={loading}
-      >
-        {loading ? (
-          <CircularProgress size={24} color="inherit" />
-        ) : (
-          t("auth.login.signIn")
-        )}
-      </Button>
-    </Box>
+        <FormControl margin="normal" required fullWidth>
+          <InputLabel htmlFor="password">{t("auth.password")}</InputLabel>
+          <OutlinedInput
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            value={formData.password}
+            onChange={handleChange}
+            disabled={loading}
+            endAdornment={
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  edge="end"
+                  disabled={loading}
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            }
+            label={t("auth.password")}
+          />
+        </FormControl>
+
+        {/* Quên mật khẩu */}
+        <Typography
+          sx={{
+            mt: 1,
+            cursor: "pointer",
+            textAlign: "right",
+            color: "primary.main",
+            fontSize: "0.875rem",
+          }}
+          onClick={() => setForgotOpen(true)}
+        >
+          {t("auth.login.forgotPassword")}
+        </Typography>
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          sx={{ mt: 3, mb: 2 }}
+          disabled={loading}
+        >
+          {loading ? (
+            <CircularProgress size={24} color="inherit" />
+          ) : (
+            t("auth.login.signIn")
+          )}
+        </Button>
+      </Box>
+
+      {/* Modal quên mật khẩu */}
+      <ForgotPasswordDialog
+        open={forgotOpen}
+        onClose={() => setForgotOpen(false)}
+      />
+    </>
   );
 }

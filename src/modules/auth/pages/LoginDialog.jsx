@@ -38,7 +38,8 @@ export default function LoginDialog({ open, onClose, onSwitchToRegister }) {
             {t("auth.login.subtitle")}
           </Typography>
 
-          <LoginForm onError={setError} />
+          {/* ✅ Truyền thêm onClose xuống LoginForm */}
+          <LoginForm onError={setError} onClose={onClose} />
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Typography variant="body2">

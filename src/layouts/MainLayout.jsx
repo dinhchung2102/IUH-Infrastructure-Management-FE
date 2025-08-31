@@ -1,17 +1,10 @@
-import {
-  Box,
-  AppBar,
-  Toolbar,
-  Typography,
-  Container,
-  Button,
-  Icon,
-  IconButton,
-} from "@mui/material";
-import { Link as RouterLink, Outlet } from "react-router-dom";
+import { Box } from "@mui/material";
+import { Outlet } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 import AppBarRes from "../components/AppBar";
+import Footer from "../components/Footer"; 
+
 export default function MainLayout() {
   const { t } = useTranslation();
 
@@ -24,36 +17,19 @@ export default function MainLayout() {
         width: "100%",
       }}
     >
+      {/* AppBar */}
       <AppBarRes />
 
-      <Container
-        component="main"
-        sx={{
-          flexGrow: 1,
-          py: 3,
-          display: "flex",
-          flexDirection: "column",
-          overflow: "auto",
-        }}
-      >
-        <Outlet />
-      </Container>
-
+      {/* Main content */}
       <Box
-        component="footer"
-        sx={{
-          py: 3,
-          bgcolor: "background.paper",
-          mt: "auto",
-          flexShrink: 0,
-        }}
+        component="main"
+        sx={{ flexGrow: 1, display: "flex", flexDirection: "column" }}
       >
-        <Container maxWidth="lg">
-          <Typography variant="body2" color="text.secondary" align="center">
-            {t("footer.copyright")}
-          </Typography>
-        </Container>
+        <Outlet /> 
       </Box>
+
+      {/* Footer */}
+      <Footer />
     </Box>
   );
 }

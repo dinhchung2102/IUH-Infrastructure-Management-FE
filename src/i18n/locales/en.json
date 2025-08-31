@@ -20,7 +20,8 @@
     "previous": "Previous",
     "submit": "Submit",
     "reset": "Reset",
-    "language": "Language"
+    "language": "Language",
+    "profile": "Profile"
   },
   "navigation": {
     "title": "IUH Infrastructure Management",
@@ -98,7 +99,12 @@
     "guest": "Guest",
     "teacher": "Teacher"
   },
-
+   "otp": {
+      "verifyEmail": "Verify your email",
+      "sentTo": "An OTP has been sent to {{email}}",
+      "enterOtp": "Enter OTP code",
+      "confirm": "Confirm"
+    },
   "studentFields": {
     "mssv": "Student ID",
     "className": "Class",
@@ -109,7 +115,13 @@
     "mgv": "Lecturer ID",
     "faculty": "Faculty"
   }
-}
+},
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email to receive a password reset link.",
+      "send": "Send",
+      "emailSent": "A password reset link has been sent to {{email}}."
+    }
   },
 
   "errors": {
