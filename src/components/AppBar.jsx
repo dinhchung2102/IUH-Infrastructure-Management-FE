@@ -63,9 +63,8 @@ function AppBarRes() {
                 src={logoIUH}
                 alt="App Logo"
                 sx={{
-                  height: "100%",
+                  paddingY: 1,
                   maxHeight: { xs: 60, md: 80 },
-                  display: "block",
                 }}
               />
             </RouterLink>

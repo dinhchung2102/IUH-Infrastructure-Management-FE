@@ -11,7 +11,7 @@ import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import ScienceIcon from "@mui/icons-material/Science";
 import SportsBasketballIcon from "@mui/icons-material/SportsBasketball";
 import ImgBG from "../assets/logo/background.jpg";
-import ImgNews from "../assets/logo/Hình-1_Campus-IUH.png";
+import ImgNews from "../assets/logo/Image1-Campus-IUH.png";
 export default function HomePage() {
   return (
     <Box>
@@ -19,8 +19,8 @@ export default function HomePage() {
       <Box
         sx={{
           width: "100%",
-          height: "100vh", 
-          pt: 8, 
+          height: "100vh",
+          pt: 8,
           px: { xs: 2, md: 6 },
           display: "flex",
           flexDirection: "column",
@@ -205,7 +205,7 @@ export default function HomePage() {
             <Card>
               <Box
                 component="img"
-                src={ImgNews} 
+                src={ImgNews}
                 alt="Tin tức 1"
                 sx={{ width: "100%", height: 250, objectFit: "cover" }}
               />
@@ -233,7 +233,7 @@ export default function HomePage() {
             <Card>
               <Box
                 component="img"
-                src={ImgNews} 
+                src={ImgNews}
                 alt="Tin tức 2"
                 sx={{ width: "100%", height: 250, objectFit: "cover" }}
               />
