@@ -26,12 +26,13 @@ export default function ForgotPasswordDialog({ open, onClose }) {
     try {
       const result = await authService.forgotPassword({ email });
       if (result.success) {
-        setMessage(t("auth.forgotPassword.emailSent", { email }));
+        setMessage("Mã OTP đã được gửi đến email " + email);
         setOtpOpen(true); // mở dialog OTP
       } else {
         setMessage(result.message || t("common.error"));
       }
     } catch (error) {
+      console.log(error);
       setMessage(t("common.error"));
     } finally {
       setSubmitting(false);
@@ -50,6 +51,7 @@ export default function ForgotPasswordDialog({ open, onClose }) {
         setMessage(result.message || t("common.error"));
       }
     } catch (err) {
+      console.log(err);
       setMessage(t("common.error"));
     }
   };
@@ -58,16 +60,20 @@ export default function ForgotPasswordDialog({ open, onClose }) {
     <>
       <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
         <DialogTitle sx={{ fontWeight: "bold", textAlign: "center" }}>
-          {t("auth.forgotPassword.title")}
+          Quên mật khẩu
         </DialogTitle>
         <DialogContent>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            {t("auth.forgotPassword.subtitle")}
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            sx={{ mb: 2, textAlign: "center" }}
+          >
+            Vui lòng nhập địa chỉ email đã đăng ký để tiếp tục
           </Typography>
           <TextField
             fullWidth
             type="email"
-            label={t("auth.register.email")}
+            label="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             disabled={submitting}
@@ -83,15 +89,25 @@ export default function ForgotPasswordDialog({ open, onClose }) {
           )}
         </DialogContent>
         <DialogActions sx={{ justifyContent: "center", pb: 2 }}>
-          <Button onClick={onClose} disabled={submitting}>
-            {t("common.cancel")}
+          <Button
+            onClick={onClose}
+            disabled={submitting}
+            sx={{
+              backgroundColor: "rgba(233, 231, 231, 0.95)",
+              color: "black",
+              "&:hover": {
+                backgroundColor: "rgba(230,230,230,1)",
+              },
+            }}
+          >
+            Hủy
           </Button>
           <Button
             variant="contained"
             onClick={handleSubmit}
             disabled={submitting || !email}
           >
-            {t("auth.forgotPassword.send")}
+            Xác nhận
           </Button>
         </DialogActions>
       </Dialog>

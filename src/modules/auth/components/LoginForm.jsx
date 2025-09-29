@@ -15,22 +15,24 @@ import {
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { authService } from "../../../api/auth.js";
-import ForgotPasswordDialog from "./ForgotPasswordDialog";
-import { useAuth } from "../../../providers/AuthContext.jsx"; // 👈 dùng context
+import { useAuth } from "../../../providers/AuthContext.jsx";
 
-export default function LoginForm({ onError, onClose }) {
+export default function LoginForm({
+  onError,
+  onClose,
+  onSwitchToRegister,
+  onSwitchToForgot,
+}) {
   const { t } = useTranslation();
   const navigate = useNavigate();
-  const { login } = useAuth(); // lấy function login từ context
+  const { login } = useAuth();
 
-  const [forgotOpen, setForgotOpen] = useState(false);
   const [formData, setFormData] = useState({
     username: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
@@ -41,41 +43,40 @@ export default function LoginForm({ onError, onClose }) {
     if (onError) onError("");
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
 
-  if (onError) onError("");
+    if (onError) onError("");
 
-  try {
-    const result = await authService.login(formData);
+    try {
+      const result = await authService.login(formData);
 
-    if (result.success && result.data) {
-      console.log("Login successful:", result.message);
+      if (result.success && result.data) {
+        console.log("Login successful:", result.message);
 
-    login(result.data.account, result.data.access_token);
+        login(result.data.account, result.data.access_token);
 
-    login(
-      result.data.account,
-      result.data.access_token,
-      result.data.refresh_token
-    );
+        login(
+          result.data.account,
+          result.data.access_token,
+          result.data.refresh_token
+        );
 
-      if (onClose) onClose();
+        if (onClose) onClose();
 
-      navigate("/");
-    } else {
-      if (onError) onError(result.message || t("auth.loginError"));
-      console.log("Login failed:", result);
+        navigate("/");
+      } else {
+        if (onError) onError(result.message || t("auth.loginError"));
+        console.log("Login failed:", result);
+      }
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      if (onError) onError(t("auth.loginError"));
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.error("Unexpected error:", error);
-    if (onError) onError(t("auth.loginError"));
-  } finally {
-    setLoading(false);
-  }
-};
-
+  };
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
 
@@ -122,18 +123,39 @@ const handleSubmit = async (e) => {
         </FormControl>
 
         {/* Quên mật khẩu */}
-        <Typography
-          sx={{
-            mt: 1,
-            cursor: "pointer",
-            textAlign: "right",
-            color: "primary.main",
-            fontSize: "0.875rem",
-          }}
-          onClick={() => setForgotOpen(true)}
-        >
-          {t("auth.login.forgotPassword")}
-        </Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+          <Typography
+            sx={{
+              mt: 1,
+              cursor: "pointer",
+              textAlign: "right",
+              color: "primary.main",
+              fontSize: "0.85rem",
+              fontStyle: "italic",
+            }}
+            onClick={() => {
+              onClose(); // Đóng dialog login trước
+              if (onSwitchToRegister) onSwitchToRegister(); // Gọi callback để AppBar xử lý
+            }}
+          >
+            Đăng ký tài khoản
+          </Typography>
+          <Typography
+            sx={{
+              mt: 1,
+              cursor: "pointer",
+              textAlign: "right",
+              color: "primary.main",
+              fontSize: "0.85rem",
+              fontStyle: "italic",
+            }}
+            onClick={() => {
+              if (onSwitchToForgot) onSwitchToForgot(); // Chỉ mở dialog quên mật khẩu, không đóng login
+            }}
+          >
+            Quên mật khẩu?
+          </Typography>
+        </Box>
 
         <Button
           type="submit"
@@ -149,12 +171,6 @@ const handleSubmit = async (e) => {
           )}
         </Button>
       </Box>
-
-      {/* Modal quên mật khẩu */}
-      <ForgotPasswordDialog
-        open={forgotOpen}
-        onClose={() => setForgotOpen(false)}
-      />
     </>
   );
 }

@@ -13,7 +13,12 @@ import { useTranslation } from "react-i18next";
 import LoginForm from "../components/LoginForm";
 import ErrorAlert from "../../../components/ErrorAlert";
 
-export default function LoginDialog({ open, onClose, onSwitchToRegister }) {
+export default function LoginDialog({
+  open,
+  onClose,
+  onSwitchToRegister,
+  onSwitchToForgot,
+}) {
   const { t } = useTranslation();
   const [error, setError] = useState("");
 
@@ -24,40 +29,21 @@ export default function LoginDialog({ open, onClose, onSwitchToRegister }) {
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ textAlign: "center" }}>
+        <DialogTitle
+          sx={{ textAlign: "center", fontWeight: "bold", fontSize: "1.3rem" }}
+        >
           {t("auth.login.title")}
         </DialogTitle>
 
         <DialogContent>
-          <Typography
-            variant="body2"
-            color="text.secondary"
-            align="center"
-            sx={{ mb: 3 }}
-          >
-            {t("auth.login.subtitle")}
-          </Typography>
-
-          {/* ✅ Truyền thêm onClose xuống LoginForm */}
-          <LoginForm onError={setError} onClose={onClose} />
-
-          <Box sx={{ mt: 2, textAlign: "center" }}>
-            <Typography variant="body2">
-              {t("auth.login.noAccount")}{" "}
-              <Link
-                component="button"
-                variant="body2"
-                onClick={onSwitchToRegister}
-              >
-                {t("auth.login.signUp")}
-              </Link>
-            </Typography>
-          </Box>
+          {/* ✅ Truyền thêm onClose và callbacks xuống LoginForm */}
+          <LoginForm
+            onError={setError}
+            onClose={onClose}
+            onSwitchToRegister={onSwitchToRegister}
+            onSwitchToForgot={onSwitchToForgot}
+          />
         </DialogContent>
-
-        <DialogActions>
-          <Button onClick={onClose}>{t("common.close")}</Button>
-        </DialogActions>
       </Dialog>
 
       <ErrorAlert error={error} onClose={handleErrorClose} />

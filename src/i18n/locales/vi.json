@@ -30,7 +30,11 @@
     "infrastructure": "Hạ tầng",
     "reports": "Báo cáo",
     "settings": "Cài đặt",
-    "profile": "Hồ sơ"
+    "profile": "Hồ sơ",
+    "about": "Giới thiệu",
+    "contact": "Liên hệ",
+    "news": "Tin tức",
+    "visit": "Tham quan"
   },
   "theme": {
     "light": "Sáng",
@@ -121,11 +125,11 @@
       }
     },
     "forgotPassword": {
-        "title": "Quên mật khẩu",
-        "subtitle": "Nhập email để nhận liên kết đặt lại mật khẩu.",
-        "send": "Gửi",
-        "emailSent": "Liên kết đặt lại mật khẩu đã được gửi đến {{email}}."
-      }
+      "title": "Quên mật khẩu",
+      "subtitle": "Nhập email để nhận liên kết đặt lại mật khẩu.",
+      "send": "Gửi",
+      "emailSent": "Liên kết đặt lại mật khẩu đã được gửi đến {{email}}."
+    }
   },
   "errors": {
     "notFound": {

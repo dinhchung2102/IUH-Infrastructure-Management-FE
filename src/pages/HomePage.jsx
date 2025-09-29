@@ -20,6 +20,9 @@ export default function HomePage() {
         alignItems: "center",
         minHeight: "100%",
         py: 4,
+        px: { xs: 2, sm: 4, md: 6, lg: 8 },
+        width: "100%",
+        maxWidth: "100vw",
       }}
     >
       <Typography variant="h3" component="h1" gutterBottom align="center">
@@ -36,7 +39,7 @@ export default function HomePage() {
         {t("home.subtitle")}
       </Typography>
 
-      <Grid container spacing={3} sx={{ maxWidth: 1200, width: "100%" }}>
+      <Grid container spacing={3} sx={{ maxWidth: "100%", width: "100%" }}>
         <Grid item xs={12} md={4}>
           <Card
             sx={{ height: "100%", display: "flex", flexDirection: "column" }}

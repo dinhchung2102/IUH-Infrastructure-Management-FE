@@ -18,428 +18,420 @@ import LanguageSwitcher from "../components/LanguageSwitcher";
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import logoIUH from "../assets/logo/iuh_logo-positive-official.png";
 import HomeIcon from "@mui/icons-material/Home";
-import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import SettingsIcon from "@mui/icons-material/Settings";
 import Menu from "@mui/material/Menu";
-import Dialog from "@mui/material/Dialog";
-import DialogTitle from "@mui/material/DialogTitle";
 import Popover from "@mui/material/Popover";
 import MenuItem from "@mui/material/MenuItem";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { Link as RouterLink, useLocation } from "react-router-dom";
 import LoginDialog from "../modules/auth/pages/LoginDialog";
 import RegisterDialog from "../modules/auth/pages/RegisterDialog";
+import ForgotPasswordDialog from "../modules/auth/components/ForgotPasswordDialog";
 import { useAuth } from "../providers/AuthContext.jsx";
 import usePermission from "../hooks/usePermission.js";
+
 function AppBarRes() {
   const { t } = useTranslation();
   const { user, logout } = useAuth();
   const { hasRole } = usePermission();
   const location = useLocation();
-  console.log(user);
   const [openDrawer, setOpenDrawer] = React.useState(false);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [anchorAccount, setAnchorAccount] = React.useState(null);
   const [openLogin, setOpenLogin] = React.useState(false);
   const [openRegister, setOpenRegister] = React.useState(false);
-  const [openAccountModal, setOpenAccountModal] = React.useState(false);
+  const [openForgot, setOpenForgot] = React.useState(false);
+
+  // Scroll animation states
+  const [isScrolledDown, setIsScrolledDown] = React.useState(false);
+  const [showScrollToTop, setShowScrollToTop] = React.useState(false);
+  const [lastScrollY, setLastScrollY] = React.useState(0);
+
   const handleOpenDrawer = () => setOpenDrawer(true);
   const handleCloseDrawer = () => setOpenDrawer(false);
-
   const handleOpenSettings = (event) => setAnchorEl(event.currentTarget);
   const handleCloseSettings = () => setAnchorEl(null);
-
   const isActive = (path) => location.pathname === path;
+
+  // Scroll handler for header animation
+  React.useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+      const scrollThreshold = 100;
+
+      // Show/hide scroll to top button - only show when scrolling up
+      if (currentScrollY > scrollThreshold) {
+        if (currentScrollY < lastScrollY) {
+          // Scrolling up - show button
+          setShowScrollToTop(true);
+        } else {
+          // Scrolling down - hide button
+          setShowScrollToTop(false);
+        }
+      } else {
+        // At top - hide button
+        setShowScrollToTop(false);
+      }
+
+      // Header hide/show logic
+      if (currentScrollY > lastScrollY && currentScrollY > scrollThreshold) {
+        // Scrolling down - hide header
+        setIsScrolledDown(true);
+      } else {
+        // Scrolling up - show header
+        setIsScrolledDown(false);
+      }
+
+      setLastScrollY(currentScrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [lastScrollY]);
+
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const navItems = React.useMemo(
+    () => [
+      { label: t("common.home"), to: "/", roles: [] },
+      { label: "Trang Admin", to: "/admin", roles: ["ADMIN"] },
+      { label: "Trang Staff", to: "/staff", roles: ["STAFF"] },
+      { label: "Giới thiệu", to: "/about", roles: [] },
+      { label: "Cơ sở vật chất", to: "/facility", roles: [] },
+      { label: "Tin tức", to: "/news", roles: [] },
+      { label: "Báo cáo sự cố", to: "/report", roles: [] },
+      { label: "Liên hệ", to: "/contact", roles: [] },
+    ],
+    [t]
+  );
+
+  const gradient =
+    "linear-gradient(135deg, rgba(9,26,70,0.95) 0%, rgba(9, 71, 178, 0.95) 100%)";
 
   return (
     <>
-      <AppBar position="static">
-        <Toolbar>
-          {/* Logo */}
-          <Box sx={{ flexGrow: 1 }}>
-            <RouterLink to="/">
+      <AppBar
+        position="fixed"
+        elevation={0}
+        sx={{
+          background: gradient,
+          backdropFilter: "blur(10px)",
+          borderBottom: (theme) => `1px solid ${theme.palette.primary.dark}40`,
+          transform: isScrolledDown ? "translateY(-100%)" : "translateY(0)",
+          transition: "transform 0.3s ease-in-out",
+          zIndex: 1100,
+        }}
+      >
+        <Toolbar sx={{ py: { xs: 1, md: 1.5 }, gap: 2 }}>
+          {/* Logo bên trái */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            <RouterLink
+              to="/"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                textDecoration: "none",
+              }}
+            >
               <Box
                 component="img"
                 src={logoIUH}
                 alt="App Logo"
                 sx={{
-                  paddingY: 1,
-                  maxHeight: { xs: 60, md: 80 },
+                  height: { xs: 44, md: 54 },
+                  width: "auto",
                 }}
               />
             </RouterLink>
           </Box>
 
-          {/* Menu desktop */}
-          {/* Menu desktop */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, gap: 1 }}>
-            {/* Trang chủ luôn hiển thị */}
-            <Button
-              component={RouterLink}
-              to="/"
-              sx={(theme) => ({
-                color: isActive("/") ? theme.palette.common.white : "inherit",
-                backgroundColor: isActive("/")
-                  ? theme.palette.primary.dark
-                  : "inherit",
-                "&:hover": {
-                  backgroundColor: isActive("/")
-                    ? theme.palette.primary.main
-                    : theme.palette.action.hover,
-                },
-              })}
-            >
-              {t("common.home")}
-            </Button>
-
-            {/* Chỉ admin mới thấy */}
-            {hasRole("ADMIN") && (
-              <Button
-                component={RouterLink}
-                to="/admin"
-                sx={(theme) => ({
-                  color: isActive("/admin")
-                    ? theme.palette.common.white
-                    : "inherit",
-                  backgroundColor: isActive("/admin")
-                    ? theme.palette.primary.dark
-                    : "inherit",
-                  "&:hover": {
-                    backgroundColor: isActive("/admin")
-                      ? theme.palette.primary.main
-                      : theme.palette.action.hover,
-                  },
-                })}
-              >
-                Trang Admin
-              </Button>
-            )}
-
-            {/* Chỉ staff mới thấy */}
-            {hasRole("STAFF") && (
-              <Button
-                component={RouterLink}
-                to="/staff"
-                sx={(theme) => ({
-                  color: isActive("/staff")
-                    ? theme.palette.common.white
-                    : "inherit",
-                  backgroundColor: isActive("/staff")
-                    ? theme.palette.primary.dark
-                    : "inherit",
-                  "&:hover": {
-                    backgroundColor: isActive("/staff")
-                      ? theme.palette.primary.main
-                      : theme.palette.action.hover,
-                  },
-                })}
-              >
-                Trang Staff
-              </Button>
-            )}
-
-            {/* Nếu có user → hiện icon user */}
-            {user ? (
-              <>
-                <IconButton
-                  size="large"
-                  edge="end"
-                  color="inherit"
-                  onClick={(e) => setAnchorAccount(e.currentTarget)}
-                >
-                  <AccountCircle />
-                </IconButton>
-
-                <Popover
-                  open={Boolean(anchorAccount)}
-                  anchorEl={anchorAccount}
-                  onClose={() => setAnchorAccount(null)}
-                  anchorOrigin={{
-                    vertical: "bottom",
-                    horizontal: "right",
-                  }}
-                  transformOrigin={{
-                    vertical: "top",
-                    horizontal: "right",
-                  }}
-                  PaperProps={{
-                    sx: {
-                      p: 2,
-                      width: 260,
-                      borderRadius: 2,
+          {/* Nav links chiếm khoảng trống còn lại và canh giữa */}
+          <Box
+            sx={{
+              display: { xs: "none", lg: "flex" },
+              flexGrow: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 1.5,
+            }}
+          >
+            {navItems.map((item) => {
+              if (
+                item.roles.length &&
+                !item.roles.some((role) => hasRole(role))
+              ) {
+                return null;
+              }
+              return (
+                <Button
+                  key={item.to}
+                  component={RouterLink}
+                  to={item.to}
+                  size="medium"
+                  sx={(theme) => ({
+                    color: isActive(item.to)
+                      ? theme.palette.primary.contrastText
+                      : theme.palette.common.white,
+                    backgroundColor: isActive(item.to)
+                      ? `${theme.palette.common.white}1f`
+                      : "transparent",
+                    borderRadius: 999,
+                    px: 3,
+                    fontWeight: 600,
+                    transition: "all 0.25s ease",
+                    "&:hover": {
+                      backgroundColor: isActive(item.to)
+                        ? `${theme.palette.common.white}33`
+                        : `${theme.palette.common.white}1a`,
+                      color: theme.palette.common.white,
                     },
-                  }}
+                  })}
                 >
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 2 }}>
-                    <Avatar
-                      src={user.avatar || undefined}
-                      alt={user.username || "User"}
-                      sx={{ width: 40, height: 40, mr: 2 }}
-                    >
-                      {!user.avatar && (user.username ? user.username[0] : "U")}
-                    </Avatar>
-
-                    <Box>
-                      <Typography variant="subtitle1">
-                        {user.fullName || user.username}
-                      </Typography>
-                      <Typography
-                        variant="body2"
-                        sx={{ color: "success.main", fontSize: "0.75rem" }}
-                      >
-                        {user.role || "User"}
-                      </Typography>
-                    </Box>
-                  </Box>
-
-                  <Button
-                    fullWidth
-                    variant="outlined"
-                    sx={{ mb: 1 }}
-                    onClick={() => {
-                      setAnchorAccount(null);
-                      // TODO: điều hướng tới trang profile
-                    }}
-                  >
-                    {t("common.profile")}
-                  </Button>
-
-                  <Button
-                    fullWidth
-                    variant="contained"
-                    color="error"
-                    onClick={() => {
-                      logout();
-                      setAnchorAccount(null);
-                    }}
-                  >
-                    {t("common.logout")}
-                  </Button>
-                </Popover>
-              </>
-            ) : (
-              // Nếu chưa đăng nhập → hiện nút login
-              <Button
-                color="inherit"
-                onClick={() => {
-                  setOpenLogin(true);
-                  handleCloseDrawer();
-                }}
-              >
-                {t("common.login")}
-              </Button>
-            )}
-
-            <ThemeSwitcher />
-            <LanguageSwitcher />
+                  {item.label}
+                </Button>
+              );
+            })}
           </Box>
 
-          {/* Menu mobile */}
-          <Box sx={{ display: { xs: "flex", md: "none" } }}>
+          {/* Item bên phải */}
+          <LanguageSwitcher />
+
+          {user ? (
             <IconButton
               size="large"
-              edge="end"
               color="inherit"
-              aria-label="menu"
-              onClick={handleOpenDrawer}
+              onClick={(e) => setAnchorAccount(e.currentTarget)}
+              sx={{ ml: 1 }}
             >
+              <AccountCircle fontSize="large" />
+            </IconButton>
+          ) : (
+            <Button
+              variant="contained"
+              color="white"
+              onClick={() => setOpenLogin(true)}
+              sx={{
+                px: 3,
+                fontWeight: 600,
+                backgroundColor: "white",
+                color: "primary.main",
+                "&:hover": {
+                  backgroundColor: "grey.100",
+                },
+              }}
+            >
+              {t("common.login")}
+            </Button>
+          )}
+
+          {/* Menu mobile */}
+          <Box sx={{ display: { xs: "flex", lg: "none" } }}>
+            <IconButton color="inherit" onClick={handleOpenDrawer}>
               <MenuIcon />
             </IconButton>
           </Box>
         </Toolbar>
       </AppBar>
 
-      {/* Drawer cho mobile */}
       <Drawer
         anchor="right"
         open={openDrawer}
         onClose={handleCloseDrawer}
         slotProps={{
           paper: {
-            sx: (theme) => ({
-              bgcolor:
-                theme.palette.mode === "light"
-                  ? theme.palette.success.main
-                  : theme.palette.background.default,
-              color: theme.palette.getContrastText(
-                theme.palette.mode === "light"
-                  ? theme.palette.success.main
-                  : theme.palette.background.default
-              ),
-              minWidth: 250,
+            sx: {
+              minWidth: 300,
+              background: gradient,
+              color: "common.white",
               display: "flex",
               flexDirection: "column",
-            }),
+              gap: 2,
+              py: 2,
+            },
           },
         }}
       >
-        {/* Logo */}
-        <Box sx={{ display: "flex", justifyContent: "center", p: 2 }}>
-          <Box
-            component="img"
-            src={logoIUH}
-            alt="App Logo"
-            sx={{ height: 60 }}
-          />
+        <Box
+          sx={{
+            px: 3,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <Box
+              component="img"
+              src={logoIUH}
+              alt="App Logo"
+              sx={{ height: 40 }}
+            />
+            <Typography
+              variant="subtitle1"
+              sx={{ fontWeight: 600, letterSpacing: 0.4 }}
+            >
+              IUH Infrastructure
+            </Typography>
+          </Box>
+          <IconButton
+            onClick={handleCloseDrawer}
+            sx={{ color: "common.white" }}
+          >
+            <MenuIcon />
+          </IconButton>
         </Box>
 
-        {/* Thông tin user nếu đã đăng nhập */}
         {user && (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              p: 2,
-              borderBottom: 1,
-              borderColor: "divider",
-            }}
-          >
-            <Avatar
-              src={user.avatar || undefined} // nếu không có avatar → hiển thị mặc định
-              alt={user.username || "Người dùng"}
-              sx={{ width: 40, height: 40, mr: 2 }}
+          <Box sx={{ px: 3 }}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+                p: 2,
+                borderRadius: 3,
+                backgroundColor: "rgba(255,255,255,0.08)",
+              }}
             >
-              {!user.avatar && (user.username ? user.username[0] : "U")}
-            </Avatar>
-
-            <Box>
-              <Typography variant="subtitle1" color="text.inherit">
-                {user.fullName || "Người dùng"}
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.inherit"
-                sx={{ fontSize: "0.6rem" }}
+              <Avatar
+                src={user.avatar || undefined}
+                alt={user.username || "User"}
               >
-                {user.role || "User"}
-              </Typography>
+                {!user.avatar && (user.username ? user.username[0] : "U")}
+              </Avatar>
+              <Box>
+                <Typography variant="subtitle2">
+                  {user.fullName || user.username}
+                </Typography>
+                <Typography variant="caption" sx={{ opacity: 0.7 }}>
+                  {user.role || "User"}
+                </Typography>
+              </Box>
             </Box>
           </Box>
         )}
 
-        {/* Menu items */}
-        <List sx={{ flexGrow: 1 }}>
-          <ListItem disablePadding>
-            <ListItemButton
-              component={RouterLink}
-              to="/"
-              sx={{
-                color: "inherit",
-                bgcolor: isActive("/") ? "action.selected" : "transparent",
-              }}
-            >
-              <ListItemIcon sx={{ color: "inherit" }}>
-                <HomeIcon />
-              </ListItemIcon>
-              <ListItemText primary={t("common.home")} />
-            </ListItemButton>
-          </ListItem>
-          {/* Trang Admin cho admin */}
-          {hasRole("ADMIN") && (
-            <ListItem disablePadding>
-              <ListItemButton
-                component={RouterLink}
-                to="/admin"
-                sx={{
-                  color: "inherit",
-                  bgcolor: isActive("/admin")
-                    ? "action.selected"
-                    : "transparent",
-                }}
-              >
-                <ListItemIcon sx={{ color: "inherit" }}>
-                  <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="Trang Admin" />
-              </ListItemButton>
-            </ListItem>
-          )}
+        <List sx={{ px: 2 }}>
+          {navItems.map((item) => {
+            if (
+              item.roles.length &&
+              !item.roles.some((role) => hasRole(role))
+            ) {
+              return null;
+            }
 
-          {/* Trang Staff cho staff */}
-          {hasRole("STAFF") && (
-            <ListItem disablePadding>
-              <ListItemButton
-                component={RouterLink}
-                to="/staff"
-                sx={{
-                  color: "inherit",
-                  bgcolor: isActive("/staff")
-                    ? "action.selected"
-                    : "transparent",
-                }}
-              >
-                <ListItemIcon sx={{ color: "inherit" }}>
-                  <HomeIcon />
-                </ListItemIcon>
-                <ListItemText primary="Trang Staff" />
-              </ListItemButton>
-            </ListItem>
-          )}
+            return (
+              <ListItem key={item.to} disablePadding>
+                <ListItemButton
+                  component={RouterLink}
+                  to={item.to}
+                  onClick={handleCloseDrawer}
+                  sx={{
+                    borderRadius: 2,
+                    color: "inherit",
+                    mb: 0.5,
+                    backgroundColor: isActive(item.to)
+                      ? "rgba(255,255,255,0.12)"
+                      : "transparent",
+                    "&:hover": {
+                      backgroundColor: "rgba(255,255,255,0.18)",
+                    },
+                  }}
+                >
+                  <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+                    <HomeIcon />
+                  </ListItemIcon>
+                  <ListItemText primary={item.label} />
+                </ListItemButton>
+              </ListItem>
+            );
+          })}
         </List>
 
-        {/* Nút Settings + Logout / Login */}
         <Box
           sx={{
-            p: 2,
+            px: 3,
+            mt: "auto",
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
+            flexDirection: "column",
+            gap: 1.5,
           }}
         >
-          <Box>
-            <IconButton
-              color="inherit"
-              onClick={(e) => setAnchorEl(e.currentTarget)}
-            >
-              <SettingsIcon />
-            </IconButton>
+          <Button
+            variant="outlined"
+            color="inherit"
+            startIcon={<SettingsIcon />}
+            onClick={handleOpenSettings}
+            sx={{ borderRadius: 4 }}
+          >
+            {t("common.settings", "Cài đặt")}
+          </Button>
 
-            <Menu
-              anchorEl={anchorEl}
-              open={Boolean(anchorEl)}
-              onClose={() => setAnchorEl(null)}
-              anchorOrigin={{ vertical: "top", horizontal: "left" }}
-              transformOrigin={{ vertical: "bottom", horizontal: "left" }}
-            >
-              <List>
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <ThemeSwitcher />
-                    </ListItemIcon>
-                    <ListItemText primary={t("theme.changeTheme")} />
-                  </ListItemButton>
-                </ListItem>
-                <ListItem disablePadding>
-                  <ListItemButton>
-                    <ListItemIcon>
-                      <LanguageSwitcher />
-                    </ListItemIcon>
-                    <ListItemText primary={t("common.language")} />
-                  </ListItemButton>
-                </ListItem>
-              </List>
-            </Menu>
-          </Box>
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleCloseSettings}
+            PaperProps={{
+              sx: {
+                mt: 1,
+                minWidth: 220,
+                borderRadius: 3,
+              },
+            }}
+          >
+            <MenuItem disableRipple>
+              <ThemeSwitcher />
+              <Typography variant="body2" sx={{ ml: 2 }}>
+                {t("theme.changeTheme")}
+              </Typography>
+            </MenuItem>
+            <MenuItem disableRipple>
+              <LanguageSwitcher />
+              <Typography variant="body2" sx={{ ml: 2 }}>
+                {t("common.language")}
+              </Typography>
+            </MenuItem>
+          </Menu>
 
           {user ? (
             <Button
-              variant="outlined"
-              color="inherit"
+              variant="contained"
+              color="secondary"
               onClick={() => {
                 logout();
                 handleCloseDrawer();
               }}
+              sx={{ fontWeight: 600 }}
             >
               {t("common.logout")}
             </Button>
           ) : (
             <Button
-              variant="outlined"
-              color="inherit"
+              variant="contained"
               onClick={() => {
                 setOpenLogin(true);
                 handleCloseDrawer();
+              }}
+              sx={{
+                fontWeight: 600,
+                backgroundColor: "white",
+                color: "primary.main",
+                "&:hover": {
+                  backgroundColor: "grey.100",
+                },
               }}
             >
               {t("common.login")}
@@ -448,12 +440,72 @@ function AppBarRes() {
         </Box>
       </Drawer>
 
+      <Popover
+        open={Boolean(anchorAccount)}
+        anchorEl={anchorAccount}
+        onClose={() => setAnchorAccount(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        PaperProps={{
+          sx: {
+            p: 2,
+            borderRadius: 3,
+            minWidth: 240,
+            boxShadow: 8,
+          },
+        }}
+      >
+        {user && (
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+              <Avatar
+                src={user.avatar || undefined}
+                alt={user.username || "User"}
+              >
+                {!user.avatar && (user.username ? user.username[0] : "U")}
+              </Avatar>
+              <Box>
+                <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                  {user.fullName || user.username}
+                </Typography>
+                <Typography variant="caption" color="text.secondary">
+                  {user.role || "User"}
+                </Typography>
+              </Box>
+            </Box>
+            <Button
+              variant="outlined"
+              fullWidth
+              sx={{ borderRadius: 4 }}
+              onClick={() => setAnchorAccount(null)}
+            >
+              {t("common.profile")}
+            </Button>
+            <Button
+              variant="contained"
+              color="inherit"
+              fullWidth
+              sx={{ borderRadius: 4 }}
+              onClick={() => {
+                logout();
+                setAnchorAccount(null);
+              }}
+            >
+              {t("common.logout")}
+            </Button>
+          </Box>
+        )}
+      </Popover>
+
       <LoginDialog
         open={openLogin}
         onClose={() => setOpenLogin(false)}
         onSwitchToRegister={() => {
           setOpenLogin(false);
           setOpenRegister(true);
+        }}
+        onSwitchToForgot={() => {
+          setOpenForgot(true); // Chỉ mở dialog quên mật khẩu, không đóng login
         }}
       />
 
@@ -465,6 +517,44 @@ function AppBarRes() {
           setOpenLogin(true);
         }}
       />
+
+      <ForgotPasswordDialog
+        open={openForgot}
+        onClose={() => setOpenForgot(false)}
+      />
+
+      {/* Scroll to Top Button */}
+      <IconButton
+        onClick={scrollToTop}
+        sx={{
+          position: "fixed",
+          bottom: 32,
+          right: 32,
+          zIndex: 1000,
+          backgroundColor: "rgba(21, 101, 192, 0.8)",
+          backdropFilter: "blur(10px)",
+          color: "white",
+          width: 56,
+          height: 56,
+          opacity: showScrollToTop ? 1 : 0,
+          visibility: showScrollToTop ? "visible" : "hidden",
+          transform: showScrollToTop ? "scale(1)" : "scale(0.8)",
+          transition: "all 0.3s ease-in-out",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12), 0 2px 8px rgba(0,0,0,0.08)",
+          border: "1px solid rgba(255,255,255,0.1)",
+          "&:hover": {
+            backgroundColor: "rgba(21, 101, 192, 0.9)",
+            backdropFilter: "blur(15px)",
+            transform: "scale(1.1)",
+            boxShadow:
+              "0 12px 40px rgba(0,0,0,0.18), 0 4px 12px rgba(0,0,0,0.12)",
+            border: "1px solid rgba(255,255,255,0.2)",
+          },
+        }}
+        aria-label="scroll to top"
+      >
+        <KeyboardArrowUpIcon color="white" />
+      </IconButton>
     </>
   );
 }
