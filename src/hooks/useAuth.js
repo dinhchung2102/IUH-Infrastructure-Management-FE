@@ -94,7 +94,7 @@ const resendOtp = async ({ email }) => {
 
 const verifyOtp = async ({ email, otp }) => {
   try {
-    const res = await axios.post("/api/auth/verify-otp", { email, otp });
+    const res = await axios.post("/api/auth/verify-otp", { email, authOTP: otp });
     if (res.data?.data?.access_token) {
       const { access_token, refresh_token, user } = res.data.data;
       saveAuth(access_token, refresh_token, user);
@@ -105,6 +105,7 @@ const verifyOtp = async ({ email, otp }) => {
     return err.response?.data || { success: false, message: "Verify OTP error" };
   }
 };
+
 
 
   return {

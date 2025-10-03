@@ -82,7 +82,7 @@ export default function Footer() {
                     hyphens: "auto",
                   }}
                 >
-                  Phòng Quản Trị Trường Đại học Công nghiệp TP.HCM
+                PHÒNG QUẢN TRỊ TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP TPHCM
                 </Typography>
                 <Typography
                   variant="body2"
@@ -190,10 +190,14 @@ export default function Footer() {
                   fontSize: { xs: "0.75rem", sm: "0.8rem", md: "0.875rem" },
                   lineHeight: 1.4,
                   wordBreak: "break-word",
+                  whiteSpace: "normal",
+                  overflowWrap: "anywhere",
+                  maxWidth: "330px",
                 }}
               >
                 12 Nguyễn Văn Bảo, phường 1, Gò Vấp, Thành phố Hồ Chí Minh
               </Typography>
+
             </Box>
 
             <Box sx={{ display: "flex", alignItems: "center", mb: 1.2 }}>

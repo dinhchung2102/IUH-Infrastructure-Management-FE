@@ -18,20 +18,12 @@ function App() {
         <ThemeProvider>
           <Router>
             <Routes>
+              {/* Routes with MainLayout */}
               <Route path="/" element={<MainLayout />}>
                 <Route index element={<HomePage />} />
                 <Route path="login" element={<LoginPage />} />
                 <Route path="register" element={<RegisterPage />} />
                 <Route path="error" element={<ErrorPage />} />
-                {/* Protected routes */}
-                <Route
-                  path="admin"
-                  element={
-                    <PermissionGuard roles={["ADMIN"]}>
-                      <AdminPage />
-                    </PermissionGuard>
-                  }
-                />
                 <Route
                   path="staff"
                   element={
@@ -42,6 +34,16 @@ function App() {
                 />
                 <Route path="*" element={<NotFoundPage />} />
               </Route>
+
+              {/* Admin route without MainLayout */}
+              <Route
+                path="/admin"
+                element={
+                  <PermissionGuard roles={["ADMIN"]}>
+                    <AdminPage />
+                  </PermissionGuard>
+                }
+              />
             </Routes>
           </Router>
         </ThemeProvider>
