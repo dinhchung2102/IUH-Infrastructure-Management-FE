@@ -2,12 +2,13 @@ import axios from "axios";
 
 // API Configuration
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api";
+  import.meta.env.VITE_API_BASE_URL || "https://api.iuh.nagentech.com/api";
 const API_TIMEOUT = parseInt(import.meta.env.VITE_API_TIMEOUT || "10000");
 
 // axios instance
 const api = axios.create({
-  baseURL: "https://iuh.api.nagentech.com/api",
+  baseURL: API_BASE_URL,
+  //  baseURL:{$} "https://api.iuh.nagentech.com/",
   timeout: API_TIMEOUT,
   headers: {
     "Content-Type": "application/json",
