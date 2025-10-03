@@ -6,10 +6,15 @@ export default function usePermission() {
 
   const hasRole = (roles) => {
     if (!user?.role) return false;
+
+    // Get role value - handle both string and object cases
+    const userRole =
+      typeof user.role === "object" ? user.role?.roleName : user.role;
+
     if (Array.isArray(roles)) {
-      return roles.includes(user.role);
+      return roles.includes(userRole);
     }
-    return user.role === roles;
+    return userRole === roles;
   };
 
   const hasPermission = (permissions) => {

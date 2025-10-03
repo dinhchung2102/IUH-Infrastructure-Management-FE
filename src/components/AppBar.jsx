@@ -14,7 +14,7 @@ import Typography from "@mui/material/Typography";
 import { ListItemIcon } from "@mui/material";
 import ListItemText from "@mui/material/ListItemText";
 import { useTranslation } from "react-i18next";
-import LanguageSwitcher from "../components/LanguageSwitcher";
+// import LanguageSwitcher from "../components/LanguageSwitcher"; // Temporarily hidden
 import ThemeSwitcher from "../components/ThemeSwitcher";
 import logoIUH from "../assets/logo/iuh_logo-positive-official.png";
 import HomeIcon from "@mui/icons-material/Home";
@@ -101,8 +101,6 @@ function AppBarRes() {
   const navItems = React.useMemo(
     () => [
       { label: t("common.home"), to: "/", roles: [] },
-      { label: "Trang Admin", to: "/admin", roles: ["ADMIN"] },
-      { label: "Trang Staff", to: "/staff", roles: ["STAFF"] },
       { label: "Giới thiệu", to: "/about", roles: [] },
       { label: "Cơ sở vật chất", to: "/facility", roles: [] },
       { label: "Tin tức", to: "/news", roles: [] },
@@ -207,7 +205,7 @@ function AppBarRes() {
           </Box>
 
           {/* Item bên phải */}
-          <LanguageSwitcher />
+          {/* <LanguageSwitcher /> Temporarily hidden */}
 
           {user ? (
             <IconButton
@@ -317,7 +315,9 @@ function AppBarRes() {
                   {user.fullName || user.username}
                 </Typography>
                 <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                  {user.role || "User"}
+                  {typeof user.role === "object"
+                    ? user.role?.roleName || "User"
+                    : user.role || "User"}
                 </Typography>
               </Box>
             </Box>
@@ -398,12 +398,12 @@ function AppBarRes() {
                 {t("theme.changeTheme")}
               </Typography>
             </MenuItem>
-            <MenuItem disableRipple>
+            {/* <MenuItem disableRipple>
               <LanguageSwitcher />
               <Typography variant="body2" sx={{ ml: 2 }}>
                 {t("common.language")}
               </Typography>
-            </MenuItem>
+            </MenuItem> Temporarily hidden */}
           </Menu>
 
           {user ? (
@@ -469,7 +469,9 @@ function AppBarRes() {
                   {user.fullName || user.username}
                 </Typography>
                 <Typography variant="caption" color="text.secondary">
-                  {user.role || "User"}
+                  {typeof user.role === "object"
+                    ? user.role?.roleName || "User"
+                    : user.role || "User"}
                 </Typography>
               </Box>
             </Box>
