@@ -12,8 +12,6 @@ import {
   Checkbox,
   Typography,
   Divider,
-  Radio,
-  RadioGroup,
   Grid,
   CircularProgress,
 } from "@mui/material";
@@ -29,11 +27,9 @@ export default function RegisterForm() {
     fullName: "",
     email: "",
     phone: "",
-    role: "student", // UI only
     password: "",
     confirmPassword: "",
     agreeToTerms: false,
-    subscribeNewsletter: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -84,6 +80,11 @@ export default function RegisterForm() {
     }
   };
 
+  // Function to determine role based on email
+  const getRoleFromEmail = (email) => {
+    return email.endsWith("@student.iuh.edu.vn") ? "student" : "guest";
+  };
+
   const handleConfirmOtp = async (otp) => {
     setLoading(true);
     setMessage("");
@@ -96,18 +97,28 @@ export default function RegisterForm() {
       });
 
       if (verifyResult.message.includes("OTP đã được xác thực")) {
+        // Tự động xác định role dựa trên email
+        const userRole = getRoleFromEmail(formData.email);
+
         const payload = {
           username: formData.email,
           fullName: formData.fullName,
           email: formData.email,
           phoneNumber: formData.phone,
           password: formData.password,
+          role: userRole, // Tự động xác định role
         };
+
+        console.log("Registering with role:", userRole);
 
         const registerResult = await authService.register(payload);
         if (registerResult.success) {
           setOtpDialogOpen(false);
-          alert("Đăng ký thành công!");
+          alert(
+            `Đăng ký thành công! Bạn được xác định là ${
+              userRole === "student" ? "sinh viên" : "khách"
+            }.`
+          );
         } else {
           setMessage(registerResult.message || "Đăng ký thất bại");
         }
@@ -145,26 +156,6 @@ export default function RegisterForm() {
           </Grid>
 
           <Grid size={{ xs: 16, sm: 8 }}>
-            <RadioGroup
-              row
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-            >
-              <FormControlLabel
-                value="student"
-                control={<Radio />}
-                label={t("auth.register.role.student")}
-              />
-              <FormControlLabel
-                value="guest"
-                control={<Radio />}
-                label={t("auth.register.role.guest")}
-              />
-            </RadioGroup>
-          </Grid>
-
-          <Grid size={{ xs: 16, sm: 8 }}>
             <TextField
               fullWidth
               margin="normal"
@@ -187,6 +178,7 @@ export default function RegisterForm() {
               name="email"
               value={formData.email}
               onChange={handleChange}
+              helperText="Email @student.iuh.edu.vn sẽ được xác định là sinh viên"
             />
           </Grid>
 
@@ -262,18 +254,6 @@ export default function RegisterForm() {
                 />
               }
               label={t("auth.register.agreeToTerms")}
-            />
-          </Grid>
-          <Grid size={16}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="subscribeNewsletter"
-                  checked={formData.subscribeNewsletter}
-                  onChange={handleChange}
-                />
-              }
-              label={t("auth.register.subscribeNewsletter")}
             />
           </Grid>
         </Grid>
