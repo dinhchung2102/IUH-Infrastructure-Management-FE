@@ -23,6 +23,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import { Delete, Edit, Add } from "@mui/icons-material";
 import { assetCategoryService } from "../../api/assetCategories";
 
+const API_BASE = "https://api.iuh.nagentech.com";
+
 export default function AssetCategoriesPage() {
   const theme = useTheme();
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
@@ -30,8 +32,6 @@ export default function AssetCategoriesPage() {
   const [open, setOpen] = useState(false);
   const [editRow, setEditRow] = useState(null);
   const [previewImage, setPreviewImage] = useState("");
-
-  // form cho create/update
   const [form, setForm] = useState({
     name: "",
     status: "ACTIVE",
@@ -39,7 +39,7 @@ export default function AssetCategoriesPage() {
     image: "",
   });
 
-  // load categories
+  // Load danh mục
   const loadCategories = async () => {
     try {
       const res = await assetCategoryService.getAll();
@@ -51,7 +51,9 @@ export default function AssetCategoriesPage() {
             name: item.name,
             status: item.status,
             description: item.description,
-            image: item.image,
+            image: item.image
+              ? `${API_BASE}/uploads/${item.image.split("/").pop()}`
+              : "",
           }))
         );
       }
@@ -68,23 +70,11 @@ export default function AssetCategoriesPage() {
     if (window.confirm("Bạn có chắc muốn xóa danh mục này?")) {
       const res = await assetCategoryService.delete(id);
       if (res.success) {
-        setRows(rows.filter((row) => row.rowId !== id));
+        await loadCategories();
       } else {
         alert("Xóa thất bại: " + res.message);
       }
     }
-  };
-
-  const handleEdit = (row) => {
-    setEditRow(row);
-    setForm({
-      name: row.name,
-      status: row.status,
-      description: row.description,
-      image: row.image,
-    });
-    setPreviewImage(row.image);
-    setOpen(true);
   };
 
   const handleCreate = () => {
@@ -99,42 +89,48 @@ export default function AssetCategoriesPage() {
     setOpen(true);
   };
 
-  const handleSave = async () => {
-    try {
-      const payload = { ...form };
-      if (editRow) {
-        const res = await assetCategoryService.update(editRow.rowId, payload);
-        if (res.success) {
-          await loadCategories();
-          setOpen(false);
-        } else {
-          alert("Cập nhật thất bại: " + res.message);
-        }
-      } else {
-        const res = await assetCategoryService.create(payload);
-        if (res.success) {
-          await loadCategories();
-          setOpen(false);
-        } else {
-          alert("Tạo danh mục thất bại: " + res.message);
-        }
-      }
-    } catch (error) {
-      console.error("Lỗi lưu danh mục:", error);
-    }
+  const handleEdit = (row) => {
+    setEditRow(row);
+    setForm({
+      name: row.name,
+      status: row.status,
+      description: row.description,
+      image: row.image || "",
+    });
+    setPreviewImage(row.image);
+    setOpen(true);
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (ev) => {
-        setPreviewImage(ev.target.result);
-        setForm({ ...form, image: ev.target.result }); // giả sử bạn sẽ gửi base64 hoặc upload lên server
-      };
-      reader.readAsDataURL(file);
+      setPreviewImage(URL.createObjectURL(file));
+      setForm((prev) => ({ ...prev, image: file }));
     }
   };
+
+ const handleSave = async () => {
+  try {
+    console.log("Form gửi lên:", form);
+    let res;
+    if (editRow) {
+      res = await assetCategoryService.update(editRow.rowId, form);
+    } else {
+      res = await assetCategoryService.create(form);
+    }
+
+    if (res.success) {
+      await loadCategories();
+      setOpen(false);
+    } else {
+      alert("Lưu thất bại: " + res.message);
+    }
+  } catch (error) {
+    console.error("Lỗi lưu danh mục:", error);
+  }
+};
+
+
 
   const columns = [
     { field: "id", headerName: "STT", width: 70 },
@@ -156,13 +152,18 @@ export default function AssetCategoriesPage() {
       field: "image",
       headerName: "Ảnh",
       width: 150,
-      renderCell: (params) => (
-        <img
-          src={params.value}
-          alt="category"
-          style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }}
-        />
-      ),
+      renderCell: (params) =>
+        params.value ? (
+          <img
+            src={params.value}
+            alt="category"
+            style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }}
+          />
+        ) : (
+          <Typography variant="body2" color="text.secondary">
+            Không có
+          </Typography>
+        ),
     },
     {
       field: "actions",
@@ -181,15 +182,8 @@ export default function AssetCategoriesPage() {
     },
   ];
 
-  // style
-  const bgColor = prefersDarkMode ? "#1e1e1e" : "#f5f5f5";
-  const cardColor = prefersDarkMode ? "#2b2b2b" : "#ffffff";
-  const textColor = prefersDarkMode ? "#e0e0e0" : "#1c1c1c";
-  const headerBg = prefersDarkMode ? "#3c3c3c" : "#1976d2";
-  const headerText = prefersDarkMode ? "#fff" : "#000000ff";
-
   return (
-    <Box sx={{ bgcolor: bgColor, minHeight: "100vh", p: 2 }}>
+    <Box sx={{ bgcolor: prefersDarkMode ? "#1e1e1e" : "#f5f5f5", minHeight: "100vh", p: 2 }}>
       {/* Header */}
       <AppBar
         position="static"
@@ -218,9 +212,9 @@ export default function AssetCategoriesPage() {
             startIcon={<Add />}
             onClick={handleCreate}
             sx={{
-              bgcolor: "linear-gradient(135deg, #0a2a43 0%, #0f4c81 100%)",
               fontWeight: "bold",
-              "&:hover": { bgcolor: "#0e0d0d80" },
+              background: "linear-gradient(135deg, #0a2a43 0%, #0f4c81 100%)",
+              "&:hover": { opacity: 0.9 },
             }}
           >
             Thêm danh mục
@@ -234,7 +228,7 @@ export default function AssetCategoriesPage() {
           sx={{
             minWidth: 800,
             height: 500,
-            bgcolor: cardColor,
+            bgcolor: prefersDarkMode ? "#2b2b2b" : "#ffffff",
             p: 2,
             borderRadius: 2,
             boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
@@ -246,8 +240,8 @@ export default function AssetCategoriesPage() {
             pageSize={5}
             rowsPerPageOptions={[5, 10]}
             sx={{
-              bgcolor: cardColor,
-              color: textColor,
+              bgcolor: prefersDarkMode ? "#2b2b2b" : "#ffffff",
+              color: prefersDarkMode ? "#e0e0e0" : "#1c1c1c",
               border: "none",
               "& .MuiDataGrid-cell": {
                 borderBottom: prefersDarkMode
@@ -255,18 +249,10 @@ export default function AssetCategoriesPage() {
                   : "1px solid rgba(0,0,0,0.1)",
               },
               "& .MuiDataGrid-columnHeaders": {
-                bgcolor: headerBg,
-                color: headerText,
+                bgcolor: prefersDarkMode ? "#3c3c3c" : "#1976d2",
+                color: prefersDarkMode ? "#fff" : "#000",
                 fontWeight: "bold",
                 fontSize: "0.95rem",
-                borderBottom: prefersDarkMode
-                  ? "1px solid rgba(255,255,255,0.1)"
-                  : "1px solid rgba(0,0,0,0.2)",
-              },
-              "& .MuiDataGrid-footerContainer": {
-                bgcolor: "linear-gradient(135deg, #0a2a43 0%, #0f4c81 100%)",
-                borderTop: "none",
-                color: "#fff",
               },
             }}
           />
@@ -277,7 +263,6 @@ export default function AssetCategoriesPage() {
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editRow ? "Cập nhật danh mục" : "Thêm danh mục mới"}</DialogTitle>
         <DialogContent>
-          {/* Tên danh mục */}
           <TextField
             margin="dense"
             label="Tên danh mục"
@@ -285,8 +270,6 @@ export default function AssetCategoriesPage() {
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
           />
-
-          {/* Trạng thái */}
           <FormControl fullWidth margin="dense">
             <InputLabel>Trạng thái</InputLabel>
             <Select
@@ -297,8 +280,6 @@ export default function AssetCategoriesPage() {
               <MenuItem value="IN_ACTIVE">Ngừng hoạt động</MenuItem>
             </Select>
           </FormControl>
-
-          {/* Mô tả */}
           <TextField
             margin="dense"
             label="Mô tả"
@@ -307,7 +288,6 @@ export default function AssetCategoriesPage() {
             onChange={(e) => setForm({ ...form, description: e.target.value })}
           />
 
-          {/* Upload ảnh */}
           <Box mt={2}>
             <Button variant="outlined" component="label">
               Chọn ảnh

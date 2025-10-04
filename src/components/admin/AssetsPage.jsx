@@ -25,6 +25,16 @@ export default function AssetManagementPage() {
   const [rows, setRows] = useState([]);
   const [open, setOpen] = useState(false);
   const [editRow, setEditRow] = useState(null);
+  const assetStatusMap = {
+  NEW: { label: "Mới", color: "#2196f3" },               // xanh dương
+  IN_USE: { label: "Đang sử dụng", color: "#4caf50" },    // xanh lá
+  UNDER_MAINTENANCE: { label: "Đang bảo trì", color: "#ff9800" }, // cam
+  DAMAGED: { label: "Hỏng", color: "#f44336" },           // đỏ
+  LOST: { label: "Mất", color: "#9e9e9e" },               // xám
+  TRANSFERRED: { label: "Đã điều chuyển", color: "#9c27b0" }, // tím
+};
+
+
   const [propertiesDialog, setPropertiesDialog] = useState({
     open: false,
     properties: {},
@@ -49,37 +59,41 @@ export default function AssetManagementPage() {
   });
 
   // load assets
-  const loadAssets = async () => {
-    try {
-      const res = await assetService.getAll();
-      if (res.success && res.data?.assets) {
-        setRows(
-          res.data.assets.map((item, index) => ({
-            rowId: item._id,
-            id: index + 1,
-            name: item.name,
-            code: item.code,
-            status: item.status,
-            description: item.description,
-            serialNumber: item.serialNumber,
-            brand: item.brand,
-            assetType: item.assetType?.name,
-            assetCategory: item.assetCategory?.name,
-            warrantyEndDate: item.warrantyEndDate
-              ? new Date(item.warrantyEndDate).toLocaleDateString()
-              : "",
-            lastMaintenanceDate: item.lastMaintenanceDate
-              ? new Date(item.lastMaintenanceDate).toLocaleDateString()
-              : "",
-            zone: item.zone?.name,
-            properties: item.properties,
-          }))
-        );
-      }
-    } catch (error) {
-      console.error("Lỗi load assets:", error);
+const loadAssets = async () => {
+  try {
+    const res = await assetService.getAll();
+    if (res.success && res.data?.assets) {
+      setRows(
+        res.data.assets.map((item, index) => ({
+          rowId: item._id,
+          id: index + 1,
+          name: item.name,
+          code: item.code,
+          status: item.status,
+          description: item.description,
+          serialNumber: item.serialNumber,
+          brand: item.brand,
+          assetType: item.assetType?.name,
+          assetCategory: item.assetCategory?.name,
+          image: item.image,
+          warrantyEndDate: item.warrantyEndDate
+            ? new Date(item.warrantyEndDate).toLocaleDateString()
+            : "",
+          lastMaintenanceDate: item.lastMaintenanceDate
+            ? new Date(item.lastMaintenanceDate).toLocaleDateString()
+            : "",
+          zone: item.zone?.name,
+          building: item.zone?.building?.name,
+          campus: item.zone?.building?.campus?.name,
+          properties: item.properties,
+        }))
+      );
     }
-  };
+  } catch (error) {
+    console.error("Lỗi load assets:", error);
+  }
+};
+
 
   useEffect(() => {
     loadAssets();
@@ -164,51 +178,87 @@ export default function AssetManagementPage() {
   };
 
   const columns = [
-    { field: "id", headerName: "STT", width: 70 },
-    { field: "name", headerName: "Tên thiết bị", flex: 1 },
-    { field: "code", headerName: "Mã thiết bị", width: 120 },
-    { field: "status", headerName: "Trạng thái", width: 150 },
-    { field: "description", headerName: "Mô tả", flex: 2 },
-    { field: "serialNumber", headerName: "Số serial", width: 160 },
-    { field: "brand", headerName: "Thương hiệu", width: 120 },
-    { field: "assetType", headerName: "Loại thiết bị", width: 150 },
-    { field: "assetCategory", headerName: "Danh mục", width: 150 },
-    { field: "zone", headerName: "Khu vực", width: 150 },
-    { field: "warrantyEndDate", headerName: "Hạn bảo hành", width: 150 },
-    { field: "lastMaintenanceDate", headerName: "Ngày bảo trì gần nhất", width: 180 },
-    {
-      field: "properties",
-      headerName: "Thuộc tính",
-      width: 150,
-      renderCell: (params) => (
-        <Button
-          variant="outlined"
-          size="small"
-          startIcon={<Visibility />}
-          onClick={() =>
-            setPropertiesDialog({ open: true, properties: params.row.properties })
-          }
-        >
-          Xem
-        </Button>
-      ),
-    },
-    {
-      field: "actions",
-      headerName: "Actions",
-      width: 150,
-      renderCell: (params) => (
-        <>
-          <IconButton color="primary" onClick={() => handleEdit(params.row)}>
-            <Edit />
-          </IconButton>
-          <IconButton color="error" onClick={() => handleDelete(params.row.rowId)}>
-            <Delete />
-          </IconButton>
-        </>
-      ),
-    },
-  ];
+  { field: "id", headerName: "STT", width: 70 },
+  { field: "name", headerName: "Tên thiết bị", flex: 1 },
+  { field: "code", headerName: "Mã thiết bị", width: 120 },
+  {
+  field: "status",
+  headerName: "Trạng thái",
+  width: 180,
+  renderCell: (params) => {
+    const status = assetStatusMap[params.value] || {};
+    return (
+      <span
+        style={{
+          backgroundColor: status.color || "#ccc",
+          color: "#fff",
+          padding: "4px 8px",
+          borderRadius: "8px",
+          fontSize: "0.85rem",
+          fontWeight: "bold",
+        }}
+      >
+        {status.label || params.value}
+      </span>
+    );
+  },
+},
+  { field: "description", headerName: "Mô tả", flex: 2 },
+  { field: "serialNumber", headerName: "Số serial", width: 160 },
+  { field: "brand", headerName: "Thương hiệu", width: 120 },
+  { field: "assetType", headerName: "Loại thiết bị", width: 150 },
+  { field: "assetCategory", headerName: "Danh mục", width: 150 },
+  {
+    field: "image",
+    headerName: "Ảnh",
+    width: 120,
+    renderCell: (params) => (
+      <img
+        src={params.value}
+        alt="asset"
+        style={{ width: 60, height: 60, objectFit: "cover", borderRadius: 8 }}
+      />
+    ),
+  },
+  { field: "zone", headerName: "Khu vực", width: 150 },
+  { field: "building", headerName: "Tòa nhà", width: 150 },
+  { field: "campus", headerName: "Cơ sở", width: 150 },
+  { field: "warrantyEndDate", headerName: "Hạn bảo hành", width: 150 },
+  { field: "lastMaintenanceDate", headerName: "Ngày bảo trì gần nhất", width: 180 },
+  {
+    field: "properties",
+    headerName: "Thuộc tính",
+    width: 150,
+    renderCell: (params) => (
+      <Button
+        variant="outlined"
+        size="small"
+        startIcon={<Visibility />}
+        onClick={() =>
+          setPropertiesDialog({ open: true, properties: params.row.properties })
+        }
+      >
+        Xem
+      </Button>
+    ),
+  },
+  {
+    field: "actions",
+    headerName: "Actions",
+    width: 150,
+    renderCell: (params) => (
+      <>
+        <IconButton color="primary" onClick={() => handleEdit(params.row)}>
+          <Edit />
+        </IconButton>
+        <IconButton color="error" onClick={() => handleDelete(params.row.rowId)}>
+          <Delete />
+        </IconButton>
+      </>
+    ),
+  },
+];
+
 
   const bgColor = prefersDarkMode ? "#1e1e1e" : "#f5f5f5";
   const cardColor = prefersDarkMode ? "#2b2b2b" : "#ffffff";
@@ -305,28 +355,54 @@ export default function AssetManagementPage() {
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle>{editRow ? "Cập nhật thiết bị" : "Thêm thiết bị mới"}</DialogTitle>
         <DialogContent>
-          {[
-            { field: "name", label: "Tên thiết bị" },
-            { field: "code", label: "Mã thiết bị" },
-            { field: "status", label: "Trạng thái" },
-            { field: "description", label: "Mô tả" },
-            { field: "serialNumber", label: "Số serial" },
-            { field: "brand", label: "Thương hiệu" },
-            { field: "image", label: "Ảnh" },
-            { field: "warrantyEndDate", label: "Hạn bảo hành" },
-            { field: "lastMaintenanceDate", label: "Ngày bảo trì gần nhất" },
-            { field: "zone", label: "Khu vực" },
-          ].map(({ field, label }) => (
-            <TextField
-              key={field}
-              margin="dense"
-              label={label}
-              fullWidth
-              value={form[field] || ""}
-              onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-            />
-          ))}
-        </DialogContent>
+  {[
+    { field: "name", label: "Tên thiết bị" },
+    { field: "code", label: "Mã thiết bị" },
+    { field: "description", label: "Mô tả" },
+    { field: "serialNumber", label: "Số serial" },
+    { field: "brand", label: "Thương hiệu" },
+    { field: "image", label: "Ảnh" },
+    { field: "warrantyEndDate", label: "Hạn bảo hành" },
+    { field: "lastMaintenanceDate", label: "Ngày bảo trì gần nhất" },
+    { field: "zone", label: "Khu vực" },
+  ].map(({ field, label }) => (
+    <TextField
+      key={field}
+      margin="dense"
+      label={label}
+      fullWidth
+      value={form[field] || ""}
+      onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+    />
+  ))}
+
+<TextField
+  select
+  margin="dense"
+  label="Trạng thái"
+  fullWidth
+  value={form.status}
+  onChange={(e) => setForm({ ...form, status: e.target.value })}
+>
+  {Object.entries(assetStatusMap).map(([key, { label, color }]) => (
+    <MenuItem key={key} value={key}>
+      <span
+        style={{
+          display: "inline-block",
+          width: 12,
+          height: 12,
+          borderRadius: "50%",
+          backgroundColor: color,
+          marginRight: 8,
+        }}
+      ></span>
+      {label}
+    </MenuItem>
+  ))}
+</TextField>
+
+</DialogContent>
+
         <DialogActions>
           <Button onClick={() => setOpen(false)}>Cancel</Button>
           <Button
