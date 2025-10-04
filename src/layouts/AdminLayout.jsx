@@ -10,6 +10,7 @@ import {
   Divider,
   Collapse,
   Toolbar,
+  IconButton,
 } from "@mui/material";
 import {
   Dashboard,
@@ -40,13 +41,15 @@ import OutdoorAreasPage from "../components/admin/AreasPage";
 import AssetsPage from "../components/admin/AssetsPage";
 import AssetCategoriesPage from "../components/admin/AssetCategoriesPage";
 
-const drawerWidth = 260;
+const drawerWidth = 250;
+const collapsedDrawerWidth = 70;
 
 export default function AdminLayout() {
   const [page, setPage] = useState("Dashboard");
   const [openDrawer, setOpenDrawer] = useState(false);
   const [openAreaMenu, setOpenAreaMenu] = useState(false);
   const [openDeviceMenu, setOpenDeviceMenu] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const menuItems = [
     { label: "Bảng điều khiển", value: "Dashboard", icon: <Dashboard /> },
@@ -84,10 +87,53 @@ export default function AdminLayout() {
 
   const MenuContent = ({ onItemClick }) => (
     <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-      <Box sx={{ p: 2, display: "flex", alignItems: "center", gap: 1.5 }}>
-        <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          IUH Infrastructure
-        </Typography>
+      <Box
+        sx={{
+          p: 2,
+          display: "flex",
+          alignItems: "center",
+          gap: 1.5,
+          position: "relative",
+        }}
+      >
+        {!sidebarCollapsed && (
+          <Typography
+            variant="h6"
+            sx={{
+              fontWeight: 600,
+              opacity: sidebarCollapsed ? 0 : 1,
+              transition: "opacity 0.3s ease",
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+            }}
+          >
+            IUH Infrastructure
+          </Typography>
+        )}
+        <IconButton
+          onClick={() => {
+            setSidebarCollapsed(!sidebarCollapsed);
+            // Đóng tất cả dropdown khi collapse
+            if (!sidebarCollapsed) {
+              setOpenDeviceMenu(false);
+              setOpenAreaMenu(false);
+            }
+          }}
+          color="white"
+          sx={{
+            position: "absolute",
+            right: 8,
+            color: "white",
+            "&:hover": { bgcolor: "rgba(255,255,255,0.1)" },
+            transition: "all 0.3s ease",
+          }}
+        >
+          {sidebarCollapsed ? (
+            <ExpandMore sx={{ transform: "rotate(-90deg)" }} />
+          ) : (
+            <ExpandLess sx={{ transform: "rotate(-90deg)" }} />
+          )}
+        </IconButton>
       </Box>
       <Divider sx={{ borderColor: "rgba(255,255,255,0.1)" }} />
 
@@ -105,45 +151,98 @@ export default function AdminLayout() {
               my: 0.5,
               borderRadius: 1.5,
               mx: 1,
+              justifyContent: sidebarCollapsed ? "center" : "flex-start",
               "&.Mui-selected": {
                 bgcolor: "#00bcd4",
                 color: "#000",
                 fontWeight: "bold",
               },
               "&.Mui-selected .MuiListItemIcon-root": { color: "#000" },
-              transition: "all 0.2s",
+              transition: "all 0.3s ease",
               "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
             }}
           >
-            <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+            <ListItemIcon
+              sx={{
+                color: "inherit",
+                minWidth: sidebarCollapsed ? "auto" : 40,
+                justifyContent: "center",
+              }}
+            >
               {item.icon}
             </ListItemIcon>
-            <ListItemText primary={item.label} />
+            {!sidebarCollapsed && (
+              <ListItemText
+                primary={item.label}
+                primaryTypographyProps={{
+                  fontSize: "0.9rem",
+                  opacity: sidebarCollapsed ? 0 : 1,
+                  transition: "opacity 0.3s ease",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                }}
+              />
+            )}
           </ListItemButton>
         ))}
 
         {/* Quản lý thiết bị */}
         <ListItemButton
-          onClick={() => setOpenDeviceMenu(!openDeviceMenu)}
+          onClick={() => {
+            if (sidebarCollapsed) return; // Không mở dropdown khi collapsed
+            setOpenDeviceMenu(!openDeviceMenu);
+            setOpenAreaMenu(false); // Đóng dropdown khu vực
+          }}
           sx={{
             my: 0.5,
             borderRadius: 1.5,
             mx: 1,
-            transition: "all 0.2s",
+            justifyContent: sidebarCollapsed ? "center" : "flex-start",
+            transition: "all 0.3s ease",
             "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
           }}
         >
-          <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+          <ListItemIcon
+            sx={{
+              color: "inherit",
+              minWidth: sidebarCollapsed ? "auto" : 40,
+              justifyContent: "center",
+            }}
+          >
             <Devices />
           </ListItemIcon>
-          <ListItemText primary="Quản lý thiết bị" />
-          {openDeviceMenu ? <ExpandLess /> : <ExpandMore />}
+          {!sidebarCollapsed && (
+            <>
+              <ListItemText
+                primary="Quản lý thiết bị"
+                primaryTypographyProps={{
+                  fontSize: "0.9rem",
+                  opacity: sidebarCollapsed ? 0 : 1,
+                  transition: "opacity 0.3s ease",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                }}
+              />
+              {openDeviceMenu ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
         </ListItemButton>
 
-        <Collapse in={openDeviceMenu} timeout="auto" unmountOnExit>
+        <Collapse
+          in={openDeviceMenu && !sidebarCollapsed}
+          timeout="auto"
+          unmountOnExit
+          sx={{ transition: "all 0.3s ease" }}
+        >
           <List component="div" disablePadding>
             <ListItemButton
-              sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
+              sx={{
+                pl: 6,
+                my: 0.5,
+                borderRadius: 1.5,
+                transition: "all 0.3s ease",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+              }}
               selected={page === "AssetCategories"}
               onClick={() => {
                 setPage("AssetCategories");
@@ -153,11 +252,23 @@ export default function AdminLayout() {
               <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
                 <Category />
               </ListItemIcon>
-              <ListItemText primary="Danh mục thiết bị" />
+              <ListItemText
+                primary="Danh mục thiết bị"
+                primaryTypographyProps={{
+                  fontSize: "0.85rem",
+                  transition: "all 0.3s ease",
+                }}
+              />
             </ListItemButton>
 
             <ListItemButton
-              sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
+              sx={{
+                pl: 6,
+                my: 0.5,
+                borderRadius: 1.5,
+                transition: "all 0.3s ease",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+              }}
               selected={page === "Assets"}
               onClick={() => {
                 setPage("Assets");
@@ -167,33 +278,74 @@ export default function AdminLayout() {
               <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
                 <Devices />
               </ListItemIcon>
-              <ListItemText primary="Quản lý thiết bị" />
+              <ListItemText
+                primary="Quản lý thiết bị"
+                primaryTypographyProps={{
+                  fontSize: "0.85rem",
+                  transition: "all 0.3s ease",
+                }}
+              />
             </ListItemButton>
           </List>
         </Collapse>
 
         {/* Quản lý khu vực */}
         <ListItemButton
-          onClick={() => setOpenAreaMenu(!openAreaMenu)}
+          onClick={() => {
+            if (sidebarCollapsed) return; // Không mở dropdown khi collapsed
+            setOpenAreaMenu(!openAreaMenu);
+            setOpenDeviceMenu(false); // Đóng dropdown thiết bị
+          }}
           sx={{
             my: 0.5,
             borderRadius: 1.5,
             mx: 1,
-            transition: "all 0.2s",
+            justifyContent: sidebarCollapsed ? "center" : "flex-start",
+            transition: "all 0.3s ease",
             "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
           }}
         >
-          <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+          <ListItemIcon
+            sx={{
+              color: "inherit",
+              minWidth: sidebarCollapsed ? "auto" : 40,
+              justifyContent: "center",
+            }}
+          >
             <LocationCity />
           </ListItemIcon>
-          <ListItemText primary="Quản lý khu vực" />
-          {openAreaMenu ? <ExpandLess /> : <ExpandMore />}
+          {!sidebarCollapsed && (
+            <>
+              <ListItemText
+                primary="Quản lý khu vực"
+                primaryTypographyProps={{
+                  fontSize: "0.9rem",
+                  opacity: sidebarCollapsed ? 0 : 1,
+                  transition: "opacity 0.3s ease",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                }}
+              />
+              {openAreaMenu ? <ExpandLess /> : <ExpandMore />}
+            </>
+          )}
         </ListItemButton>
 
-        <Collapse in={openAreaMenu} timeout="auto" unmountOnExit>
+        <Collapse
+          in={openAreaMenu && !sidebarCollapsed}
+          timeout="auto"
+          unmountOnExit
+          sx={{ transition: "all 0.3s ease" }}
+        >
           <List component="div" disablePadding>
             <ListItemButton
-              sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
+              sx={{
+                pl: 6,
+                my: 0.5,
+                borderRadius: 1.5,
+                transition: "all 0.3s ease",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+              }}
               selected={page === "Buildings"}
               onClick={() => {
                 setPage("Buildings");
@@ -203,11 +355,23 @@ export default function AdminLayout() {
               <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
                 <Apartment />
               </ListItemIcon>
-              <ListItemText primary="Quản lý tòa nhà" />
+              <ListItemText
+                primary="Quản lý tòa nhà"
+                primaryTypographyProps={{
+                  fontSize: "0.85rem",
+                  transition: "all 0.3s ease",
+                }}
+              />
             </ListItemButton>
 
             <ListItemButton
-              sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
+              sx={{
+                pl: 6,
+                my: 0.5,
+                borderRadius: 1.5,
+                transition: "all 0.3s ease",
+                "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+              }}
               selected={page === "OutdoorAreas"}
               onClick={() => {
                 setPage("OutdoorAreas");
@@ -217,14 +381,51 @@ export default function AdminLayout() {
               <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
                 <AccountTree />
               </ListItemIcon>
-              <ListItemText primary="Khu vực ngoài trời" />
+              <ListItemText
+                primary="Khu vực ngoài trời"
+                primaryTypographyProps={{
+                  fontSize: "0.85rem",
+                  transition: "all 0.3s ease",
+                }}
+              />
             </ListItemButton>
           </List>
         </Collapse>
       </List>
 
-      <Box sx={{ p: 2, textAlign: "center", fontSize: 12, opacity: 0.6 }}>
-        © 2025 IUH
+      <Box sx={{ mt: "auto", p: 1 }}>
+        <ListItemButton
+          onClick={() => window.open("/", "_blank")}
+          sx={{
+            my: 0.5,
+            borderRadius: 1.5,
+            mx: 1,
+            justifyContent: sidebarCollapsed ? "center" : "flex-start",
+            transition: "all 0.3s ease",
+            "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
+          }}
+          title="Trang chủ"
+        >
+          <ListItemIcon
+            sx={{
+              color: "inherit",
+              minWidth: sidebarCollapsed ? "auto" : 40,
+              justifyContent: "center",
+            }}
+          ></ListItemIcon>
+          {!sidebarCollapsed && (
+            <ListItemText
+              primary="Xem website"
+              primaryTypographyProps={{
+                fontSize: "0.85rem",
+                opacity: sidebarCollapsed ? 0 : 1,
+                transition: "opacity 0.3s ease",
+                whiteSpace: "nowrap",
+                overflow: "hidden",
+              }}
+            />
+          )}
+        </ListItemButton>
       </Box>
     </Box>
   );
@@ -236,16 +437,18 @@ export default function AdminLayout() {
         variant="permanent"
         sx={{
           display: { xs: "none", lg: "block" },
-          width: drawerWidth,
+          width: sidebarCollapsed ? collapsedDrawerWidth : drawerWidth,
           flexShrink: 0,
+          transition: "width 0.3s ease",
           "& .MuiDrawer-paper": {
-            width: drawerWidth,
+            width: sidebarCollapsed ? collapsedDrawerWidth : drawerWidth,
             height: "100vh",
             background: "linear-gradient(135deg, #0a2a43 0%, #0f4c81 100%)",
             color: "#fff",
             boxSizing: "border-box",
             borderRight: "1px solid rgba(255,255,255,0.1)",
             overflowY: "auto",
+            transition: "width 0.3s ease",
           },
         }}
       >
@@ -278,8 +481,6 @@ export default function AdminLayout() {
           flexGrow: 1,
           bgcolor: "#f5f5f5",
           minHeight: "100vh",
-          p: 3,
-          mt: 2,
           overflowY: "auto",
           overflowX: "auto",
         }}
