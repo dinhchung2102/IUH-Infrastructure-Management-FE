@@ -3,6 +3,7 @@ import { apiHelper } from "./index.js";
 const AUTH_ENDPOINTS = {
   LOGIN: "/auth/login",
   SEND_OTP: "/auth/send-otp",
+  SEND_REGISTER_OTP: "/auth/send-register-otp",
   RESEND_OTP: "/auth/resend-otp",
   VERIFY_OTP: "/auth/verify-otp",
   REFRESH_TOKEN: "/auth/refresh-token",
@@ -58,28 +59,38 @@ export const authService = {
     }
   },
 
-  /** Gửi OTP */
-async sendOtp(payload) {
-  // payload phải là object { email: "..." }
-  const response = await apiHelper.post(AUTH_ENDPOINTS.SEND_OTP, payload);
-  return response.data;
-},
-/** Gửi lại OTP */
-async resendOtp(payload) {
-  const response = await apiHelper.post(AUTH_ENDPOINTS.RESEND_OTP, payload);
-  return response.data;
-},
+  /** Gửi OTP (dùng cho các luồng khác) */
+  async sendOtp(payload) {
+    const response = await apiHelper.post(AUTH_ENDPOINTS.SEND_OTP, payload);
+    return response.data;
+  },
 
-/** Xác thực OTP */
-async verifyOtp(payload) {
-  const response = await apiHelper.post(AUTH_ENDPOINTS.VERIFY_OTP, payload);
-  return response.data;
-},
+  /** Gửi OTP đăng ký */
+  async sendRegisterOtp(payload) {
+    const response = await apiHelper.post(
+      AUTH_ENDPOINTS.SEND_REGISTER_OTP,
+      payload
+    );
+    return response.data;
+  },
 
+  /** Gửi lại OTP */
+  async resendOtp(payload) {
+    const response = await apiHelper.post(AUTH_ENDPOINTS.RESEND_OTP, payload);
+    return response.data;
+  },
+
+  /** Xác thực OTP */
+  async verifyOtp(payload) {
+    const response = await apiHelper.post(AUTH_ENDPOINTS.VERIFY_OTP, payload);
+    return response.data;
+  },
 
   /** Refresh token */
   async refreshToken(refreshToken) {
-    const response = await apiHelper.post(AUTH_ENDPOINTS.REFRESH_TOKEN, { refreshToken });
+    const response = await apiHelper.post(AUTH_ENDPOINTS.REFRESH_TOKEN, {
+      refreshToken,
+    });
     return response.data;
   },
 

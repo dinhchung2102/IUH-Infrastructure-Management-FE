@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../../providers/AuthContext.jsx";
 import {
   TextField,
   Button,
@@ -8,28 +10,31 @@ import {
   OutlinedInput,
   InputAdornment,
   IconButton,
-  FormControlLabel,
-  Checkbox,
-  Typography,
-  Divider,
   Grid,
   CircularProgress,
+  Select,
+  MenuItem,
+  Typography,
+  Divider,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { useTranslation } from "react-i18next";
 import OtpDialog from "./OtpDialog.jsx";
 import { authService } from "../../../api/auth.js";
 
-export default function RegisterForm() {
-  const { t } = useTranslation();
+// Simple RFC5322-like email regex
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i;
+
+export default function RegisterForm({ onSuccess }) {
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
+    gender: "",
     password: "",
     confirmPassword: "",
-    agreeToTerms: false,
   });
 
   const [showPassword, setShowPassword] = useState(false);
@@ -39,95 +44,98 @@ export default function RegisterForm() {
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
-    const { name, value, checked, type } = e.target;
+    const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: value,
     }));
   };
 
-  // Khi nhấn submit form → mở OTP dialog và gửi OTP tới email
+  // Submit: gửi OTP đăng ký
   const handleSubmit = async (e) => {
     e.preventDefault();
     setMessage("");
 
     if (formData.password !== formData.confirmPassword) {
-      setMessage(t("auth.register.passwordMismatch"));
+      setMessage("Mật khẩu xác nhận không khớp");
       return;
     }
 
     if (!formData.email) {
-      setMessage(t("auth.register.emailRequired"));
+      setMessage("Vui lòng nhập địa chỉ email");
+      return;
+    }
+
+    if (!EMAIL_REGEX.test(formData.email)) {
+      setMessage("Địa chỉ email không hợp lệ");
       return;
     }
 
     try {
       setLoading(true);
-
-      const result = await authService.sendOtp({ email: formData.email });
-      console.log(result);
-
-      if (result.success) {
+      // Gửi OTP đăng ký tới email
+      const result = await authService.sendRegisterOtp({
+        email: formData.email,
+      });
+      if (result?.success) {
         setOtpDialogOpen(true);
       } else {
-        setMessage(result.message || t("common.error"));
+        setMessage(result?.message || "Có lỗi xảy ra khi gửi OTP đăng ký");
       }
     } catch (err) {
-      console.error("Send OTP error:", err);
-      setMessage(t("common.error"));
+      const apiMessage = err?.response?.data?.message;
+      setMessage(apiMessage || "Có lỗi xảy ra khi gửi OTP đăng ký");
     } finally {
       setLoading(false);
     }
   };
 
-  // Function to determine role based on email
-  const getRoleFromEmail = (email) => {
-    return email.endsWith("@student.iuh.edu.vn") ? "student" : "guest";
-  };
-
+  // Xác nhận OTP: gọi /auth/register với authOTP, sau đó login và điều hướng
   const handleConfirmOtp = async (otp) => {
     setLoading(true);
     setMessage("");
     try {
-      // Xác thực OTP
-      console.log("Xác thực OTP", formData.email, otp);
-      const verifyResult = await authService.verifyOtp({
+      const payload = {
+        username: formData.email,
+        password: formData.password,
         email: formData.email,
+        fullName: formData.fullName,
+        gender: formData.gender, // MALE | FEMALE
         authOTP: otp,
+      };
+
+      const registerResult = await authService.register(payload);
+      if (!registerResult?.success) {
+        const msg = registerResult?.message || "Đăng ký thất bại";
+        setMessage(msg);
+        return { success: false, message: msg };
+      }
+
+      // Đăng nhập ngay sau khi đăng ký thành công
+      const loginResult = await authService.login({
+        username: formData.email,
+        password: formData.password,
       });
 
-      if (verifyResult.message.includes("OTP đã được xác thực")) {
-        // Tự động xác định role dựa trên email
-        const userRole = getRoleFromEmail(formData.email);
-
-        const payload = {
-          username: formData.email,
-          fullName: formData.fullName,
-          email: formData.email,
-          phoneNumber: formData.phone,
-          password: formData.password,
-          role: userRole, // Tự động xác định role
-        };
-
-        console.log("Registering with role:", userRole);
-
-        const registerResult = await authService.register(payload);
-        if (registerResult.success) {
-          setOtpDialogOpen(false);
-          alert(
-            `Đăng ký thành công! Bạn được xác định là ${
-              userRole === "student" ? "sinh viên" : "khách"
-            }.`
-          );
-        } else {
-          setMessage(registerResult.message || "Đăng ký thất bại");
-        }
+      if (loginResult?.success && loginResult?.data) {
+        // Lưu thông tin đăng nhập vào context
+        login(
+          loginResult.data.account || loginResult.data.user || {},
+          loginResult.data.access_token
+        );
+        setOtpDialogOpen(false); // đóng dialog OTP
+        if (onSuccess) onSuccess(); // đóng form đăng ký
+        navigate("/"); // quay về trang chủ
+        return { success: true };
       } else {
-        setMessage(verifyResult.message || "OTP không hợp lệ");
+        const msg = loginResult?.message || "Đăng nhập sau đăng ký thất bại";
+        setMessage(msg);
+        return { success: false, message: msg };
       }
     } catch (err) {
-      console.error("Confirm OTP error:", err);
-      setMessage(err.response?.data?.message || "Có lỗi xảy ra");
+      const apiMessage = err?.response?.data?.message || "Có lỗi xảy ra";
+      setMessage(apiMessage);
+      return { success: false, message: apiMessage };
     } finally {
       setLoading(false);
     }
@@ -148,7 +156,7 @@ export default function RegisterForm() {
               fullWidth
               margin="normal"
               id="fullName"
-              label={t("auth.register.fullName")}
+              label="Họ và tên"
               name="fullName"
               value={formData.fullName}
               onChange={handleChange}
@@ -160,34 +168,48 @@ export default function RegisterForm() {
               fullWidth
               margin="normal"
               id="phone"
-              label={t("auth.register.phone")}
+              label="Số điện thoại"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
             />
           </Grid>
 
-          {/* Email */}
+          {/* Email và Giới tính cùng hàng */}
           <Grid size={{ xs: 16, sm: 8 }}>
             <TextField
               required
               fullWidth
               margin="normal"
               id="email"
-              label={t("auth.register.email")}
+              label="Địa chỉ Email"
               name="email"
               value={formData.email}
               onChange={handleChange}
-              helperText="Email @student.iuh.edu.vn sẽ được xác định là sinh viên"
             />
           </Grid>
 
-          {/* Password */}
           <Grid size={{ xs: 16, sm: 8 }}>
             <FormControl margin="normal" required fullWidth>
-              <InputLabel htmlFor="password">
-                {t("auth.register.password")}
-              </InputLabel>
+              <InputLabel id="gender-label">Giới tính</InputLabel>
+              <Select
+                labelId="gender-label"
+                id="gender"
+                name="gender"
+                value={formData.gender}
+                label="Giới tính"
+                onChange={handleChange}
+              >
+                <MenuItem value="MALE">Nam</MenuItem>
+                <MenuItem value="FEMALE">Nữ</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+
+          {/* Mật khẩu và Xác nhận mật khẩu cùng hàng */}
+          <Grid size={{ xs: 16, sm: 8 }}>
+            <FormControl margin="normal" required fullWidth>
+              <InputLabel htmlFor="password">Mật khẩu</InputLabel>
               <OutlinedInput
                 id="password"
                 name="password"
@@ -204,16 +226,15 @@ export default function RegisterForm() {
                     </IconButton>
                   </InputAdornment>
                 }
-                label={t("auth.register.password")}
+                label="Mật khẩu"
               />
             </FormControl>
           </Grid>
 
-          {/* Confirm Password */}
           <Grid size={{ xs: 16, sm: 8 }}>
             <FormControl margin="normal" required fullWidth>
               <InputLabel htmlFor="confirmPassword">
-                {t("auth.register.confirmPassword")}
+                Xác nhận mật khẩu
               </InputLabel>
               <OutlinedInput
                 id="confirmPassword"
@@ -233,30 +254,13 @@ export default function RegisterForm() {
                     </IconButton>
                   </InputAdornment>
                 }
-                label={t("auth.register.confirmPassword")}
+                label="Xác nhận mật khẩu"
               />
             </FormControl>
           </Grid>
         </Grid>
 
         <Divider sx={{ my: 2 }} />
-
-        {/* Checkbox */}
-        <Grid container spacing={2} columns={16}>
-          <Grid size={16}>
-            <FormControlLabel
-              control={
-                <Checkbox
-                  name="agreeToTerms"
-                  checked={formData.agreeToTerms}
-                  onChange={handleChange}
-                  required
-                />
-              }
-              label={t("auth.register.agreeToTerms")}
-            />
-          </Grid>
-        </Grid>
 
         {message && (
           <Typography
@@ -268,20 +272,16 @@ export default function RegisterForm() {
           </Typography>
         )}
 
-        <Grid container spacing={2} columns={16} justifyContent="center">
-          <Grid item size={{ xs: 16, sm: 8 }}>
-            <Button
-              type="submit"
-              fullWidth
-              variant="contained"
-              disabled={loading}
-              sx={{ mt: 3, mb: 2 }}
-              startIcon={loading && <CircularProgress size={16} />}
-            >
-              {t("auth.register.signUp")}
-            </Button>
-          </Grid>
-        </Grid>
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          disabled={loading}
+          sx={{ mt: 3, mb: 2 }}
+          startIcon={loading && <CircularProgress size={16} />}
+        >
+          Đăng ký
+        </Button>
       </Box>
 
       {/* OTP Dialog */}
