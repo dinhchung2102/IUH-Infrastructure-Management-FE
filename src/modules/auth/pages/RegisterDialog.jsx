@@ -9,12 +9,10 @@ import {
   Box,
   Link,
 } from "@mui/material";
-import { useTranslation } from "react-i18next";
 import RegisterForm from "../components/RegisterForm";
 import ErrorAlert from "../../../components/ErrorAlert";
 
 export default function RegisterDialog({ open, onClose, onSwitchToLogin }) {
-  const { t } = useTranslation();
   const [error, setError] = useState("");
 
   const handleErrorClose = () => {
@@ -24,8 +22,10 @@ export default function RegisterDialog({ open, onClose, onSwitchToLogin }) {
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
-        <DialogTitle sx={{ textAlign: "center" }}>
-          {t("auth.register.title")}
+        <DialogTitle
+          sx={{ textAlign: "center", fontSize: "1.5rem", fontWeight: 600 }}
+        >
+          Đăng ký
         </DialogTitle>
 
         <DialogContent>
@@ -35,27 +35,31 @@ export default function RegisterDialog({ open, onClose, onSwitchToLogin }) {
             align="center"
             sx={{ mb: 3 }}
           >
-            {t("auth.register.subtitle")}
+            Email @student.iuh.edu.vn sẽ được xác định là sinh viên
           </Typography>
 
-          <RegisterForm onError={setError} />
+          <RegisterForm onError={setError} onSuccess={onClose} />
 
           <Box sx={{ mt: 2, textAlign: "center" }}>
             <Typography variant="body2">
-              {t("auth.register.hasAccount")}{" "}
+              Bạn đã có tài khoản?{" "}
               <Link
                 component="button"
                 variant="body2"
                 onClick={onSwitchToLogin}
+                sx={{
+                  textDecoration: "none",
+                  verticalAlign: "baseline",
+                }}
               >
-                {t("auth.login.signIn")}
+                Đăng nhập
               </Link>
             </Typography>
           </Box>
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose}>{t("common.close")}</Button>
+          <Button onClick={onClose}>Đóng</Button>
         </DialogActions>
       </Dialog>
 
