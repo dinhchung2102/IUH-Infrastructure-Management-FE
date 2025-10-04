@@ -21,6 +21,20 @@ import { campusService } from "../../api/campus";
 
 export default function FacilitiesPage() {
   const theme = useTheme();
+  // Thay enum bằng object
+const CommonStatus = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  UNDERMAINTENANCE: "UNDERMAINTENANCE",
+};
+
+// Mapping sang tiếng Việt
+const statusLabels = {
+  [CommonStatus.ACTIVE]: "Đang hoạt động",
+  [CommonStatus.INACTIVE]: "Đã đóng cửa",
+  [CommonStatus.UNDERMAINTENANCE]: "Đang bảo trì",
+};
+
   const prefersDarkMode = useMediaQuery("(prefers-color-scheme: dark)");
   const sampleManagers = [
     {
@@ -161,26 +175,31 @@ export default function FacilitiesPage() {
     { field: "địa chỉ", headerName: "Địa chỉ", flex: 1.5 },
     { field: "số điện thoại", headerName: "SĐT", width: 150 },
     { field: "email", headerName: "Email", flex: 1 },
-    {
-      field: "trạng thái",
-      headerName: "Trạng thái",
-      width: 150,
-      renderCell: (params) => (
-        <Typography
-          sx={{
-            color: params.value === "ACTIVE" ? "green" : "red",
-            fontWeight: "bold",
-            fontSize: 14,
-            display: "flex",
-            justifyContent: "center",
-            alignContent: "center",
-            paddingTop: 2,
-          }}
-        >
-          {params.value === "ACTIVE" ? "Đang hoạt động" : "Đã đóng cửa"}
-        </Typography>
-      ),
-    },
+  {
+  field: "trạng thái",
+  headerName: "Trạng thái",
+  width: 150,
+  renderCell: (params) => (
+    <Typography
+      sx={{
+        color:
+          params.value === CommonStatus.ACTIVE
+            ? "green"
+            : params.value === CommonStatus.INACTIVE
+            ? "red"
+            : "orange",
+        fontWeight: "bold",
+        fontSize: 14,
+        display: "flex",
+        justifyContent: "center",
+        alignContent: "center",
+        paddingTop: 2,
+      }}
+    >
+      {statusLabels[params.value] || params.value}
+    </Typography>
+  ),
+},
     {
       field: "quản_lý",
       headerName: "Quản lý",
@@ -308,57 +327,80 @@ export default function FacilitiesPage() {
         </Box>
       </Box>
 
-      {/* Dialog Form Campus */}
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        maxWidth="sm"
+     
+  {/* Dialog Form Campus */}
+<Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
+  <DialogTitle>{editRow ? "Cập nhật cơ sở" : "Thêm cơ sở mới"}</DialogTitle>
+  <DialogContent>
+    {/* Map friendly labels */}
+    {[
+      { field: "name", label: "Tên cơ sở" },
+      { field: "address", label: "Địa chỉ" },
+      { field: "phone", label: "Số điện thoại" },
+      { field: "email", label: "Email" },
+    ].map(({ field, label }) => (
+      <TextField
+        key={field}
+        margin="dense"
+        label={label}
         fullWidth
-      >
-        <DialogTitle>
-          {editRow ? "Cập nhật cơ sở" : "Thêm cơ sở mới"}
-        </DialogTitle>
-        <DialogContent>
-          {["name", "address", "phone", "email", "status"].map((field) => (
-            <TextField
-              key={field}
-              margin="dense"
-              label={field === "name" ? "Tên cơ sở" : field}
-              fullWidth
-              value={form[field]}
-              onChange={(e) => setForm({ ...form, [field]: e.target.value })}
-            />
-          ))}
+        value={form[field]}
+        onChange={(e) => setForm({ ...form, [field]: e.target.value })}
+      />
+    ))}
 
-          <Typography sx={{ mt: 2, fontWeight: "bold" }}>Quản lý</Typography>
+    {/* Trạng thái */}
+    <TextField
+      select
+      margin="dense"
+      label="Trạng thái"
+      fullWidth
+      value={form.status}
+      onChange={(e) => setForm({ ...form, status: e.target.value })}
+      sx={{ mt: 2 }}
+    >
+      {[
+        { value: "ACTIVE", label: "Đang hoạt động" },
+        { value: "INACTIVE", label: "Đã đóng cửa" },
+        { value: "UNDERMAINTENANCE", label: "Đang bảo trì" },
+      ].map((option) => (
+        <MenuItem key={option.value} value={option.value}>
+          {option.label}
+        </MenuItem>
+      ))}
+    </TextField>
 
-          <TextField
-            select
-            margin="dense"
-            label="Chọn quản lý"
-            fullWidth
-            value={form.manager} // _id
-            onChange={(e) => setForm({ ...form, manager: e.target.value })} // lưu _id
-          >
-            {sampleManagers.map((manager) => (
-              <MenuItem key={manager.id} value={manager.id}>
-                {manager.fullName}
-              </MenuItem>
-            ))}
-          </TextField>
-        </DialogContent>
+    {/* Quản lý */}
+    <Typography sx={{ mt: 2, fontWeight: "bold" }}>Quản lý</Typography>
+    <TextField
+      select
+      margin="dense"
+      label="Chọn quản lý"
+      fullWidth
+      value={form.manager} // _id
+      onChange={(e) => setForm({ ...form, manager: e.target.value })} // lưu _id
+    >
+      {sampleManagers.map((manager) => (
+        <MenuItem key={manager.id} value={manager.id}>
+          {manager.fullName}
+        </MenuItem>
+      ))}
+    </TextField>
+  </DialogContent>
 
-        <DialogActions>
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button
-            variant="contained"
-            sx={{ bgcolor: "#00bcd4", "&:hover": { bgcolor: "#0097a7" } }}
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
+  <DialogActions>
+    <Button onClick={() => setOpen(false)}>Cancel</Button>
+    <Button
+      variant="contained"
+      sx={{ bgcolor: "#00bcd4", "&:hover": { bgcolor: "#0097a7" } }}
+      onClick={handleSave}
+    >
+      Save
+    </Button>
+  </DialogActions>
+</Dialog>
+
+
 
       {/* Dialog Manager */}
       <Dialog
@@ -369,7 +411,7 @@ export default function FacilitiesPage() {
       >
         <DialogTitle>Thông tin quản lý</DialogTitle>
         <DialogContent>
-          <Typography>Họ tên: {managerDialog.manager?.["họ tên"]}</Typography>
+          <Typography>Họ tên: {managerDialog.manager?.fullName}</Typography>
           <Typography>Email: {managerDialog.manager?.email}</Typography>
         </DialogContent>
         <DialogActions>
