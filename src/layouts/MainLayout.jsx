@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import { Outlet } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+//import { useTranslation } from "react-i18next";
 
 import AppBarRes from "../components/AppBar";
 import Footer from "../components/Footer";
 
 export default function MainLayout() {
-  const { t } = useTranslation();
+  //const { t } = useTranslation();
 
   return (
     <Box

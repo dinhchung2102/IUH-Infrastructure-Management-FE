@@ -12,6 +12,7 @@ const AUTH_ENDPOINTS = {
   PROFILE: "/auth/profile",
   REQUEST_RESET_PASSWORD: "/auth/request-reset-password",
   RESET_PASSWORD: "/auth/reset-password",
+  ACCOUNTS: "/auth/accounts",
 };
 
 export const authService = {
@@ -31,11 +32,8 @@ export const authService = {
         console.log("Login successful:", responseData.message);
 
         if (responseData.data && responseData.data.access_token) {
-          const { access_token, refresh_token, user } = responseData.data;
+          const { access_token, user } = responseData.data;
           localStorage.setItem("access_token", access_token);
-          if (refresh_token) {
-            localStorage.setItem("refresh_token", refresh_token);
-          }
           if (user) {
             localStorage.setItem("user", JSON.stringify(user));
           }
@@ -148,6 +146,72 @@ export const authService = {
       return response.data;
     } catch (error) {
       console.error("Reset password error:", error);
+      if (error.response?.data) {
+        return error.response.data;
+      }
+      return {
+        success: false,
+        message: error.message || "Network error occurred",
+      };
+    }
+  },
+
+  /** Lấy danh sách tài khoản (Admin) */
+  async getAccounts(params = {}) {
+    try {
+      const queryParams = new URLSearchParams();
+
+      if (params.search) queryParams.append("search", params.search);
+      if (params.role) queryParams.append("role", params.role);
+      if (params.page) queryParams.append("page", params.page);
+      if (params.limit) queryParams.append("limit", params.limit);
+      if (params.sortBy) queryParams.append("sortBy", params.sortBy);
+      if (params.sortOrder) queryParams.append("sortOrder", params.sortOrder);
+
+      const url = `${AUTH_ENDPOINTS.ACCOUNTS}${
+        queryParams.toString() ? `?${queryParams.toString()}` : ""
+      }`;
+      const response = await apiHelper.get(url);
+      return response.data;
+    } catch (error) {
+      console.error("Get accounts error:", error);
+      if (error.response?.data) {
+        return error.response.data;
+      }
+      return {
+        success: false,
+        message: error.message || "Network error occurred",
+      };
+    }
+  },
+
+  /** Lấy thông tin tài khoản theo ID (Admin) */
+  async getAccountById(id) {
+    try {
+      const response = await apiHelper.get(`${AUTH_ENDPOINTS.ACCOUNTS}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Get account by ID error:", error);
+      if (error.response?.data) {
+        return error.response.data;
+      }
+      return {
+        success: false,
+        message: error.message || "Network error occurred",
+      };
+    }
+  },
+
+  /** Cập nhật tài khoản (Admin) */
+  async updateAccount(id, payload) {
+    try {
+      const response = await apiHelper.patch(
+        `${AUTH_ENDPOINTS.ACCOUNTS}/${id}`,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Update account error:", error);
       if (error.response?.data) {
         return error.response.data;
       }

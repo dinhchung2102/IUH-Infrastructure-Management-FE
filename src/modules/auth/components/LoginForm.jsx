@@ -57,12 +57,6 @@ export default function LoginForm({
 
         login(result.data.account, result.data.access_token);
 
-        login(
-          result.data.account,
-          result.data.access_token,
-          result.data.refresh_token
-        );
-
         if (onClose) onClose();
 
         navigate("/");

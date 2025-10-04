@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import {
-  Box, Typography, Drawer,
-  List, ListItemButton, ListItemText, ListItemIcon, Divider, Collapse, Toolbar
+  Box,
+  Typography,
+  Drawer,
+  List,
+  ListItemButton,
+  ListItemText,
+  ListItemIcon,
+  Divider,
+  Collapse,
+  Toolbar,
 } from "@mui/material";
 import {
   Dashboard,
@@ -16,7 +24,7 @@ import {
   ExpandLess,
   ExpandMore,
   AccountTree,
-  Category // icon cho danh mục
+  Category, // icon cho danh mục
 } from "@mui/icons-material";
 
 import DashboardPage from "../components/admin/DashboardPage";
@@ -45,23 +53,32 @@ export default function AdminLayout() {
     { label: "Quản lý tài khoản", value: "Accounts", icon: <People /> },
     { label: "Quản lý cơ sở", value: "Facilities", icon: <Business /> },
     { label: "Quản lý nhân viên", value: "Employees", icon: <Assignment /> },
-    { label: "Quản lý báo cáo", value: "Reports", icon: <Report /> },
-    { label: "Quản lý lịch trực", value: "Schedules", icon: <EventNote /> },
   ];
 
   const renderPage = () => {
     switch (page) {
-      case "Dashboard": return <DashboardPage />;
-      case "Accounts": return <AccountsPage />;
-      case "Facilities": return <FacilitiesPage />;
-      case "Employees": return <EmployeesPage />;
-      case "Reports": return <ReportsPage />;
-      case "Schedules": return <SchedulesPage />;
-      case "Buildings": return <BuildingsPage />;
-      case "OutdoorAreas": return <OutdoorAreasPage />;
-      case "Assets": return <AssetsPage />;
-      case "AssetCategories": return <AssetCategoriesPage />;
-      default: return <Typography color="black">Page not found</Typography>;
+      case "Dashboard":
+        return <DashboardPage />;
+      case "Accounts":
+        return <AccountsPage />;
+      case "Facilities":
+        return <FacilitiesPage />;
+      case "Employees":
+        return <EmployeesPage />;
+      case "Reports":
+        return <ReportsPage />;
+      case "Schedules":
+        return <SchedulesPage />;
+      case "Buildings":
+        return <BuildingsPage />;
+      case "OutdoorAreas":
+        return <OutdoorAreasPage />;
+      case "Assets":
+        return <AssetsPage />;
+      case "AssetCategories":
+        return <AssetCategoriesPage />;
+      default:
+        return <Typography color="black">Page not found</Typography>;
     }
   };
 
@@ -80,12 +97,19 @@ export default function AdminLayout() {
           <ListItemButton
             key={item.value}
             selected={page === item.value}
-            onClick={() => { setPage(item.value); if (onItemClick) onItemClick(); }}
+            onClick={() => {
+              setPage(item.value);
+              if (onItemClick) onItemClick();
+            }}
             sx={{
               my: 0.5,
               borderRadius: 1.5,
               mx: 1,
-              "&.Mui-selected": { bgcolor: "#00bcd4", color: "#000", fontWeight: "bold" },
+              "&.Mui-selected": {
+                bgcolor: "#00bcd4",
+                color: "#000",
+                fontWeight: "bold",
+              },
               "&.Mui-selected .MuiListItemIcon-root": { color: "#000" },
               transition: "all 0.2s",
               "&:hover": { bgcolor: "rgba(255,255,255,0.08)" },
@@ -121,18 +145,28 @@ export default function AdminLayout() {
             <ListItemButton
               sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
               selected={page === "AssetCategories"}
-              onClick={() => { setPage("AssetCategories"); if (onItemClick) onItemClick(); }}
+              onClick={() => {
+                setPage("AssetCategories");
+                if (onItemClick) onItemClick();
+              }}
             >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}><Category /></ListItemIcon>
-              <ListItemText primary="Quản lý danh mục thiết bị" />
+              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+                <Category />
+              </ListItemIcon>
+              <ListItemText primary="Danh mục thiết bị" />
             </ListItemButton>
 
             <ListItemButton
               sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
               selected={page === "Assets"}
-              onClick={() => { setPage("Assets"); if (onItemClick) onItemClick(); }}
+              onClick={() => {
+                setPage("Assets");
+                if (onItemClick) onItemClick();
+              }}
             >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}><Devices /></ListItemIcon>
+              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+                <Devices />
+              </ListItemIcon>
               <ListItemText primary="Quản lý thiết bị" />
             </ListItemButton>
           </List>
@@ -161,19 +195,29 @@ export default function AdminLayout() {
             <ListItemButton
               sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
               selected={page === "Buildings"}
-              onClick={() => { setPage("Buildings"); if (onItemClick) onItemClick(); }}
+              onClick={() => {
+                setPage("Buildings");
+                if (onItemClick) onItemClick();
+              }}
             >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}><Apartment /></ListItemIcon>
+              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+                <Apartment />
+              </ListItemIcon>
               <ListItemText primary="Quản lý tòa nhà" />
             </ListItemButton>
 
             <ListItemButton
               sx={{ pl: 6, my: 0.5, borderRadius: 1.5 }}
               selected={page === "OutdoorAreas"}
-              onClick={() => { setPage("OutdoorAreas"); if (onItemClick) onItemClick(); }}
+              onClick={() => {
+                setPage("OutdoorAreas");
+                if (onItemClick) onItemClick();
+              }}
             >
-              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}><AccountTree /></ListItemIcon>
-              <ListItemText primary="Quản lý khu vực ngoài trời" />
+              <ListItemIcon sx={{ color: "inherit", minWidth: 40 }}>
+                <AccountTree />
+              </ListItemIcon>
+              <ListItemText primary="Khu vực ngoài trời" />
             </ListItemButton>
           </List>
         </Collapse>
@@ -205,7 +249,6 @@ export default function AdminLayout() {
           },
         }}
       >
-        <Toolbar />
         <MenuContent />
       </Drawer>
 
