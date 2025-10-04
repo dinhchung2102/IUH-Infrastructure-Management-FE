@@ -1,7 +1,7 @@
-import { apiHelper } from "./index.js";
-
+import { apiHelper } from "./index.js"; 
 const AREAS_ENDPOINTS = {
   GET_ALL: "/zone-area/areas",
+  GET_ALL_BY_CAMPUS: (campusId) => `/zone-area/campus/${campusId}/areas`, // chỉ còn campus
   CREATE: "/zone-area/areas",
   GET_BY_ID: (id) => `/zone-area/areas/${id}`,
   UPDATE: (id) => `/zone-area/areas/${id}`,
@@ -9,10 +9,7 @@ const AREAS_ENDPOINTS = {
 };
 
 export const areasService = {
-  /**
-   * Lấy danh sách tất cả khu vực
-   * @returns {Promise} Danh sách khu vực
-   */
+  // Lấy tất cả khu vực
   async getAll() {
     try {
       const response = await apiHelper.get(AREAS_ENDPOINTS.GET_ALL);
@@ -23,11 +20,17 @@ export const areasService = {
     }
   },
 
-  /**
-   * Lấy chi tiết khu vực theo ID
-   * @param {string} id - ID khu vực
-   * @returns {Promise} Chi tiết khu vực
-   */
+  // Lấy tất cả khu vực theo campus
+  async getAllByCampus(campusId) {
+    try {
+      const response = await apiHelper.get(AREAS_ENDPOINTS.GET_ALL_BY_CAMPUS(campusId));
+      return response.data;
+    } catch (error) {
+      console.error("getAllByCampus areas error:", error);
+      return { success: false, message: error.message || "Network error occurred" };
+    }
+  },
+
   async getById(id) {
     try {
       const response = await apiHelper.get(AREAS_ENDPOINTS.GET_BY_ID(id));
@@ -38,11 +41,6 @@ export const areasService = {
     }
   },
 
-  /**
-   * Tạo khu vực mới
-   * @param {Object} payload - Thông tin khu vực
-   * @returns {Promise} Kết quả tạo khu vực
-   */
   async create(payload) {
     try {
       const response = await apiHelper.post(AREAS_ENDPOINTS.CREATE, payload);
@@ -53,12 +51,6 @@ export const areasService = {
     }
   },
 
-  /**
-   * Cập nhật khu vực
-   * @param {string} id - ID khu vực
-   * @param {Object} payload - Thông tin cập nhật
-   * @returns {Promise} Kết quả cập nhật
-   */
   async update(id, payload) {
     try {
       const response = await apiHelper.patch(AREAS_ENDPOINTS.UPDATE(id), payload);
@@ -69,11 +61,6 @@ export const areasService = {
     }
   },
 
-  /**
-   * Xóa khu vực
-   * @param {string} id - ID khu vực
-   * @returns {Promise} Kết quả xóa
-   */
   async delete(id) {
     try {
       const response = await apiHelper.delete(AREAS_ENDPOINTS.DELETE(id));

@@ -2,6 +2,7 @@ import { apiHelper } from "./index.js";
 
 const BUILDING_ENDPOINTS = {
   GET_ALL: "/zone-area/buildings",
+  GET_ALL_BY_CAMPUS: (campusId) => `/zone-area/campus/${campusId}/buildings`, // thêm
   CREATE: "/zone-area/buildings",
   GET_BY_ID: (id) => `/zone-area/buildings/${id}`,
   UPDATE: (id) => `/zone-area/buildings/${id}`,
@@ -102,6 +103,24 @@ export const buildingService = {
       };
     }
   },
+    /**
+   * Lấy tất cả tòa nhà theo campus
+   * @param {string} campusId - ID của campus
+   * @returns {Promise} Danh sách tòa nhà
+   */
+  async getAllByCampus(campusId) {
+    try {
+      const response = await apiHelper.get(BUILDING_ENDPOINTS.GET_ALL_BY_CAMPUS(campusId));
+      return response.data;
+    } catch (error) {
+      console.error("getAllByCampus building error:", error);
+      return {
+        success: false,
+        message: error.message || "Network error occurred",
+      };
+    }
+  },
+
 };
 
 export default buildingService;
