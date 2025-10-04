@@ -10,6 +10,8 @@ const AUTH_ENDPOINTS = {
   LOGOUT: "/auth/logout",
   REGISTER: "/auth/register",
   PROFILE: "/auth/profile",
+  REQUEST_RESET_PASSWORD: "/auth/request-reset-password",
+  RESET_PASSWORD: "/auth/reset-password",
 };
 
 export const authService = {
@@ -114,6 +116,46 @@ export const authService = {
   async getProfile() {
     const response = await apiHelper.get(AUTH_ENDPOINTS.PROFILE);
     return response.data;
+  },
+
+  /** Gửi OTP để reset mật khẩu */
+  async requestResetPassword(payload) {
+    try {
+      const response = await apiHelper.post(
+        AUTH_ENDPOINTS.REQUEST_RESET_PASSWORD,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Request reset password error:", error);
+      if (error.response?.data) {
+        return error.response.data;
+      }
+      return {
+        success: false,
+        message: error.message || "Network error occurred",
+      };
+    }
+  },
+
+  /** Reset mật khẩu với OTP */
+  async resetPassword(payload) {
+    try {
+      const response = await apiHelper.put(
+        AUTH_ENDPOINTS.RESET_PASSWORD,
+        payload
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Reset password error:", error);
+      if (error.response?.data) {
+        return error.response.data;
+      }
+      return {
+        success: false,
+        message: error.message || "Network error occurred",
+      };
+    }
   },
 };
 
