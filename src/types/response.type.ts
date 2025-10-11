@@ -21,10 +21,14 @@ export interface Account {
 }
 
 export interface AuthResponse {
+  success: true;
   message: string;
-  access_token: string;
-  refresh_token: string;
-  account: Account;
+  data: {
+    access_token: string;
+    account: Account;
+  };
+  timestamp: string;
+  path: string;
 }
 
 export interface LoginRequest {

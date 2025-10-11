@@ -8,26 +8,31 @@ import type {
   RefreshTokenResponse,
 } from "@/types/response.type";
 
-// Send OTP to email
-export const sendOTP = async (
+// Send registration OTP to email
+export const sendRegisterOTP = async (
   data: SendOTPRequest
 ): Promise<{ message: string }> => {
-  const response = await api.post<{ message: string }>("/auth/send-otp", data);
+  const response = await api.post<{ message: string }>(
+    "/auth/send-register-otp",
+    data
+  );
   return response.data;
 };
 
 // Login
-export const login = async (data: LoginRequest): Promise<AuthResponse> => {
+export const login = async (
+  data: LoginRequest
+): Promise<AuthResponse["data"]> => {
   const response = await api.post<AuthResponse>("/auth/login", data);
-  return response.data;
+  return response.data.data;
 };
 
 // Register (requires OTP)
 export const register = async (
   data: RegisterRequest
-): Promise<AuthResponse> => {
+): Promise<AuthResponse["data"]> => {
   const response = await api.post<AuthResponse>("/auth/register", data);
-  return response.data;
+  return response.data.data;
 };
 
 // Refresh token
@@ -45,7 +50,6 @@ export const refreshToken = async (
 export const logout = async (): Promise<void> => {
   await api.post("/auth/logout");
   localStorage.removeItem("access_token");
-  localStorage.removeItem("refresh_token");
   localStorage.removeItem("account");
 };
 

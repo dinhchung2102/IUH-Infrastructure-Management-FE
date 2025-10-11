@@ -36,7 +36,9 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const originalRequest: any = error.config;
+    const originalRequest = error.config as typeof error.config & {
+      _retry?: boolean;
+    };
 
     if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
@@ -58,26 +60,19 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshToken = localStorage.getItem("refresh_token");
+        // Try to refresh using cookie-based refresh token
+        const res = await api.post("/auth/refresh-token");
 
-        if (!refreshToken) {
-          throw new Error("No refresh token available");
-        }
+        const newAccessToken =
+          res.data.data?.access_token || res.data.access_token;
 
-        const res = await api.post("/auth/refresh-token", {
-          refreshToken: refreshToken,
-        });
-
-        const newAccessToken = res.data.access_token;
-        const newRefreshToken = res.data.refresh_token;
-
-        // Lưu tokens mới
+        // Lưu access token mới
         localStorage.setItem("access_token", newAccessToken);
-        localStorage.setItem("refresh_token", newRefreshToken);
 
         // Lưu account data mới nếu có
-        if (res.data.account) {
-          localStorage.setItem("account", JSON.stringify(res.data.account));
+        if (res.data.data?.account || res.data.account) {
+          const account = res.data.data?.account || res.data.account;
+          localStorage.setItem("account", JSON.stringify(account));
         }
 
         api.defaults.headers.common["Authorization"] =
@@ -92,12 +87,11 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
 
-        // Clear all tokens and redirect to login
+        // Clear all data and redirect to home
         localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
         localStorage.removeItem("account");
 
-        // Redirect to login page
+        // Redirect to home page
         window.location.href = "/";
 
         return Promise.reject(err);

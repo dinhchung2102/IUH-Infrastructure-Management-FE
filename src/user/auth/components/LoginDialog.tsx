@@ -65,9 +65,8 @@ export function LoginDialog({
     try {
       const response = await login(data);
 
-      // Store tokens
+      // Store token
       localStorage.setItem("access_token", response.access_token);
-      localStorage.setItem("refresh_token", response.refresh_token);
 
       // Store account info
       localStorage.setItem("account", JSON.stringify(response.account));
@@ -79,7 +78,7 @@ export function LoginDialog({
         localStorage.removeItem("remembered_username");
       }
 
-      toast.success(response.message || "Đăng nhập thành công!");
+      // Don't show toast here - let parent handle it
       form.reset();
       onOpenChange(false);
 
@@ -138,7 +137,7 @@ export function LoginDialog({
                   <FormControl>
                     <div className="relative">
                       <Input
-                        placeholder="••••••••"
+                        placeholder="Nhập mật khẩu"
                         type={showPassword ? "text" : "password"}
                         autoComplete="current-password"
                         disabled={isLoading}

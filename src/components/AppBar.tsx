@@ -15,18 +15,41 @@ import {
   FileText,
   Mail,
   Building,
+  User,
+  LogOut,
+  Settings,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
 import logoImage from "@/assets/logo/iuh_logo-official.png";
 import {
   LoginDialog,
   RegisterDialog,
+  OTPDialog,
   ForgotPasswordDialog,
 } from "@/user/auth/components";
 import { toast } from "sonner";
+import { logout } from "@/user/auth/api/auth.api";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import type { Account } from "@/types/response.type";
+import { getRoleDisplay, getUserInitials } from "@/utils/formatDisplay.util";
 
-type DialogType = "login" | "register" | "forgotPassword" | null;
+type DialogType = "login" | "register" | "otp" | "forgotPassword" | null;
 
 export default function AppBar() {
   const location = useLocation();
@@ -34,12 +57,14 @@ export default function AppBar() {
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [activeDialog, setActiveDialog] = useState<DialogType>(null);
+  const [otpEmail, setOtpEmail] = useState("");
+  const [account, setAccount] = useState<Account | null>(null);
+  const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
     const previous = scrollY.getPrevious() ?? 0;
 
-    // Hide when scrolling down and past threshold
     if (latest > previous && latest > 150) {
       setHidden(true);
     } else {
@@ -64,20 +89,80 @@ export default function AppBar() {
     { path: "/contact", label: "Liên hệ", icon: Mail },
   ];
 
+  useEffect(() => {
+    // Load account from localStorage on mount
+    const storedAccount = localStorage.getItem("account");
+    if (storedAccount) {
+      try {
+        const parsedAccount = JSON.parse(storedAccount);
+        if (
+          parsedAccount &&
+          typeof parsedAccount === "object" &&
+          parsedAccount.email
+        ) {
+          setAccount(parsedAccount);
+        } else {
+          console.warn("Invalid account data in localStorage");
+          localStorage.removeItem("account");
+        }
+      } catch (error) {
+        console.error("Failed to parse account data:", error);
+        localStorage.removeItem("account");
+      }
+    }
+  }, []);
+
   const handleLoginSuccess = () => {
-    toast.success("Đăng nhập thành công!");
-    // Redirect to admin page after successful login
-    setTimeout(() => {
-      navigate("/admin");
-    }, 500);
+    const storedAccount = localStorage.getItem("account");
+    if (storedAccount) {
+      try {
+        const parsedAccount = JSON.parse(storedAccount);
+        setAccount(parsedAccount);
+        toast.success("Đăng nhập thành công!");
+
+        // Only redirect to admin if role is ADMIN
+        if (parsedAccount.role === "ADMIN") {
+          setTimeout(() => {
+            navigate("/admin");
+          }, 500);
+        }
+      } catch (error) {
+        console.error("Failed to parse account data:", error);
+      }
+    }
   };
 
   const handleRegisterSuccess = () => {
-    toast.success("Đăng ký thành công!");
-    // Redirect to admin page after successful registration
-    setTimeout(() => {
-      navigate("/admin");
-    }, 500);
+    const storedAccount = localStorage.getItem("account");
+    if (storedAccount) {
+      try {
+        const parsedAccount = JSON.parse(storedAccount);
+        setAccount(parsedAccount);
+        toast.success("Đăng ký thành công!");
+
+        // Only redirect to admin if role is ADMIN
+        if (parsedAccount.role === "ADMIN") {
+          setTimeout(() => {
+            navigate("/admin");
+          }, 500);
+        }
+      } catch (error) {
+        console.error("Failed to parse account data:", error);
+      }
+    }
+  };
+
+  const confirmLogout = async () => {
+    try {
+      await logout();
+      setAccount(null);
+      setShowLogoutAlert(false);
+      toast.success("Đăng xuất thành công!");
+      navigate("/");
+    } catch {
+      toast.error("Đăng xuất thất bại");
+      setShowLogoutAlert(false);
+    }
   };
 
   return (
@@ -134,21 +219,102 @@ export default function AppBar() {
             </nav>
           </div>
 
-          {/* Desktop Auth Buttons */}
+          {/* Desktop Auth Section */}
           <div className="hidden md:flex items-center gap-2">
-            <Button
-              variant="ghost"
-              className="hover:bg-primary/10 hover:text-primary"
-              onClick={() => setActiveDialog("login")}
-            >
-              Đăng nhập
-            </Button>
-            <Button
-              className="bg-primary hover:bg-primary/90 shadow-md"
-              onClick={() => setActiveDialog("register")}
-            >
-              Đăng ký
-            </Button>
+            {account ? (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    className="gap-2 bg-transparent hover:bg-transparent cursor-pointer"
+                    size="icon"
+                  >
+                    <Avatar className="size-12">
+                      <AvatarImage
+                        src={account?.avatar}
+                        alt={account?.fullName}
+                      />
+                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
+                        {getUserInitials(account?.fullName)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-56" align="end">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-3 px-2 py-1.5">
+                      <Avatar className="size-10">
+                        <AvatarImage
+                          src={account?.avatar}
+                          alt={account?.fullName}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {getUserInitials(account?.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-sm font-semibold">
+                          {account?.fullName || account?.username || "User"}
+                        </p>
+                        <p className="text-xs text-primary/70 font-medium">
+                          {getRoleDisplay(account?.role)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="h-px bg-border my-1" />
+                    <Button
+                      variant="ghost"
+                      className="justify-start gap-2"
+                      size="sm"
+                      asChild
+                    >
+                      <a href="/profile" className="cursor-pointer">
+                        <User className="size-4" />
+                        Hồ sơ
+                      </a>
+                    </Button>
+                    {account?.role === "ADMIN" && (
+                      <Button
+                        variant="ghost"
+                        className="justify-start gap-2"
+                        size="sm"
+                        asChild
+                      >
+                        <a href="/admin" className="cursor-pointer">
+                          <Settings className="size-4" />
+                          Quản trị
+                        </a>
+                      </Button>
+                    )}
+                    <Button
+                      variant="ghost"
+                      className="justify-start cursor-pointer gap-2 text-destructive hover:text-destructive"
+                      size="sm"
+                      onClick={() => setShowLogoutAlert(true)}
+                    >
+                      <LogOut className="size-4" />
+                      Đăng xuất
+                    </Button>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  className="hover:bg-primary/10 hover:text-primary"
+                  onClick={() => setActiveDialog("login")}
+                >
+                  Đăng nhập
+                </Button>
+                <Button
+                  className="bg-primary hover:bg-primary/90 shadow-md"
+                  onClick={() => setActiveDialog("register")}
+                >
+                  Đăng ký
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu */}
@@ -202,26 +368,88 @@ export default function AppBar() {
                   );
                 })}
               </nav>
-              <div className="flex flex-col gap-2 mt-6 pt-6 border-t">
-                <Button
-                  variant="outline"
-                  className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary"
-                  onClick={() => {
-                    setOpen(false);
-                    setActiveDialog("login");
-                  }}
-                >
-                  Đăng nhập
-                </Button>
-                <Button
-                  className="w-full bg-primary hover:bg-primary/90 shadow-md"
-                  onClick={() => {
-                    setOpen(false);
-                    setActiveDialog("register");
-                  }}
-                >
-                  Đăng ký
-                </Button>
+              {/* Mobile Auth Section */}
+              <div className="mt-6 pt-6 border-t">
+                {account ? (
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-3 px-2 py-2">
+                      <Avatar className="size-10">
+                        <AvatarImage
+                          src={account?.avatar}
+                          alt={account?.fullName}
+                        />
+                        <AvatarFallback className="bg-primary/10 text-primary">
+                          {getUserInitials(account?.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex flex-col gap-0.5">
+                        <p className="text-sm font-semibold">
+                          {account?.fullName || account?.username || "User"}
+                        </p>
+                        <p className="text-xs text-primary/70 font-medium">
+                          {getRoleDisplay(account?.role)}
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-2"
+                      asChild
+                      onClick={() => setOpen(false)}
+                    >
+                      <a href="/profile">
+                        <User className="size-4" />
+                        Hồ sơ
+                      </a>
+                    </Button>
+                    {account?.role === "ADMIN" && (
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start gap-2"
+                        asChild
+                        onClick={() => setOpen(false)}
+                      >
+                        <a href="/admin">
+                          <Settings className="size-4" />
+                          Quản trị
+                        </a>
+                      </Button>
+                    )}
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-2 text-destructive hover:text-destructive"
+                      onClick={() => {
+                        setOpen(false);
+                        setShowLogoutAlert(true);
+                      }}
+                    >
+                      <LogOut className="size-4" />
+                      Đăng xuất
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="outline"
+                      className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary"
+                      onClick={() => {
+                        setOpen(false);
+                        setActiveDialog("login");
+                      }}
+                    >
+                      Đăng nhập
+                    </Button>
+                    <Button
+                      className="w-full bg-primary hover:bg-primary/90 shadow-md"
+                      onClick={() => {
+                        setOpen(false);
+                        setActiveDialog("register");
+                      }}
+                    >
+                      Đăng ký
+                    </Button>
+                  </div>
+                )}
               </div>
             </SheetContent>
           </Sheet>
@@ -250,7 +478,18 @@ export default function AppBar() {
           setActiveDialog(null);
           setTimeout(() => setActiveDialog("login"), 100);
         }}
-        onSwitchToOTP={handleRegisterSuccess}
+        onSwitchToOTP={(email) => {
+          setOtpEmail(email);
+          setActiveDialog(null);
+          setTimeout(() => setActiveDialog("otp"), 100);
+        }}
+      />
+
+      <OTPDialog
+        open={activeDialog === "otp"}
+        onOpenChange={(open) => !open && setActiveDialog(null)}
+        email={otpEmail}
+        onVerifySuccess={handleRegisterSuccess}
       />
 
       <ForgotPasswordDialog
@@ -261,6 +500,30 @@ export default function AppBar() {
           setTimeout(() => setActiveDialog("login"), 100);
         }}
       />
+
+      {/* Logout Confirmation Dialog */}
+      <AlertDialog open={showLogoutAlert} onOpenChange={setShowLogoutAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xác nhận đăng xuất</AlertDialogTitle>
+            <AlertDialogDescription>
+              Bạn có chắc chắn muốn đăng xuất khỏi hệ thống? Bạn sẽ cần đăng
+              nhập lại để sử dụng các tính năng.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer">
+              Hủy
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmLogout}
+              className="bg-destructive text-white hover:bg-destructive/90 cursor-pointer"
+            >
+              Đăng xuất
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
   );
 }
