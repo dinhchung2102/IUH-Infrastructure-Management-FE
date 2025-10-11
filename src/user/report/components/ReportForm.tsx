@@ -189,7 +189,7 @@ export function ReportForm() {
               className="w-full hover:scale-105 transition-transform"
               size="lg"
             >
-              <FileText className="mr-2 h-4 w-4" />
+              <FileText className=" h-4 w-4" />
               Gửi báo cáo
             </Button>
           </form>

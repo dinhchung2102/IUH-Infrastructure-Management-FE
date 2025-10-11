@@ -66,7 +66,7 @@ export function ContactForm() {
               type="submit"
               className="w-full hover:scale-105 transition-transform"
             >
-              <Mail className="mr-2 h-4 w-4" />
+              <Mail className=" h-4 w-4" />
               Gửi tin nhắn
             </Button>
           </form>

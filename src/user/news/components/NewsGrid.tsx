@@ -142,7 +142,7 @@ export function NewsGrid() {
                     className="hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
                     Đọc thêm
-                    <ArrowRight className="ml-2 h-3 w-3" />
+                    <ArrowRight className=" h-3 w-3" />
                   </Button>
                 </div>
               </CardContent>

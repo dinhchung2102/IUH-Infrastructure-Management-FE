@@ -33,7 +33,7 @@ export function HeroSection() {
                 className="w-full sm:w-auto shadow-lg hover:shadow-xl hover:scale-105 transition-all"
               >
                 <Link to="/report">
-                  <FileText className="mr-2 h-4 w-4" />
+                  <FileText className=" h-4 w-4" />
                   Báo cáo sự cố
                 </Link>
               </Button>
@@ -45,7 +45,7 @@ export function HeroSection() {
               >
                 <Link to="/about">
                   Tìm hiểu thêm
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className=" h-4 w-4" />
                 </Link>
               </Button>
             </div>

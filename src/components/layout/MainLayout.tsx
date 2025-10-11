@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import AppBar from "../AppBar";
 import Footer from "../Footer";
 import { ScrollProgress, PageTransition } from "../motion";
+import { Toaster } from "../ui/sonner";
 
 export default function MainLayout() {
   return (
@@ -14,6 +15,7 @@ export default function MainLayout() {
         </PageTransition>
       </main>
       <Footer />
+      <Toaster />
     </div>
   );
 }

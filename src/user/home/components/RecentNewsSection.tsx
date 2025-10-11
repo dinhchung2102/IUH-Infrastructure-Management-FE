@@ -38,7 +38,7 @@ export function RecentNewsSection() {
             <Button variant="ghost" asChild>
               <Link to="/news">
                 Xem tất cả
-                <ArrowRight className="ml-2 h-4 w-4" />
+                <ArrowRight className=" h-4 w-4" />
               </Link>
             </Button>
           </div>
@@ -72,7 +72,7 @@ export function RecentNewsSection() {
                   >
                     <Link to="/news">
                       Chi tiết
-                      <ArrowRight className="ml-2 h-3 w-3" />
+                      <ArrowRight className=" h-3 w-3" />
                     </Link>
                   </Button>
                 </CardContent>

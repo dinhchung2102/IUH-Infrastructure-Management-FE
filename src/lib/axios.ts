@@ -20,7 +20,7 @@ const processQueue = (error: unknown, token: string | null = null) => {
 };
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL} || http://localhost:3000/api`,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   withCredentials: true,
 });
 
@@ -58,11 +58,28 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await api.post("/auth/refresh");
+        const refreshToken = localStorage.getItem("refresh_token");
 
-        const newAccessToken = (res.data as any).access_token;
+        if (!refreshToken) {
+          throw new Error("No refresh token available");
+        }
 
+        const res = await api.post("/auth/refresh-token", {
+          refreshToken: refreshToken,
+        });
+
+        const newAccessToken = res.data.access_token;
+        const newRefreshToken = res.data.refresh_token;
+
+        // Lưu tokens mới
         localStorage.setItem("access_token", newAccessToken);
+        localStorage.setItem("refresh_token", newRefreshToken);
+
+        // Lưu account data mới nếu có
+        if (res.data.account) {
+          localStorage.setItem("account", JSON.stringify(res.data.account));
+        }
+
         api.defaults.headers.common["Authorization"] =
           "Bearer " + newAccessToken;
 
@@ -74,7 +91,15 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         processQueue(err, null);
+
+        // Clear all tokens and redirect to login
         localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("account");
+
+        // Redirect to login page
+        window.location.href = "/";
+
         return Promise.reject(err);
       } finally {
         isRefreshing = false;

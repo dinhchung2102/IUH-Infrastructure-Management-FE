@@ -34,7 +34,7 @@ export function CTASection() {
               <Button size="lg" asChild className="shadow-lg hover:shadow-xl">
                 <Link to="/report">
                   Báo cáo ngay
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                  <ArrowRight className=" h-4 w-4" />
                 </Link>
               </Button>
             </motion.div>
