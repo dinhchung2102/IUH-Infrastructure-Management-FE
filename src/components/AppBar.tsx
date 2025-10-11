@@ -60,6 +60,7 @@ export default function AppBar() {
   const [otpEmail, setOtpEmail] = useState("");
   const [account, setAccount] = useState<Account | null>(null);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
+  const [showTokenExpiredAlert, setShowTokenExpiredAlert] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -133,22 +134,36 @@ export default function AppBar() {
   };
 
   const handleRegisterSuccess = () => {
+    console.log("handleRegisterSuccess called");
     const storedAccount = localStorage.getItem("account");
-    if (storedAccount) {
+    console.log("storedAccount:", storedAccount);
+
+    if (storedAccount && storedAccount !== "undefined") {
       try {
         const parsedAccount = JSON.parse(storedAccount);
+        console.log("parsedAccount:", parsedAccount);
+        console.log("Account avatar:", parsedAccount.avatar);
         setAccount(parsedAccount);
-        toast.success("Đăng ký thành công!");
+        console.log("Account state updated");
 
-        // Only redirect to admin if role is ADMIN
+        // Show success toast
+        toast.success("Đăng ký tài khoản thành công!");
+
+        // Redirect based on role
         if (parsedAccount.role === "ADMIN") {
           setTimeout(() => {
             navigate("/admin");
           }, 500);
         }
+        // Other roles (STUDENT, STAFF, GUEST, TEACHER) stay on current page
       } catch (error) {
         console.error("Failed to parse account data:", error);
+        toast.error("Đăng ký thành công nhưng có lỗi khi đăng nhập.");
       }
+    } else {
+      console.log("No stored account found or account is undefined");
+      // Show toast anyway to indicate success
+      toast.success("Đăng ký thành công!");
     }
   };
 
@@ -159,10 +174,28 @@ export default function AppBar() {
       setShowLogoutAlert(false);
       toast.success("Đăng xuất thành công!");
       navigate("/");
-    } catch {
-      toast.error("Đăng xuất thất bại");
+    } catch (error: any) {
+      console.error("Logout error:", error);
+      // Even if API fails, clear local data
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("account");
+      localStorage.removeItem("remembered_email");
+      setAccount(null);
       setShowLogoutAlert(false);
+
+      // Check if it's a token expiration error
+      if (error.response?.status === 401) {
+        toast.success("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+      } else {
+        toast.error("Đăng xuất thất bại");
+      }
     }
+  };
+
+  const handleTokenExpiredConfirm = () => {
+    setShowTokenExpiredAlert(false);
+    setAccount(null);
+    navigate("/");
   };
 
   return (
@@ -231,7 +264,7 @@ export default function AppBar() {
                   >
                     <Avatar className="size-12">
                       <AvatarImage
-                        src={account?.avatar}
+                        src={account?.avatar || undefined}
                         alt={account?.fullName}
                       />
                       <AvatarFallback className="text-xs bg-primary/10 text-primary">
@@ -254,7 +287,7 @@ export default function AppBar() {
                       </Avatar>
                       <div className="flex flex-col gap-0.5">
                         <p className="text-sm font-semibold">
-                          {account?.fullName || account?.username || "User"}
+                          {account?.fullName || "User"}
                         </p>
                         <p className="text-xs text-primary/70 font-medium">
                           {getRoleDisplay(account?.role)}
@@ -384,7 +417,7 @@ export default function AppBar() {
                       </Avatar>
                       <div className="flex flex-col gap-0.5">
                         <p className="text-sm font-semibold">
-                          {account?.fullName || account?.username || "User"}
+                          {account?.fullName || "User"}
                         </p>
                         <p className="text-xs text-primary/70 font-medium">
                           {getRoleDisplay(account?.role)}
@@ -520,6 +553,30 @@ export default function AppBar() {
               className="bg-destructive text-white hover:bg-destructive/90 cursor-pointer"
             >
               Đăng xuất
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Token Expired Dialog */}
+      <AlertDialog
+        open={showTokenExpiredAlert}
+        onOpenChange={setShowTokenExpiredAlert}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Phiên đăng nhập đã hết hạn</AlertDialogTitle>
+            <AlertDialogDescription>
+              Phiên đăng nhập của bạn đã hết hạn. Vui lòng đăng nhập lại để tiếp
+              tục sử dụng hệ thống.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              className="cursor-pointer"
+              onClick={handleTokenExpiredConfirm}
+            >
+              Đăng nhập lại
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

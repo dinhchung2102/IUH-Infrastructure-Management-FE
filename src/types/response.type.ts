@@ -7,7 +7,6 @@ export interface ApiResponse<T = any> {
 
 export interface Account {
   _id: string;
-  username: string;
   email: string;
   fullName: string;
   phoneNumber?: string;
@@ -32,12 +31,11 @@ export interface AuthResponse {
 }
 
 export interface LoginRequest {
-  username: string;
+  email: string;
   password: string;
 }
 
 export interface RegisterRequest {
-  username: string;
   password: string;
   email: string;
   fullName: string;

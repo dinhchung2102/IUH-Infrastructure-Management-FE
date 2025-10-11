@@ -26,7 +26,7 @@ import { toast } from "sonner";
 import { getErrorMessage } from "@/lib/error-handler";
 
 const loginSchema = z.object({
-  username: z.string().min(1, "Tên đăng nhập là bắt buộc"),
+  email: z.string().min(1, "Email là bắt buộc").email("Email không hợp lệ"),
   password: z.string().min(1, "Mật khẩu là bắt buộc"),
   rememberMe: z.boolean().optional(),
 });
@@ -54,9 +54,9 @@ export function LoginDialog({
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: localStorage.getItem("remembered_username") || "",
+      email: localStorage.getItem("remembered_email") || "",
       password: "",
-      rememberMe: !!localStorage.getItem("remembered_username"),
+      rememberMe: !!localStorage.getItem("remembered_email"),
     },
   });
 
@@ -73,9 +73,9 @@ export function LoginDialog({
 
       // Handle remember me
       if (data.rememberMe) {
-        localStorage.setItem("remembered_username", data.username);
+        localStorage.setItem("remembered_email", data.email);
       } else {
-        localStorage.removeItem("remembered_username");
+        localStorage.removeItem("remembered_email");
       }
 
       // Don't show toast here - let parent handle it
@@ -110,15 +110,15 @@ export function LoginDialog({
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="username"
+              name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tên đăng nhập</FormLabel>
+                  <FormLabel>Email</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="username"
-                      type="text"
-                      autoComplete="username"
+                      placeholder="example@iuh.edu.vn"
+                      type="email"
+                      autoComplete="email"
                       disabled={isLoading}
                       {...field}
                     />

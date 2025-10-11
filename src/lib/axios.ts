@@ -87,12 +87,13 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
 
-        // Clear all data and redirect to home
+        // Clear all data
         localStorage.removeItem("access_token");
         localStorage.removeItem("account");
+        localStorage.removeItem("remembered_email");
 
-        // Redirect to home page
-        window.location.href = "/";
+        // Show alert dialog for re-login
+        window.dispatchEvent(new CustomEvent("token-expired"));
 
         return Promise.reject(err);
       } finally {

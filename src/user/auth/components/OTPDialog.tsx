@@ -14,7 +14,7 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 import {
   InputOTP,
@@ -87,20 +87,32 @@ export function OTPDialog({
         authOTP: data.otp,
       });
 
+      console.log("Register response:", response);
+
       // Store token
       localStorage.setItem("access_token", response.access_token);
 
       // Store account info
-      localStorage.setItem("account", JSON.stringify(response.account));
+      if (response.account) {
+        localStorage.setItem("account", JSON.stringify(response.account));
+        console.log("Account stored:", response.account);
+      } else {
+        console.error("No account in response:", response);
+      }
 
       // Don't show toast here - let parent handle it
       form.reset();
       clearRegistrationData();
-      onOpenChange(false);
 
+      console.log("OTP verification successful, calling onVerifySuccess");
       if (onVerifySuccess) {
         onVerifySuccess();
+      } else {
+        console.log("onVerifySuccess callback not provided");
       }
+
+      // Close dialog after calling callback
+      onOpenChange(false);
     } catch (error) {
       toast.error(
         getErrorMessage(error, "Mã OTP không hợp lệ. Vui lòng thử lại.")
@@ -185,7 +197,7 @@ export function OTPDialog({
                       </InputOTP>
                     </div>
                   </FormControl>
-                  <FormMessage className="text-center" />
+                  <FormLabel className="text-center" />
                 </FormItem>
               )}
             />

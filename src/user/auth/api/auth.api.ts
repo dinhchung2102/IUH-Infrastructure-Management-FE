@@ -51,6 +51,7 @@ export const logout = async (): Promise<void> => {
   await api.post("/auth/logout");
   localStorage.removeItem("access_token");
   localStorage.removeItem("account");
+  localStorage.removeItem("remembered_email");
 };
 
 // Get current account

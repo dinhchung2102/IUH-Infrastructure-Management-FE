@@ -29,10 +29,6 @@ import { useRegistrationStore } from "../stores/registration.store";
 
 const registerSchema = z
   .object({
-    username: z
-      .string()
-      .min(3, "Tên đăng nhập phải có ít nhất 3 ký tự")
-      .max(50, "Tên đăng nhập không được quá 50 ký tự"),
     email: z.string().min(1, "Email là bắt buộc").email("Email không hợp lệ"),
     fullName: z
       .string()
@@ -41,15 +37,12 @@ const registerSchema = z
     gender: z.enum(["MALE", "FEMALE"]),
     password: z
       .string()
-      .min(6, "Mật khẩu phải có ít nhất 6 ký tự")
-      .regex(
-        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
-        "Mật khẩu phải chứa chữ hoa, chữ thường và số"
-      ),
+      .min(6, "Mật khẩu tối thiểu 6 ký tự")
+      .max(100, "Mật khẩu không được quá 100 ký tự"),
     confirmPassword: z.string().min(1, "Vui lòng xác nhận mật khẩu"),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Mật khẩu xác nhận không khớp",
+    message: "Mật khẩu không trùng khớp",
     path: ["confirmPassword"],
   });
 
@@ -76,7 +69,6 @@ export function RegisterDialog({
   const form = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
-      username: "",
       email: "",
       fullName: "",
       gender: "MALE",
@@ -115,7 +107,7 @@ export function RegisterDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[700px]">
+      <DialogContent className="sm:max-w-[400px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-center">
             Đăng ký tài khoản
@@ -127,29 +119,8 @@ export function RegisterDialog({
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* Two column grid for desktop */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Column 1 */}
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tên đăng nhập</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="username"
-                        autoComplete="username"
-                        disabled={isLoading}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Column 2 */}
+            {/* Single column layout */}
+            <div className="space-y-4">
               <FormField
                 control={form.control}
                 name="email"
@@ -170,7 +141,6 @@ export function RegisterDialog({
                 )}
               />
 
-              {/* Column 1 */}
               <FormField
                 control={form.control}
                 name="fullName"
@@ -190,7 +160,6 @@ export function RegisterDialog({
                 )}
               />
 
-              {/* Column 2 */}
               <FormField
                 control={form.control}
                 name="gender"
@@ -237,7 +206,6 @@ export function RegisterDialog({
                 )}
               />
 
-              {/* Column 1 */}
               <FormField
                 control={form.control}
                 name="password"
@@ -274,7 +242,6 @@ export function RegisterDialog({
                 )}
               />
 
-              {/* Column 2 */}
               <FormField
                 control={form.control}
                 name="confirmPassword"
