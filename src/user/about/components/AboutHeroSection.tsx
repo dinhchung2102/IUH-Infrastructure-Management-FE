@@ -3,7 +3,9 @@ import { Building2 } from "lucide-react";
 
 export function AboutHeroSection() {
   return (
-    <section className="bg-gradient-to-b from-background to-muted/50 py-16 md:py-24">
+    <section
+      className={`bg-gradient-to-b from-background to-muted/50 py-16 md:py-24`}
+    >
       <div className="container">
         <div className="mx-auto max-w-3xl text-center">
           <Badge variant="secondary" className="mb-4">

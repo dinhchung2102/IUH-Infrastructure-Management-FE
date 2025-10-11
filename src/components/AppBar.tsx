@@ -7,56 +7,101 @@ import {
   SheetHeader,
   SheetTitle,
 } from "./ui/sheet";
-import { Menu, Home, Info, Newspaper, FileText, Mail } from "lucide-react";
+import {
+  Menu,
+  Home,
+  Info,
+  Newspaper,
+  FileText,
+  Mail,
+  Building,
+} from "lucide-react";
 import { useState } from "react";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import logoImage from "@/assets/logo/iuh_logo-official.png";
 
 export default function AppBar() {
   const location = useLocation();
   const [open, setOpen] = useState(false);
+  const [hidden, setHidden] = useState(false);
+  const { scrollY } = useScroll();
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    const previous = scrollY.getPrevious() ?? 0;
+
+    // Hide when scrolling down and past threshold
+    if (latest > previous && latest > 150) {
+      setHidden(true);
+    } else {
+      setHidden(false);
+    }
+  });
 
   const isActive = (path: string) => {
-    return location.pathname === path;
+    // Exact match for home, starts with for others
+    if (path === "/") {
+      return location.pathname === "/";
+    }
+    return location.pathname.startsWith(path);
   };
 
   const navItems = [
     { path: "/", label: "Trang chủ", icon: Home },
     { path: "/about", label: "Giới thiệu", icon: Info },
+    { path: "/facilities", label: "Cơ sở vật chất", icon: Building },
     { path: "/news", label: "Tin tức", icon: Newspaper },
-    { path: "/report", label: "Báo cáo", icon: FileText },
+    { path: "/report", label: "Báo cáo sự cố", icon: FileText },
     { path: "/contact", label: "Liên hệ", icon: Mail },
   ];
 
   return (
-    <header className="px-6 sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-6">
+    <motion.header
+      variants={{
+        visible: { y: 0 },
+        hidden: { y: "-100%" },
+      }}
+      animate={hidden ? "hidden" : "visible"}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
+      className="px-6 sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+    >
+      <div className="container flex h-18 items-center justify-between">
+        <div className="flex items-center gap-6 flex-1">
           <Link
             to="/"
             className="flex items-center gap-2 hover:opacity-80 transition-opacity"
           >
             <img
-              src="../assets/logo/iuh_logo-official.png"
+              src={logoImage}
               alt="IUH Logo"
-              className="h-8 w-8 object-contain"
+              className="h-14 w-auto object-contain"
             />
-            <span className="font-semibold text-lg bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
-              IUH Facilities
-            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex md:flex-1 items-center justify-center gap-1 w-full">
             {navItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
-                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors hover:bg-accent hover:text-accent-foreground ${
+                className={`relative px-8 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 ${
                   isActive(item.path)
-                    ? "text-primary bg-accent"
-                    : "text-muted-foreground"
+                    ? "text-primary"
+                    : "text-foreground/70 hover:text-primary"
                 }`}
               >
                 {item.label}
+                {isActive(item.path) && (
+                  <motion.span
+                    layoutId="navbar-indicator"
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full"
+                    initial={false}
+                    transition={{
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 30,
+                    }}
+                  />
+                )}
               </Link>
             ))}
           </nav>
@@ -64,10 +109,12 @@ export default function AppBar() {
 
         {/* Desktop Auth Buttons */}
         <div className="hidden md:flex items-center gap-2">
-          <Button variant="ghost" size="sm">
+          <Button
+            variant="default"
+            className="hover:bg-default/10 hover:text-default cursor-pointer"
+          >
             Đăng nhập
           </Button>
-          <Button size="sm">Đăng ký</Button>
         </div>
 
         {/* Mobile Menu */}
@@ -85,32 +132,56 @@ export default function AppBar() {
             <nav className="flex flex-col gap-2 mt-6">
               {navItems.map((item) => {
                 const Icon = item.icon;
+                const active = isActive(item.path);
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
                     onClick={() => setOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors hover:bg-accent ${
-                      isActive(item.path)
-                        ? "bg-accent text-accent-foreground"
-                        : "text-muted-foreground"
+                    className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+                      active
+                        ? "text-primary font-semibold"
+                        : "text-foreground/70 hover:text-primary"
                     }`}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span className="font-medium">{item.label}</span>
+                    {active && (
+                      <motion.div
+                        layoutId="mobile-nav-indicator"
+                        className="absolute inset-0 bg-primary/10 rounded-lg"
+                        initial={false}
+                        transition={{
+                          type: "spring",
+                          stiffness: 380,
+                          damping: 30,
+                        }}
+                      />
+                    )}
+                    <Icon
+                      className={`h-5 w-5 relative z-10 ${
+                        active ? "text-primary" : ""
+                      }`}
+                    />
+                    <span className="font-medium relative z-10">
+                      {item.label}
+                    </span>
                   </Link>
                 );
               })}
             </nav>
             <div className="flex flex-col gap-2 mt-6 pt-6 border-t">
-              <Button variant="outline" className="w-full">
+              <Button
+                variant="outline"
+                className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary"
+              >
                 Đăng nhập
               </Button>
-              <Button className="w-full">Đăng ký</Button>
+              <Button className="w-full bg-primary hover:bg-primary/90 shadow-md">
+                Đăng ký
+              </Button>
             </div>
           </SheetContent>
         </Sheet>
       </div>
-    </header>
+    </motion.header>
   );
 }

@@ -12,6 +12,7 @@ import AdminLayout from "./components/layout/AdminLayout";
 // User pages
 import HomePage from "./user/home/HomePage";
 import AboutPage from "./user/about/AboutPage";
+import FacilitiesPage from "./user/facilities/FacilitiesPage";
 import ContactPage from "./user/contact/ContactPage";
 import NewsPage from "./user/news/NewsPage";
 import ReportPage from "./user/report/ReportPage";
@@ -26,6 +27,7 @@ function AppRoutes() {
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
+          <Route path="facilities" element={<FacilitiesPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="news" element={<NewsPage />} />
           <Route path="report" element={<ReportPage />} />
