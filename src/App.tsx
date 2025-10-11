@@ -17,6 +17,9 @@ import ContactPage from "./user/contact/ContactPage";
 import NewsPage from "./user/news/NewsPage";
 import ReportPage from "./user/report/ReportPage";
 
+// Admin pages
+import DashboardPage from "./admin/pages/DashboardPage";
+
 function AppRoutes() {
   const location = useLocation();
 
@@ -35,7 +38,16 @@ function AppRoutes() {
 
         {/* Admin Routes with AdminLayout */}
         <Route path="/admin" element={<AdminLayout />}>
-          {/* Add admin routes here */}
+          <Route index element={<DashboardPage />} />
+          <Route path="analytics" element={<div>Analytics Page</div>} />
+          <Route path="facilities" element={<div>Facilities Management</div>} />
+          <Route path="users" element={<div>Users Management</div>} />
+          <Route path="reports" element={<div>Reports Management</div>} />
+          <Route path="news" element={<div>News Management</div>} />
+          <Route path="maintenance" element={<div>Maintenance Schedule</div>} />
+          <Route path="feedback" element={<div>Feedback Management</div>} />
+          <Route path="settings" element={<div>Settings</div>} />
+          <Route path="profile" element={<div>Profile</div>} />
         </Route>
 
         {/* 404 - Redirect to home */}
