@@ -60,3 +60,13 @@ export interface RefreshTokenResponse {
   refresh_token: string;
   account: Account;
 }
+
+export interface RequestPasswordResetRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  authOTP: string;
+  newPassword: string;
+}

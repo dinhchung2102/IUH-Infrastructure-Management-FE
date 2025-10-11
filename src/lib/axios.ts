@@ -40,7 +40,19 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    // Don't try to refresh token for login/register endpoints
+    const isAuthEndpoint =
+      originalRequest?.url?.includes("/auth/login") ||
+      originalRequest?.url?.includes("/auth/register") ||
+      originalRequest?.url?.includes("/auth/send-register-otp") ||
+      originalRequest?.url?.includes("/auth/request-reset-password") ||
+      originalRequest?.url?.includes("/auth/reset-password");
+
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !isAuthEndpoint
+    ) {
       if (isRefreshing) {
         // Nếu đang refresh, chờ refresh xong
         return new Promise(function (resolve, reject) {

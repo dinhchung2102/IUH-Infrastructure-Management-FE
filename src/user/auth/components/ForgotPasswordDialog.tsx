@@ -1,4 +1,7 @@
-import { HelpCircle, Mail, Phone } from "lucide-react";
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import {
   Dialog,
   DialogContent,
@@ -6,109 +9,124 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { requestPasswordReset } from "../api/auth.api";
+import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/error-handler";
+
+const forgotPasswordSchema = z.object({
+  email: z.string().min(1, "Email là bắt buộc").email("Email không hợp lệ"),
+});
+
+type ForgotPasswordFormValues = z.infer<typeof forgotPasswordSchema>;
 
 interface ForgotPasswordDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSwitchToLogin?: () => void;
+  onSwitchToResetPassword?: (email: string) => void;
 }
 
 export function ForgotPasswordDialog({
   open,
   onOpenChange,
   onSwitchToLogin,
+  onSwitchToResetPassword,
 }: ForgotPasswordDialogProps) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const form = useForm<ForgotPasswordFormValues>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: {
+      email: "",
+    },
+  });
+
+  const onSubmit = async (data: ForgotPasswordFormValues) => {
+    setIsLoading(true);
+    try {
+      await requestPasswordReset(data.email);
+      toast.success("Mã OTP đã được gửi đến email của bạn!");
+      form.reset();
+      onOpenChange(false);
+
+      // Switch to reset password dialog
+      if (onSwitchToResetPassword) {
+        onSwitchToResetPassword(data.email);
+      }
+    } catch (error) {
+      toast.error(
+        getErrorMessage(error, "Gửi OTP thất bại. Vui lòng thử lại.")
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <div className="mx-auto mb-4 flex size-12 items-center justify-center rounded-full bg-primary/10">
-            <HelpCircle className="size-6 text-primary" />
-          </div>
           <DialogTitle className="text-2xl font-bold text-center">
-            Quên mật khẩu?
+            Quên mật khẩu
           </DialogTitle>
           <DialogDescription className="text-center">
-            Liên hệ với chúng tôi để được hỗ trợ đặt lại mật khẩu
+            Nhập email để nhận mã OTP đặt lại mật khẩu
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="rounded-full bg-green-500/10 p-3">
-                  <Phone className="size-5 text-green-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">Hotline hỗ trợ</h3>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Gọi điện trực tiếp để được hỗ trợ nhanh nhất
-                  </p>
-                  <a
-                    href="tel:02838940390"
-                    className="text-sm font-medium text-primary hover:underline"
-                  >
-                    028 3894 0390
-                  </a>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="example@iuh.edu.vn"
+                      type="email"
+                      autoComplete="email"
+                      disabled={isLoading}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex items-start gap-4">
-                <div className="rounded-full bg-blue-500/10 p-3">
-                  <Mail className="size-5 text-blue-600" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold mb-1">Email hỗ trợ</h3>
-                  <p className="text-sm text-muted-foreground mb-2">
-                    Gửi email để được hỗ trợ đặt lại mật khẩu
-                  </p>
-                  <a
-                    href="mailto:support@iuh.edu.vn"
-                    className="text-sm font-medium text-primary hover:underline"
-                  >
-                    support@iuh.edu.vn
-                  </a>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="bg-muted/50 rounded-lg p-4">
-            <p className="text-sm text-muted-foreground text-center">
-              Vui lòng cung cấp thông tin tài khoản của bạn khi liên hệ để được
-              hỗ trợ nhanh chóng
-            </p>
-          </div>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={() => {
-                onOpenChange(false);
-                onSwitchToLogin?.();
-              }}
-            >
-              Quay lại đăng nhập
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? <>Đang gửi OTP...</> : "Gửi mã OTP"}
             </Button>
-            <Button
-              className="flex-1"
-              onClick={() => {
-                window.location.href = "tel:02838940390";
-              }}
-            >
-              <Phone className="size-4 mr-2" />
-              Gọi ngay
-            </Button>
-          </div>
-        </div>
+
+            <div className="text-center text-sm">
+              <span className="text-muted-foreground">Nhớ mật khẩu? </span>
+              <Button
+                type="button"
+                variant="link"
+                className="px-1"
+                onClick={() => {
+                  onOpenChange(false);
+                  onSwitchToLogin?.();
+                }}
+                disabled={isLoading}
+              >
+                Đăng nhập ngay
+              </Button>
+            </div>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );

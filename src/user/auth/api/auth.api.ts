@@ -59,3 +59,21 @@ export const getCurrentAccount = async () => {
   const response = await api.get("/auth/me");
   return response.data;
 };
+
+// Request password reset
+export const requestPasswordReset = async (
+  email: string
+): Promise<{ message: string }> => {
+  const response = await api.post("/auth/request-reset-password", { email });
+  return response.data;
+};
+
+// Reset password with OTP
+export const resetPassword = async (data: {
+  email: string;
+  authOTP: string;
+  newPassword: string;
+}): Promise<{ message: string }> => {
+  const response = await api.put("/auth/reset-password", data);
+  return response.data;
+};

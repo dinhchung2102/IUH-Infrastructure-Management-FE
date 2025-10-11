@@ -27,6 +27,7 @@ import {
   RegisterDialog,
   OTPDialog,
   ForgotPasswordDialog,
+  ResetPasswordDialog,
 } from "@/user/auth/components";
 import { toast } from "sonner";
 import { logout } from "@/user/auth/api/auth.api";
@@ -49,7 +50,13 @@ import {
 import type { Account } from "@/types/response.type";
 import { getRoleDisplay, getUserInitials } from "@/utils/formatDisplay.util";
 
-type DialogType = "login" | "register" | "otp" | "forgotPassword" | null;
+type DialogType =
+  | "login"
+  | "register"
+  | "otp"
+  | "forgotPassword"
+  | "resetPassword"
+  | null;
 
 export default function AppBar() {
   const location = useLocation();
@@ -58,6 +65,7 @@ export default function AppBar() {
   const [hidden, setHidden] = useState(false);
   const [activeDialog, setActiveDialog] = useState<DialogType>(null);
   const [otpEmail, setOtpEmail] = useState("");
+  const [resetPasswordEmail, setResetPasswordEmail] = useState("");
   const [account, setAccount] = useState<Account | null>(null);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const [showTokenExpiredAlert, setShowTokenExpiredAlert] = useState(false);
@@ -527,7 +535,22 @@ export default function AppBar() {
 
       <ForgotPasswordDialog
         open={activeDialog === "forgotPassword"}
+        onOpenChange={(open: boolean) => !open && setActiveDialog(null)}
+        onSwitchToLogin={() => {
+          setActiveDialog(null);
+          setTimeout(() => setActiveDialog("login"), 100);
+        }}
+        onSwitchToResetPassword={(email: string) => {
+          setResetPasswordEmail(email);
+          setActiveDialog(null);
+          setTimeout(() => setActiveDialog("resetPassword"), 100);
+        }}
+      />
+
+      <ResetPasswordDialog
+        open={activeDialog === "resetPassword"}
         onOpenChange={(open) => !open && setActiveDialog(null)}
+        email={resetPasswordEmail}
         onSwitchToLogin={() => {
           setActiveDialog(null);
           setTimeout(() => setActiveDialog("login"), 100);

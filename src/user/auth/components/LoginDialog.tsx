@@ -86,6 +86,7 @@ export function LoginDialog({
         onLoginSuccess();
       }
     } catch (error) {
+      console.error("Login error:", error);
       toast.error(
         getErrorMessage(error, "Đăng nhập thất bại. Vui lòng thử lại.")
       );
