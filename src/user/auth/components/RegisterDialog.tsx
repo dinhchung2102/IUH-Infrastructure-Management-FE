@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/select";
 import { sendOTP, register } from "../api/auth.api";
 import { toast } from "sonner";
+import { getErrorMessage } from "@/lib/error-handler";
 
 const emailSchema = z.object({
   email: z.string().min(1, "Email là bắt buộc").email("Email không hợp lệ"),
@@ -120,9 +121,8 @@ export function RegisterDialog({
       setStep("register");
       toast.success("Mã OTP đã được gửi đến email của bạn!");
     } catch (error) {
-      const err = error as { response?: { data?: { message?: string } } };
       toast.error(
-        err.response?.data?.message || "Gửi OTP thất bại. Vui lòng thử lại."
+        getErrorMessage(error, "Gửi OTP thất bại. Vui lòng thử lại.")
       );
     } finally {
       setIsLoading(false);
@@ -153,9 +153,8 @@ export function RegisterDialog({
         onSwitchToOTP(data.email);
       }
     } catch (error) {
-      const err = error as { response?: { data?: { message?: string } } };
       toast.error(
-        err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
+        getErrorMessage(error, "Đăng ký thất bại. Vui lòng thử lại.")
       );
     } finally {
       setIsLoading(false);
