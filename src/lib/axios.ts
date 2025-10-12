@@ -40,6 +40,41 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
+    // Early-handle: if refresh token endpoint itself returns 401, force logout flow
+    if (error.response?.status === 401) {
+      const url = originalRequest?.url || "";
+      const isRefreshEndpoint = url.includes("/auth/refresh-token");
+      if (isRefreshEndpoint) {
+        // Reject any queued requests and stop refreshing
+        processQueue(error, null);
+        isRefreshing = false;
+
+        // Clear all local credentials
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("account");
+        localStorage.removeItem("remembered_email");
+
+        // Remove default Authorization header to avoid stale token usage
+        const defaultsHeaders = api.defaults.headers as Record<
+          string,
+          unknown
+        > & {
+          common?: Record<string, string>;
+        };
+        if (
+          defaultsHeaders?.common &&
+          "Authorization" in defaultsHeaders.common
+        ) {
+          delete defaultsHeaders.common["Authorization"];
+        }
+
+        // Notify app to show re-login dialog
+        window.dispatchEvent(new CustomEvent("token-expired"));
+
+        return Promise.reject(error);
+      }
+    }
+
     // Don't try to refresh token for login/register endpoints
     const isAuthEndpoint =
       originalRequest?.url?.includes("/auth/login") ||
@@ -103,6 +138,20 @@ api.interceptors.response.use(
         localStorage.removeItem("access_token");
         localStorage.removeItem("account");
         localStorage.removeItem("remembered_email");
+
+        // Remove default Authorization header to avoid stale token usage
+        const defaultsHeaders2 = api.defaults.headers as Record<
+          string,
+          unknown
+        > & {
+          common?: Record<string, string>;
+        };
+        if (
+          defaultsHeaders2?.common &&
+          "Authorization" in defaultsHeaders2.common
+        ) {
+          delete defaultsHeaders2.common["Authorization"];
+        }
 
         // Show alert dialog for re-login
         window.dispatchEvent(new CustomEvent("token-expired"));
