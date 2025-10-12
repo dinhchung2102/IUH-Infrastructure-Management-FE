@@ -1,5 +1,5 @@
-import { NavLink } from "react-router-dom";
-import { useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
 import {
   LayoutDashboard,
   Building2,
@@ -113,7 +113,49 @@ const navigation = [
 ];
 
 function SidebarContent() {
-  const [openSection, setOpenSection] = useState<string>("");
+  const location = useLocation();
+
+  const findSectionByPath = (pathname: string): string => {
+    let bestMatchSection = "";
+    let bestMatchLength = -1;
+
+    for (const section of navigation) {
+      for (const item of section.items) {
+        if (item.href === "/") continue; // external link
+
+        // Exact match takes priority
+        if (pathname === item.href) {
+          const length = item.href.length;
+          if (length > bestMatchLength) {
+            bestMatchLength = length;
+            bestMatchSection = section.title;
+          }
+          continue;
+        }
+
+        // Prefix match for nested routes, prefer the longest href
+        if (pathname.startsWith(item.href + "/")) {
+          const length = item.href.length;
+          if (length > bestMatchLength) {
+            bestMatchLength = length;
+            bestMatchSection = section.title;
+          }
+        }
+      }
+    }
+
+    if (bestMatchSection) return bestMatchSection;
+    if (pathname === "/admin") return "Tổng quan";
+    return "";
+  };
+
+  const [openSection, setOpenSection] = useState<string>(() =>
+    findSectionByPath(location.pathname)
+  );
+
+  useEffect(() => {
+    setOpenSection(findSectionByPath(location.pathname));
+  }, [location.pathname]);
 
   const toggleSection = (sectionTitle: string) => {
     console.log("toggleSection called:", sectionTitle, "current:", openSection);
@@ -175,7 +217,7 @@ function SidebarContent() {
                 </button>
               </CollapsibleTrigger>
               <CollapsibleContent className="space-y-1">
-                <div className="ml-2 mt-1 space-y-1 animate-in slide-in-from-top-2 duration-200">
+                <div className="ml-2 mt-1 space-y-1">
                   {section.items.map((item) =>
                     item.href === "/" ? (
                       // Special handling for external website link
