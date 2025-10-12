@@ -99,12 +99,10 @@ export function FacilitiesFilters() {
         <Separator />
 
         <div className="flex gap-2">
-          <Button variant="outline" className="flex-1" size="sm">
+          <Button variant="outline" className="flex-1">
             Xóa bộ lọc
           </Button>
-          <Button className="flex-1" size="sm">
-            Áp dụng
-          </Button>
+          <Button className="flex-1">Áp dụng</Button>
         </div>
       </CardContent>
     </Card>

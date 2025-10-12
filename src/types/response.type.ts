@@ -1,3 +1,5 @@
+import type { PermissionString } from "./permission.type";
+
 // Response types for API calls
 export interface ApiResponse<T = any> {
   success: boolean;
@@ -16,7 +18,7 @@ export interface Account {
   dateOfBirth?: string;
   isActive: boolean;
   role: string;
-  permissions: string[];
+  permissions: PermissionString[];
 }
 
 export interface AuthResponse {

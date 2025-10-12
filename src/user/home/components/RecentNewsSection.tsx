@@ -66,7 +66,6 @@ export function RecentNewsSection() {
                 <CardContent>
                   <Button
                     variant="ghost"
-                    size="sm"
                     className="w-full hover:bg-primary hover:text-primary-foreground transition-colors"
                     asChild
                   >

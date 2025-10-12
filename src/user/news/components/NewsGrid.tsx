@@ -99,9 +99,7 @@ export function NewsGrid() {
         <p className="text-sm text-muted-foreground">
           Hiển thị {news.length} bài viết
         </p>
-        <Button variant="outline" size="sm">
-          Mới nhất
-        </Button>
+        <Button variant="outline">Mới nhất</Button>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
@@ -137,7 +135,6 @@ export function NewsGrid() {
                   </div>
                   <Button
                     variant="ghost"
-                    size="sm"
                     className="hover:bg-primary hover:text-primary-foreground transition-colors"
                   >
                     Đọc thêm
@@ -153,21 +150,11 @@ export function NewsGrid() {
       {/* Pagination */}
       <div className="mt-8 flex justify-center">
         <div className="flex gap-2">
-          <Button variant="outline" size="sm">
-            Trang trước
-          </Button>
-          <Button variant="outline" size="sm">
-            1
-          </Button>
-          <Button variant="default" size="sm">
-            2
-          </Button>
-          <Button variant="outline" size="sm">
-            3
-          </Button>
-          <Button variant="outline" size="sm">
-            Trang sau
-          </Button>
+          <Button variant="outline">Trang trước</Button>
+          <Button variant="outline">1</Button>
+          <Button variant="default">2</Button>
+          <Button variant="outline">3</Button>
+          <Button variant="outline">Trang sau</Button>
         </div>
       </div>
     </div>

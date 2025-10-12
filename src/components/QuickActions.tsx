@@ -11,22 +11,27 @@ import {
 
 export default function QuickActions() {
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [lastScrollY, setLastScrollY] = useState(0);
 
   useEffect(() => {
-    const toggleVisibility = () => {
-      if (window.scrollY > 300) {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
+
+      if (currentScrollY > 300 && currentScrollY < lastScrollY) {
         setShowScrollTop(true);
       } else {
         setShowScrollTop(false);
       }
+
+      setLastScrollY(currentScrollY);
     };
 
-    window.addEventListener("scroll", toggleVisibility);
+    window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("scroll", toggleVisibility);
+      window.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, [lastScrollY]);
 
   const scrollToTop = () => {
     window.scrollTo({
