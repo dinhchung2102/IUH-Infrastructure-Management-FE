@@ -125,7 +125,7 @@ export default function AccountTable({
             onChange={(e) => setSearchInput(e.target.value)}
             className="bg-white"
           />
-          <Button type="submit" variant="default">
+          <Button type="submit" variant="default" className="cursor-pointer">
             Tìm kiếm
           </Button>
         </form>
@@ -339,7 +339,10 @@ export default function AccountTable({
                   <TableCell className="text-center">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0 cursor-pointer"
+                        >
                           <span className="sr-only">Mở menu</span>
                           <MoreHorizontal className="h-4 w-4" />
                         </Button>

@@ -1,6 +1,14 @@
-import { AccountTable } from "../components";
+import { useState } from "react";
+import {
+  AccountTable,
+  AccountStatsCards,
+  AccountStatsDialog,
+} from "../components";
 import PaginationComponent from "@/components/PaginationComponent";
-import { useAccountManagement } from "../hooks";
+import { useAccountManagement, useAccountStats } from "../hooks";
+import { Button } from "@/components/ui/button";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { ChartBar } from "lucide-react";
 
 export default function AccountPage() {
   const {
@@ -14,16 +22,34 @@ export default function AccountPage() {
     handlePageChange,
   } = useAccountManagement();
 
+  const { stats, loading: statsLoading } = useAccountStats();
+  const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
+
   return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="text-3xl font-semibold tracking-tight">
-          Quản lý tài khoản
-        </h2>
-        <p className="text-muted-foreground">
-          Quản lý và theo dõi tất cả tài khoản trong hệ thống
-        </p>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/admin" },
+            { label: "Quản lý", href: "/admin/account" },
+            { label: "Quản lý tài khoản", isCurrent: true },
+          ]}
+        />
+        <Button
+          className="w-full cursor-pointer md:w-auto"
+          onClick={() => setIsStatsDialogOpen(true)}
+        >
+          <ChartBar className="h-4 w-4" />
+          Xem thống kê
+        </Button>
       </div>
+
+      <AccountStatsCards stats={stats} loading={statsLoading} />
+
+      <AccountStatsDialog
+        open={isStatsDialogOpen}
+        onOpenChange={setIsStatsDialogOpen}
+      />
 
       <AccountTable
         accounts={accounts}
