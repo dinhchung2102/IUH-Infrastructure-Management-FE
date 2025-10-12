@@ -166,12 +166,11 @@ export function FacilitiesGrid() {
                   </div>
 
                   <div className="flex gap-2 pt-2">
-                    <Button variant="outline" size="sm" className="flex-1">
+                    <Button variant="outline" className="flex-1">
                       <Info className="size-4 mr-1" />
                       Chi tiết
                     </Button>
                     <Button
-                      size="sm"
                       className="flex-1"
                       disabled={facility.status !== "available"}
                     >

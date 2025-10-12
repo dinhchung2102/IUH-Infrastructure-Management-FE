@@ -306,7 +306,6 @@ export default function AppBar() {
                     <Button
                       variant="ghost"
                       className="justify-start gap-2"
-                      size="sm"
                       asChild
                     >
                       <a href="/profile" className="cursor-pointer">
@@ -318,7 +317,6 @@ export default function AppBar() {
                       <Button
                         variant="ghost"
                         className="justify-start gap-2"
-                        size="sm"
                         asChild
                       >
                         <a href="/admin" className="cursor-pointer">
@@ -330,7 +328,6 @@ export default function AppBar() {
                     <Button
                       variant="ghost"
                       className="justify-start cursor-pointer gap-2 text-destructive hover:text-destructive"
-                      size="sm"
                       onClick={() => setShowLogoutAlert(true)}
                     >
                       <LogOut className="size-4" />
