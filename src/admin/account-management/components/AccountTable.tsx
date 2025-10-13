@@ -18,7 +18,6 @@ import {
   ChevronUp,
   MoreHorizontal,
   Eye,
-  Edit,
   Trash2,
   UserCheck,
   UserX,
@@ -46,7 +45,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { TableSkeleton } from "@/components/TableSkeleton";
+import {
+  getAccountById,
+  lockAccount,
+  unlockAccount,
+  deleteAccount,
+} from "../api/account-actions.api";
 
 interface AccountTableProps {
   accounts: AccountResponse[];
@@ -60,6 +66,7 @@ interface AccountTableProps {
   };
   onFiltersChange: (filters: Partial<QueryAccountsDto>) => void;
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
+  onAccountStatusUpdate?: (accountId: string, newStatus: boolean) => void;
 }
 
 export default function AccountTable({
@@ -69,6 +76,7 @@ export default function AccountTable({
   filters,
   onFiltersChange,
   onSortChange,
+  onAccountStatusUpdate,
 }: AccountTableProps) {
   const [searchInput, setSearchInput] = React.useState(filters.search);
 
@@ -88,18 +96,82 @@ export default function AccountTable({
 
   const getSortIcon = (field: string) => {
     if (paginationRequest.sortBy !== field) {
-      return <ChevronsUpDown className="ml-2 h-4 w-4" />;
+      return <ChevronsUpDown className="h-4 w-4" />;
     }
     return paginationRequest.sortOrder === "asc" ? (
-      <ChevronUp className="ml-2 h-4 w-4" />
+      <ChevronUp className="h-4 w-4" />
     ) : (
-      <ChevronDown className="ml-2 h-4 w-4" />
+      <ChevronDown className="h-4 w-4" />
     );
   };
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onFiltersChange({ search: searchInput });
+  };
+
+  const handleViewDetails = async (accountId: string) => {
+    try {
+      const response = await getAccountById(accountId);
+      console.log("Chi tiết tài khoản:", response.data);
+
+      // TODO: Mở dialog hoặc navigate đến trang chi tiết
+      toast.success(
+        `Đã tải thông tin tài khoản ${
+          response?.data?.fullName || response?.data?.email || "N/A"
+        }`
+      );
+    } catch (error) {
+      console.error("Lỗi khi tải chi tiết tài khoản:", error);
+      toast.error("Không thể tải thông tin tài khoản");
+    }
+  };
+
+  const handleToggleAccountStatus = async (
+    accountId: string,
+    currentStatus: boolean
+  ) => {
+    try {
+      let response;
+      const newStatus = !currentStatus; // Trạng thái mới sau khi toggle
+
+      if (currentStatus) {
+        // Lock account
+        response = await lockAccount(accountId);
+        console.log("Đã khóa tài khoản:", response.data);
+        toast.success("Tài khoản đã được khóa");
+      } else {
+        // Unlock account
+        response = await unlockAccount(accountId);
+        console.log("Đã mở khóa tài khoản:", response.data);
+        toast.success("Tài khoản đã được mở khóa");
+      }
+
+      // Cập nhật UI ngay lập tức
+      onAccountStatusUpdate?.(accountId, newStatus);
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái tài khoản:", error);
+      toast.error("Không thể cập nhật trạng thái tài khoản");
+    }
+  };
+
+  const handleDeleteAccount = async (accountId: string) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
+      return;
+    }
+
+    try {
+      await deleteAccount(accountId);
+      console.log("Đã xóa tài khoản:", accountId);
+
+      toast.success("Tài khoản đã được xóa");
+
+      // TODO: Refresh danh sách tài khoản
+      // onRefresh?.();
+    } catch (error) {
+      console.error("Lỗi khi xóa tài khoản:", error);
+      toast.error("Không thể xóa tài khoản");
+    }
   };
 
   const roleOptions = [
@@ -170,7 +242,7 @@ export default function AccountTable({
           <SelectContent>
             <SelectItem value="all">Tất cả trạng thái</SelectItem>
             <SelectItem value="active">Hoạt động</SelectItem>
-            <SelectItem value="inactive">Không hoạt động</SelectItem>
+            <SelectItem value="inactive">Đã khóa</SelectItem>
           </SelectContent>
         </Select>
         <Select
@@ -333,7 +405,7 @@ export default function AccountTable({
                       variant={account.isActive ? "default" : "destructive"}
                       className="text-xs"
                     >
-                      {account.isActive ? "Hoạt động" : "Không hoạt động"}
+                      {account.isActive ? "Hoạt động" : "Đã khóa"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
@@ -351,40 +423,35 @@ export default function AccountTable({
                         <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() =>
-                            console.log("Xem chi tiết:", account._id)
-                          }
+                          onClick={() => handleViewDetails(account._id)}
                         >
                           <Eye className="mr-2 h-4 w-4" />
                           Xem chi tiết
                         </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => console.log("Chỉnh sửa:", account._id)}
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Chỉnh sửa
-                        </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
                           onClick={() =>
-                            console.log("Toggle status:", account._id)
+                            handleToggleAccountStatus(
+                              account._id,
+                              account.isActive
+                            )
                           }
                         >
                           {account.isActive ? (
                             <>
                               <UserX className="mr-2 h-4 w-4" />
-                              Vô hiệu hóa
+                              Khóa tài khoản
                             </>
                           ) : (
                             <>
                               <UserCheck className="mr-2 h-4 w-4" />
-                              Kích hoạt
+                              Mở khóa tài khoản
                             </>
                           )}
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                          onClick={() => console.log("Xóa:", account._id)}
+                          onClick={() => handleDeleteAccount(account._id)}
                           className="text-red-600"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />

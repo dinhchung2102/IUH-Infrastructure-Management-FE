@@ -20,6 +20,7 @@ export default function AccountPage() {
     handleFiltersChange,
     handleSortChange,
     handlePageChange,
+    updateAccountStatus,
   } = useAccountManagement();
 
   const { stats, loading: statsLoading } = useAccountStats();
@@ -58,6 +59,7 @@ export default function AccountPage() {
         filters={filters}
         onFiltersChange={handleFiltersChange}
         onSortChange={handleSortChange}
+        onAccountStatusUpdate={updateAccountStatus}
       />
 
       <PaginationComponent

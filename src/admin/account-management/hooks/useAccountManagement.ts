@@ -32,11 +32,12 @@ export function useAccountManagement() {
   } = useAccountPagination();
 
   // Data fetching
-  const { accounts, loading, error, refetch } = useAccountData({
-    filters,
-    paginationRequest,
-    onPaginationUpdate: updatePagination,
-  });
+  const { accounts, loading, error, refetch, updateAccountStatus } =
+    useAccountData({
+      filters,
+      paginationRequest,
+      onPaginationUpdate: updatePagination,
+    });
 
   // Handler để thay đổi filters và reset về trang 1
   const handleFiltersChange = (
@@ -68,5 +69,6 @@ export function useAccountManagement() {
 
     // Utils
     refetch,
+    updateAccountStatus,
   };
 }

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { getAccounts } from "../api/account.api";
 import type { AccountResponse, QueryAccountsDto } from "../types/account.type";
 import type {
@@ -28,6 +28,10 @@ export function useAccountData({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
+  // Sử dụng useRef để tránh stale closure
+  const onPaginationUpdateRef = useRef(onPaginationUpdate);
+  onPaginationUpdateRef.current = onPaginationUpdate;
+
   const fetchAccounts = useCallback(async () => {
     try {
       setLoading(true);
@@ -43,23 +47,39 @@ export function useAccountData({
 
       const res = await getAccounts(query);
       setAccounts(res?.data.accounts || []);
-      onPaginationUpdate(res?.data?.pagination || DEFAULT_PAGINATION_RESPONSE);
+      onPaginationUpdateRef.current(
+        res?.data?.pagination || DEFAULT_PAGINATION_RESPONSE
+      );
     } catch (err) {
       setError(err as Error);
       setAccounts([]);
     } finally {
       setLoading(false);
     }
-  }, [filters, paginationRequest, onPaginationUpdate]);
+  }, [filters, paginationRequest]);
 
   useEffect(() => {
     fetchAccounts();
   }, [fetchAccounts]);
+
+  const updateAccountStatus = useCallback(
+    (accountId: string, newStatus: boolean) => {
+      setAccounts((prevAccounts) =>
+        prevAccounts.map((account) =>
+          account._id === accountId
+            ? { ...account, isActive: newStatus }
+            : account
+        )
+      );
+    },
+    []
+  );
 
   return {
     accounts,
     loading,
     error,
     refetch: fetchAccounts,
+    updateAccountStatus,
   };
 }
