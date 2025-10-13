@@ -54,8 +54,8 @@ const navigation = [
         icon: Building2,
       },
       {
-        title: "Người dùng",
-        href: "/admin/users",
+        title: "Tài khoản",
+        href: "/admin/account",
         icon: Users,
       },
       {

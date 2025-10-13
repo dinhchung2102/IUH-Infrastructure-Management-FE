@@ -121,6 +121,23 @@ export default function AppBar() {
     }
   }, []);
 
+  useEffect(() => {
+    const onTokenExpired = (_e: Event) => {
+      // Show alert dialog when refresh token fails
+      setShowTokenExpiredAlert(true);
+      // Ensure any mobile sheet is closed
+      setOpen(false);
+    };
+
+    window.addEventListener("token-expired", onTokenExpired as EventListener);
+    return () => {
+      window.removeEventListener(
+        "token-expired",
+        onTokenExpired as EventListener
+      );
+    };
+  }, []);
+
   const handleLoginSuccess = () => {
     const storedAccount = localStorage.getItem("account");
     if (storedAccount) {
@@ -204,6 +221,8 @@ export default function AppBar() {
     setShowTokenExpiredAlert(false);
     setAccount(null);
     navigate("/");
+    // Force login dialog to appear
+    setTimeout(() => setActiveDialog("login"), 50);
   };
 
   return (

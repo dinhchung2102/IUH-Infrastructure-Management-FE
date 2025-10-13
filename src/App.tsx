@@ -19,6 +19,7 @@ import ReportPage from "./user/report/ReportPage";
 
 // Admin pages
 import DashboardPage from "./admin/pages/DashboardPage";
+import AccountPage from "./admin/account-management/page/AccountPage";
 
 function AppRoutes() {
   const location = useLocation();
@@ -41,7 +42,7 @@ function AppRoutes() {
           <Route index element={<DashboardPage />} />
           <Route path="analytics" element={<div>Analytics Page</div>} />
           <Route path="facilities" element={<div>Facilities Management</div>} />
-          <Route path="users" element={<div>Users Management</div>} />
+          <Route path="account" element={<AccountPage />} />
           <Route path="reports" element={<div>Reports Management</div>} />
           <Route path="news" element={<div>News Management</div>} />
           <Route path="maintenance" element={<div>Maintenance Schedule</div>} />
