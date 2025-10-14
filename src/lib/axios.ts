@@ -49,6 +49,9 @@ api.interceptors.response.use(
         processQueue(error, null);
         isRefreshing = false;
 
+        // Check if user was previously logged in (had a token)
+        const hadToken = !!localStorage.getItem("access_token");
+
         // Clear all local credentials
         localStorage.removeItem("access_token");
         localStorage.removeItem("account");
@@ -68,8 +71,10 @@ api.interceptors.response.use(
           delete defaultsHeaders.common["Authorization"];
         }
 
-        // Notify app to show re-login dialog
-        window.dispatchEvent(new CustomEvent("token-expired"));
+        // Only notify if user was logged in before (to show session expired dialog)
+        if (hadToken) {
+          window.dispatchEvent(new CustomEvent("token-expired"));
+        }
 
         return Promise.reject(error);
       }
@@ -134,6 +139,9 @@ api.interceptors.response.use(
       } catch (err) {
         processQueue(err, null);
 
+        // Check if user was previously logged in (had a token)
+        const hadToken = !!localStorage.getItem("access_token");
+
         // Clear all data
         localStorage.removeItem("access_token");
         localStorage.removeItem("account");
@@ -153,8 +161,10 @@ api.interceptors.response.use(
           delete defaultsHeaders2.common["Authorization"];
         }
 
-        // Show alert dialog for re-login
-        window.dispatchEvent(new CustomEvent("token-expired"));
+        // Only show alert dialog if user was logged in before
+        if (hadToken) {
+          window.dispatchEvent(new CustomEvent("token-expired"));
+        }
 
         return Promise.reject(err);
       } finally {

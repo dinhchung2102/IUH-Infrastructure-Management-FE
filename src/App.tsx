@@ -8,6 +8,8 @@ import {
 import { AnimatePresence } from "framer-motion";
 import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/layout/AdminLayout";
+import { SessionExpiredDialog } from "./components/SessionExpiredDialog";
+import { Toaster } from "./components/ui/sonner";
 
 // User pages
 import HomePage from "./user/home/HomePage";
@@ -62,6 +64,8 @@ function App() {
   return (
     <BrowserRouter>
       <AppRoutes />
+      <SessionExpiredDialog />
+      <Toaster />
     </BrowserRouter>
   );
 }
