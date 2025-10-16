@@ -12,6 +12,9 @@ import {
   BookOpen,
   ChevronRight,
   Globe,
+  Map,
+  DoorClosed,
+  Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -29,6 +32,7 @@ interface AdminSidebarProps {
   onOpenChange?: (open: boolean) => void;
 }
 
+// ------------------ NAVIGATION DATA ------------------
 const navigation = [
   {
     title: "Tổng quan",
@@ -50,8 +54,24 @@ const navigation = [
     items: [
       {
         title: "Cơ sở vật chất",
-        href: "/admin/facilities",
         icon: Building2,
+        children: [
+          {
+            title: "Quản lý cơ sở",
+            href: "/admin/campus",
+            icon: Home,
+          },
+          {
+            title: "Quản lý khu vực",
+            href: "/admin/building-area",
+            icon: Map,
+          },
+          {
+            title: "Quản lý phòng",
+            href: "/admin/facilities/room",
+            icon: DoorClosed,
+          },
+        ],
       },
       {
         title: "Tài khoản",
@@ -112,6 +132,7 @@ const navigation = [
   },
 ];
 
+// ------------------ SIDEBAR CONTENT ------------------
 function SidebarContent() {
   const location = useLocation();
 
@@ -121,9 +142,8 @@ function SidebarContent() {
 
     for (const section of navigation) {
       for (const item of section.items) {
-        if (item.href === "/") continue; // external link
+        if (item.href === "/") continue;
 
-        // Exact match takes priority
         if (pathname === item.href) {
           const length = item.href.length;
           if (length > bestMatchLength) {
@@ -133,12 +153,20 @@ function SidebarContent() {
           continue;
         }
 
-        // Prefix match for nested routes, prefer the longest href
         if (pathname.startsWith(item.href + "/")) {
           const length = item.href.length;
           if (length > bestMatchLength) {
             bestMatchLength = length;
             bestMatchSection = section.title;
+          }
+        }
+
+        // Check nested children
+        if (item.children) {
+          for (const child of item.children) {
+            if (pathname.startsWith(child.href)) {
+              bestMatchSection = section.title;
+            }
           }
         }
       }
@@ -158,7 +186,6 @@ function SidebarContent() {
   }, [location.pathname]);
 
   const toggleSection = (sectionTitle: string) => {
-    console.log("toggleSection called:", sectionTitle, "current:", openSection);
     setOpenSection((prev) => (prev === sectionTitle ? "" : sectionTitle));
   };
 
@@ -166,17 +193,7 @@ function SidebarContent() {
     sectionTitle: string,
     event?: React.MouseEvent
   ) => {
-    console.log(
-      "openSection_KeepOpen called:",
-      sectionTitle,
-      "current:",
-      openSection
-    );
-    // Ngăn event bubble lên CollapsibleTrigger
-    if (event) {
-      event.stopPropagation();
-    }
-    // Chỉ mở section, không đóng nếu đã mở
+    if (event) event.stopPropagation();
     if (openSection !== sectionTitle) {
       setOpenSection(sectionTitle);
     }
@@ -196,14 +213,6 @@ function SidebarContent() {
             <Collapsible
               key={section.title}
               open={openSection === section.title}
-              onOpenChange={(open) => {
-                console.log(
-                  "Collapsible onOpenChange:",
-                  section.title,
-                  "open:",
-                  open
-                );
-              }}
             >
               <CollapsibleTrigger asChild>
                 <button
@@ -216,11 +225,69 @@ function SidebarContent() {
                   </div>
                 </button>
               </CollapsibleTrigger>
+
               <CollapsibleContent className="space-y-1">
                 <div className="ml-2 mt-1 space-y-1">
-                  {section.items.map((item) =>
-                    item.href === "/" ? (
-                      // Special handling for external website link
+                  {section.items.map((item) => {
+                    // Nếu có menu con
+                    if (item.children) {
+  // Xác định nếu route hiện tại nằm trong các child => active = true
+  const isActive = item.children.some((child) =>
+    location.pathname.startsWith(child.href)
+  );
+
+  return (
+    <Collapsible key={item.title} defaultOpen={isActive}>
+      <CollapsibleTrigger asChild>
+        <button
+          onClick={(e) => openSection_KeepOpen(section.title, e)}
+          className={cn(
+            "group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all",
+            isActive
+              ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+          )}
+        >
+          <div className="flex items-center gap-3">
+            <item.icon className="size-4 shrink-0" />
+            <span>{item.title}</span>
+          </div>
+          <ChevronRight
+            className={cn(
+              "size-3 transition-transform",
+              isActive && "rotate-90"
+            )}
+          />
+        </button>
+      </CollapsibleTrigger>
+
+      <CollapsibleContent className="ml-6 mt-1 space-y-1">
+        {item.children.map((child) => (
+          <NavLink
+            key={child.href}
+            to={child.href}
+            onClick={(e) => openSection_KeepOpen(section.title, e)}
+            className={({ isActive }) =>
+              cn(
+                "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all",
+                isActive
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+              )
+            }
+          >
+            <child.icon className="size-4 shrink-0" />
+            {child.title}
+          </NavLink>
+        ))}
+      </CollapsibleContent>
+    </Collapsible>
+  );
+}
+
+
+                    // Nếu không có menu con
+                    return item.href === "/" ? (
                       <a
                         key={item.href}
                         href={item.href}
@@ -257,8 +324,8 @@ function SidebarContent() {
                           </>
                         )}
                       </NavLink>
-                    )
-                  )}
+                    );
+                  })}
                 </div>
               </CollapsibleContent>
             </Collapsible>
@@ -277,6 +344,7 @@ function SidebarContent() {
   );
 }
 
+// ------------------ MAIN SIDEBAR ------------------
 export default function AdminSidebar({
   className,
   mobile = false,

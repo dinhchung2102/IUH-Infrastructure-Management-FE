@@ -1,0 +1,104 @@
+import api from "@/lib/axios";
+import type { ApiResponse } from "@/types/response.type";
+
+/* ============================
+ *  ENUM & TYPES
+ * ============================ */
+
+/** Trạng thái của tòa nhà */
+export enum CommonStatus {
+  ACTIVE = "ACTIVE",
+  INACTIVE = "INACTIVE",
+  UNDERMAINTENANCE = "UNDERMAINTENANCE",
+}
+
+/** Dữ liệu trả về từ API */
+export interface BuildingResponse {
+  _id: string;
+  name: string;
+  floor: number;
+  status: CommonStatus;
+  campus: {
+    _id: string;
+    name: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** DTO khi tạo mới tòa nhà */
+export interface CreateBuildingDto {
+  name: string;
+  floor: number;
+  status: CommonStatus;
+  campus: string; // ID của Campus
+}
+
+/** DTO khi cập nhật */
+export interface UpdateBuildingDto extends Partial<CreateBuildingDto> {}
+
+/** Tham số truy vấn khi lấy danh sách */
+export interface QueryBuildingDto {
+  keyword?: string;
+  page?: number;
+  limit?: number;
+  campus?: string;
+}
+
+/* ============================
+ *  API CALLS
+ * ============================ */
+
+/** Lấy danh sách tòa nhà */
+export const getBuildings = async (query?: QueryBuildingDto) => {
+  const res = await api.get<ApiResponse<BuildingResponse[]>>(
+    "/zone-area/buildings",
+    { params: query }
+  );
+  return res.data;
+};
+
+/** Lấy chi tiết tòa nhà theo ID */
+export const getBuildingById = async (id: string) => {
+  const res = await api.get<ApiResponse<BuildingResponse>>(
+    `/zone-area/buildings/${id}`
+  );
+  return res.data;
+};
+
+/** Tạo mới tòa nhà */
+export const createBuilding = async (data: CreateBuildingDto) => {
+  const res = await api.post<ApiResponse<BuildingResponse>>(
+    "/zone-area/buildings",
+    data
+  );
+  return res.data;
+};
+
+/** Cập nhật tòa nhà */
+export const updateBuilding = async (
+  id: string,
+  data: UpdateBuildingDto
+) => {
+  const res = await api.patch<ApiResponse<BuildingResponse>>(
+    `/zone-area/buildings/${id}`,
+    data
+  );
+  return res.data;
+};
+
+/** Xóa tòa nhà */
+export const deleteBuilding = async (id: string) => {
+  const res = await api.delete<ApiResponse<void>>(
+    `/zone-area/buildings/${id}`
+  );
+  return res.data;
+};
+
+/** Lấy danh sách tòa nhà theo Campus */
+export const getBuildingsByCampus = async (campusId: string) => {
+  const res = await api.get<ApiResponse<BuildingResponse[]>>(
+    `/zone-area/buildings/campus/${campusId}`
+  );
+  return res.data;
+};
