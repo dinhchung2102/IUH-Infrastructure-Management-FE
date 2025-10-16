@@ -18,6 +18,7 @@ import FacilitiesPage from "./user/facilities/FacilitiesPage";
 import ContactPage from "./user/contact/ContactPage";
 import NewsPage from "./user/news/NewsPage";
 import ReportPage from "./user/report/ReportPage";
+import QuickReportPage from "./user/report/QuickReportPage";
 
 // Admin pages
 import DashboardPage from "./admin/pages/DashboardPage";
@@ -29,6 +30,9 @@ function AppRoutes() {
   return (
     <AnimatePresence mode="wait" initial={false}>
       <Routes location={location} key={location.pathname}>
+        {/* Quick Report - Standalone (No Layout) */}
+        <Route path="/quick-report/:assetId" element={<QuickReportPage />} />
+
         {/* User Routes with MainLayout */}
         <Route path="/" element={<MainLayout />}>
           <Route index element={<HomePage />} />

@@ -75,13 +75,13 @@ export function ReportForm() {
   useEffect(() => {
     Promise.all([getReportTypes(), getCampuses()])
       .then(([reportTypesRes, campusesRes]) => {
-        if (reportTypesRes.data.reportTypes) {
+        if (reportTypesRes.data?.reportTypes) {
           setReportTypes(reportTypesRes.data.reportTypes);
         }
         if (campusesRes.data?.campuses) {
           setCampuses(campusesRes.data?.campuses || []);
         }
-        console.log("[REPORT TYPES]:", reportTypesRes.data.reportTypes);
+        console.log("[REPORT TYPES]:", reportTypesRes.data?.reportTypes);
         console.log("[CAMPUSES]:", campusesRes.data?.campuses);
       })
       .catch((error) => {
