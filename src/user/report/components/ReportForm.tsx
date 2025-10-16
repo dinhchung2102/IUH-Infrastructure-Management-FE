@@ -17,11 +17,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Reveal } from "@/components/motion";
 import { FileText, Upload } from "lucide-react";
-import { getReportTypes } from "../api/report.api";
+import { getReportTypes, createReport, sendReportOTP } from "../api/report.api";
 import type { ReportType } from "../types/report.types";
 import { getCampuses, type Campus } from "../api/campus.api";
+import { toast } from "sonner";
+// import { useNavigate } from "react-router-dom"; // Uncomment if using navigation
 import { getOutdoorAreasByCampusId, type Area } from "../api/area.api";
 import {
   getBuildingsByCampusId,
@@ -41,8 +56,17 @@ const areaTypes = [
 ];
 
 export function ReportForm() {
+  // const navigate = useNavigate(); // Uncomment if you want to redirect after submit
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // OTP Dialog for non-authenticated users
+  const [showOtpDialog, setShowOtpDialog] = useState(false);
+  const [otp, setOtp] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
 
   // Form state
   const [selectedCampus, setSelectedCampus] = useState("");
@@ -52,9 +76,13 @@ export function ReportForm() {
   const [selectedOutdoorArea, setSelectedOutdoorArea] = useState("");
   const [selectedIndoorZone, setSelectedIndoorZone] = useState("");
   const [selectedAsset, setSelectedAsset] = useState("");
+  const [selectedReportType, setSelectedReportType] = useState("");
+  const [description, setDescription] = useState("");
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewImages, setPreviewImages] = useState<
     { url: string; type: string; name: string }[]
   >([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Data from API
   const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
@@ -89,10 +117,13 @@ export function ReportForm() {
       });
   }, []);
 
-  // Load user info from localStorage if logged in
+  // Load user info from localStorage and check authentication
   useEffect(() => {
+    const token = localStorage.getItem("access_token");
     const accountData = localStorage.getItem("account");
-    if (accountData) {
+
+    if (token && accountData) {
+      setIsAuthenticated(true);
       try {
         const account = JSON.parse(accountData);
         setFullName(account.fullName || account.name || "");
@@ -100,6 +131,8 @@ export function ReportForm() {
       } catch (error) {
         console.error("Error parsing account data:", error);
       }
+    } else {
+      setIsAuthenticated(false);
     }
   }, []);
 
@@ -218,8 +251,12 @@ export function ReportForm() {
     // Clear old previews
     previewImages.forEach((preview) => URL.revokeObjectURL(preview.url));
 
+    // Store actual files
+    const filesArray = Array.from(files);
+    setSelectedFiles(filesArray);
+
     // Create new preview URLs with file type
-    const newPreviews = Array.from(files).map((file) => ({
+    const newPreviews = filesArray.map((file) => ({
       url: URL.createObjectURL(file),
       type: file.type,
       name: file.name,
@@ -234,10 +271,182 @@ export function ReportForm() {
     };
   }, [previewImages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // Create report with FormData
+  const submitReport = async (otpCode?: string) => {
+    try {
+      const formData = new FormData();
+      formData.append("asset", selectedAsset);
+      formData.append("type", selectedReportType);
+      formData.append("description", description.trim());
+      formData.append("email", email.trim());
+
+      // For non-authenticated users, add OTP
+      if (!isAuthenticated && otpCode) {
+        formData.append("authOTP", otpCode);
+      }
+
+      // Append all files
+      selectedFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      // Create report
+      toast.info("Đang gửi báo cáo...");
+      await createReport(formData);
+
+      toast.success("Báo cáo đã được gửi thành công!");
+      setShowOtpDialog(false);
+
+      // Reset form or redirect
+      setTimeout(() => {
+        // Reset form
+        setSelectedReportType("");
+        setDescription("");
+        setSelectedFiles([]);
+        setPreviewImages([]);
+        setSelectedAsset("");
+        setOtp("");
+        // Or navigate
+        // navigate("/");
+      }, 1500);
+    } catch (error: unknown) {
+      console.error("Error submitting report:", error);
+      let errorMsg = "Lỗi khi gửi báo cáo. Vui lòng thử lại.";
+
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "data" in error.response &&
+        error.response.data &&
+        typeof error.response.data === "object" &&
+        "message" in error.response.data &&
+        typeof error.response.data.message === "string"
+      ) {
+        errorMsg = error.response.data.message;
+      }
+
+      toast.error(errorMsg);
+      throw error;
+    }
+  };
+
+  // Handle verify OTP and submit
+  const handleVerifyOtp = async () => {
+    if (!otp.trim()) {
+      toast.error("Vui lòng nhập mã OTP");
+      return;
+    }
+
+    setIsVerifyingOtp(true);
+    try {
+      await submitReport(otp);
+    } catch {
+      // Error already handled in submitReport
+    } finally {
+      setIsVerifyingOtp(false);
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Report submitted");
-    // TODO: Implement API call
+
+    // Validation
+    if (!selectedReportType) {
+      toast.error("Vui lòng chọn loại báo cáo");
+      return;
+    }
+
+    if (!description.trim()) {
+      toast.error("Vui lòng nhập mô tả chi tiết");
+      return;
+    }
+
+    // Validate description length
+    if (description.trim().length < 10) {
+      toast.error("Mô tả phải có ít nhất 10 ký tự");
+      return;
+    }
+
+    if (description.trim().length > 1000) {
+      toast.error("Mô tả không được quá 1000 ký tự");
+      return;
+    }
+
+    if (!fullName.trim()) {
+      toast.error("Vui lòng nhập họ và tên");
+      return;
+    }
+
+    if (!email.trim()) {
+      toast.error("Vui lòng nhập email");
+      return;
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Email không hợp lệ");
+      return;
+    }
+
+    // Validate images are required
+    if (selectedFiles.length === 0) {
+      toast.error("Vui lòng tải lên ít nhất 1 hình ảnh");
+      return;
+    }
+
+    if (!selectedAsset) {
+      toast.error("Vui lòng chọn thiết bị cần báo cáo");
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    // If authenticated, submit directly
+    if (isAuthenticated) {
+      try {
+        await submitReport();
+        setIsSubmitting(false);
+      } catch {
+        setIsSubmitting(false);
+      }
+      return;
+    }
+
+    // For non-authenticated users, send OTP first
+    setIsSendingOtp(true);
+    try {
+      await sendReportOTP(email);
+      toast.success("OTP đã được gửi đến email của bạn");
+      setShowOtpDialog(true);
+      setIsSendingOtp(false);
+    } catch (error: unknown) {
+      console.error("Error sending OTP:", error);
+      let errorMsg = "Không thể gửi OTP. Vui lòng thử lại.";
+
+      if (
+        error &&
+        typeof error === "object" &&
+        "response" in error &&
+        error.response &&
+        typeof error.response === "object" &&
+        "data" in error.response &&
+        error.response.data &&
+        typeof error.response.data === "object" &&
+        "message" in error.response.data &&
+        typeof error.response.data.message === "string"
+      ) {
+        errorMsg = error.response.data.message;
+      }
+
+      toast.error(errorMsg);
+      setIsSendingOtp(false);
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -256,6 +465,11 @@ export function ReportForm() {
             <div className="space-y-4">
               <h3 className="text-sm font-semibold text-muted-foreground">
                 Thông tin người báo cáo
+                {isAuthenticated && (
+                  <span className="ml-2 text-xs text-green-600 font-normal">
+                    (Đã xác thực)
+                  </span>
+                )}
               </h3>
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-2">
@@ -266,6 +480,7 @@ export function ReportForm() {
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required
+                    disabled={isAuthenticated}
                   />
                 </div>
                 <div className="space-y-2">
@@ -277,6 +492,7 @@ export function ReportForm() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    disabled={isAuthenticated}
                   />
                 </div>
               </div>
@@ -290,13 +506,17 @@ export function ReportForm() {
 
               <div className="space-y-2">
                 <Label htmlFor="report-type">Loại báo cáo *</Label>
-                <Select required>
+                <Select
+                  required
+                  value={selectedReportType}
+                  onValueChange={setSelectedReportType}
+                >
                   <SelectTrigger id="report-type">
                     <SelectValue placeholder="Chọn loại báo cáo" />
                   </SelectTrigger>
                   <SelectContent>
                     {reportTypes.map((type) => (
-                      <SelectItem key={type.value} value={type.label}>
+                      <SelectItem key={type.value} value={type.value}>
                         {type.label}
                       </SelectItem>
                     ))}
@@ -308,10 +528,15 @@ export function ReportForm() {
                 <Label htmlFor="description">Mô tả *</Label>
                 <Textarea
                   id="description"
-                  placeholder="Mô tả chi tiết về vấn đề cần báo cáo..."
+                  placeholder="Mô tả chi tiết về vấn đề cần báo cáo... (10-1000 ký tự)"
                   rows={5}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  {description.length}/1000 ký tự
+                </p>
               </div>
 
               {/* Campus, Area Type, Location and Equipment - 4 Columns in 1 Row */}
@@ -535,7 +760,7 @@ export function ReportForm() {
 
               {/* File Upload */}
               <div className="space-y-2">
-                <Label htmlFor="attachments">Hình ảnh/Video báo cáo</Label>
+                <Label htmlFor="attachments">Hình ảnh/Video báo cáo *</Label>
                 <div className="flex items-center gap-4">
                   <Input
                     id="attachments"
@@ -544,6 +769,7 @@ export function ReportForm() {
                     accept="image/*,video/*"
                     className="cursor-pointer"
                     onChange={handleImageChange}
+                    required
                   />
                   <Upload className="h-5 w-5 text-muted-foreground" />
                 </div>
@@ -594,13 +820,108 @@ export function ReportForm() {
               type="submit"
               className="w-full hover:scale-105 transition-transform"
               size="lg"
+              disabled={isSubmitting || isSendingOtp}
             >
-              <FileText className="h-4 w-4" />
-              Gửi báo cáo
+              {isSubmitting || isSendingOtp ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                  {isSendingOtp ? "Đang gửi OTP..." : "Đang gửi..."}
+                </>
+              ) : (
+                <>
+                  <FileText className="h-4 w-4" />
+                  Gửi báo cáo
+                </>
+              )}
             </Button>
           </form>
         </CardContent>
       </Card>
+
+      {/* OTP Dialog with InputOTP */}
+      <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="text-center">Xác thực Email</DialogTitle>
+            <DialogDescription className="text-center">
+              Mã OTP đã được gửi đến email
+              <br />
+              <strong className="text-foreground">{email}</strong>
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-4">
+            {/* InputOTP - 6 slots riêng biệt */}
+            <div className="flex justify-center">
+              <InputOTP
+                maxLength={6}
+                value={otp}
+                onChange={(value) => setOtp(value)}
+                disabled={isVerifyingOtp}
+              >
+                <InputOTPGroup className="gap-2">
+                  <InputOTPSlot index={0} className="w-12 h-14 text-2xl" />
+                  <InputOTPSlot index={1} className="w-12 h-14 text-2xl" />
+                  <InputOTPSlot index={2} className="w-12 h-14 text-2xl" />
+                  <InputOTPSlot index={3} className="w-12 h-14 text-2xl" />
+                  <InputOTPSlot index={4} className="w-12 h-14 text-2xl" />
+                  <InputOTPSlot index={5} className="w-12 h-14 text-2xl" />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+
+            {/* Resend OTP */}
+            <div className="text-center text-sm">
+              <span className="text-muted-foreground">
+                Không nhận được OTP?{" "}
+              </span>
+              <Button
+                type="button"
+                variant="link"
+                className="px-1 h-auto"
+                onClick={async () => {
+                  try {
+                    await sendReportOTP(email);
+                    toast.success("OTP đã được gửi lại");
+                    setOtp("");
+                  } catch {
+                    toast.error("Không thể gửi lại OTP");
+                  }
+                }}
+                disabled={isVerifyingOtp}
+              >
+                Gửi lại mã
+              </Button>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setShowOtpDialog(false);
+                setOtp("");
+                setIsSubmitting(false);
+              }}
+            >
+              Hủy
+            </Button>
+            <Button
+              onClick={handleVerifyOtp}
+              disabled={isVerifyingOtp || otp.length < 6}
+            >
+              {isVerifyingOtp ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
+                  Đang xác thực...
+                </>
+              ) : (
+                "Xác nhận"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Reveal>
   );
 }
