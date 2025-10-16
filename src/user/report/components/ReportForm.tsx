@@ -52,7 +52,9 @@ export function ReportForm() {
   const [selectedOutdoorArea, setSelectedOutdoorArea] = useState("");
   const [selectedIndoorZone, setSelectedIndoorZone] = useState("");
   const [selectedAsset, setSelectedAsset] = useState("");
-  const [previewImages, setPreviewImages] = useState<string[]>([]);
+  const [previewImages, setPreviewImages] = useState<
+    { url: string; type: string; name: string }[]
+  >([]);
 
   // Data from API
   const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
@@ -208,25 +210,27 @@ export function ReportForm() {
     }
   }, [selectedIndoorZone, areaType]);
 
-  // Handle image file selection and preview
+  // Handle file selection and preview (images + videos)
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
 
     // Clear old previews
-    previewImages.forEach((url) => URL.revokeObjectURL(url));
+    previewImages.forEach((preview) => URL.revokeObjectURL(preview.url));
 
-    // Create new preview URLs
-    const newPreviews = Array.from(files).map((file) =>
-      URL.createObjectURL(file)
-    );
+    // Create new preview URLs with file type
+    const newPreviews = Array.from(files).map((file) => ({
+      url: URL.createObjectURL(file),
+      type: file.type,
+      name: file.name,
+    }));
     setPreviewImages(newPreviews);
   };
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
     return () => {
-      previewImages.forEach((url) => URL.revokeObjectURL(url));
+      previewImages.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
   }, [previewImages]);
 
@@ -531,37 +535,53 @@ export function ReportForm() {
 
               {/* File Upload */}
               <div className="space-y-2">
-                <Label htmlFor="attachments">Hình ảnh báo cáo</Label>
+                <Label htmlFor="attachments">Hình ảnh/Video báo cáo</Label>
                 <div className="flex items-center gap-4">
                   <Input
                     id="attachments"
                     type="file"
                     multiple
-                    accept="image/*"
+                    accept="image/*,video/*"
                     className="cursor-pointer"
                     onChange={handleImageChange}
                   />
                   <Upload className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Hỗ trợ: JPG, PNG (Tối đa 5MB mỗi file)
+                  Hỗ trợ: JPG, PNG, MP4, MOV (Tối đa 10MB mỗi file)
                 </p>
 
-                {/* Image Preview */}
+                {/* Media Preview */}
                 {previewImages.length > 0 && (
                   <div className="mt-4 space-y-2">
-                    <Label>Preview ({previewImages.length} ảnh)</Label>
+                    <Label>
+                      Preview ({previewImages.length}{" "}
+                      {previewImages.length === 1 ? "file" : "files"})
+                    </Label>
                     <div className="grid grid-cols-2 gap-2">
-                      {previewImages.map((url, index) => (
+                      {previewImages.map((preview, index) => (
                         <div
                           key={index}
                           className="rounded-lg border p-2 bg-muted/30"
                         >
-                          <img
-                            src={url}
-                            alt={`Preview ${index + 1}`}
-                            className="w-full h-auto rounded object-contain"
-                          />
+                          {preview.type.startsWith("image/") ? (
+                            <img
+                              src={preview.url}
+                              alt={`Preview ${index + 1}`}
+                              className="w-full h-auto rounded object-contain"
+                            />
+                          ) : preview.type.startsWith("video/") ? (
+                            <video
+                              src={preview.url}
+                              controls
+                              className="w-full h-auto rounded"
+                            >
+                              Your browser does not support video.
+                            </video>
+                          ) : null}
+                          <p className="mt-1 text-xs text-center text-muted-foreground truncate">
+                            {preview.name}
+                          </p>
                         </div>
                       ))}
                     </div>
