@@ -22,6 +22,7 @@ export interface Asset {
 }
 
 export interface AssetResponse {
+  image: string;
   _id: string;
   name: string;
   code: string;
@@ -52,7 +53,6 @@ export interface AssetResponse {
     createdAt: string;
     updatedAt: string;
     __v: number;
-    image: string;
   };
 }
 

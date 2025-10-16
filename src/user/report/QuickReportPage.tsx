@@ -223,12 +223,12 @@ export default function QuickReportPage() {
           </CardHeader>
           <CardContent className="space-y-3 text-sm">
             {/* Asset Image */}
-            {asset.zone?.image && (
+            {asset?.image && (
               <div className="rounded-lg overflow-hidden border bg-muted/30">
                 <img
-                  src={`${import.meta.env.VITE_URL_UPLOADS}${asset.zone.image}`}
+                  src={`${import.meta.env.VITE_URL_UPLOADS}${asset.image}`}
                   alt={asset.name}
-                  className="w-full h-48 object-cover"
+                  className="w-full h-auto object-contain"
                 />
               </div>
             )}
@@ -286,7 +286,7 @@ export default function QuickReportPage() {
           <CardHeader>
             <CardTitle className="text-xl sm:text-2xl">Báo cáo sự cố</CardTitle>
             <CardDescription className="text-xs sm:text-sm">
-              Vui lòng điền đầy đủ thông tin để chúng tôi xử lý báo cáo
+              Vui lòng điền đầy đủ thông tin về báo cáo sự cố của bạn
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -368,9 +368,6 @@ export default function QuickReportPage() {
                     required
                     className="resize-none"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Mô tả càng chi tiết càng giúp chúng tôi xử lý nhanh hơn
-                  </p>
                 </div>
 
                 {/* File Upload */}
