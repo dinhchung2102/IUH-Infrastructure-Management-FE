@@ -56,7 +56,7 @@ function CampusPage() {
     try {
       setLoading(true);
       const res = await getCampus({});
-      const list = Array.isArray(res?.data) ? res.data : [];
+      const list = res?.data?.campuses || [];
       setCampuses(list);
     } catch (err) {
       console.error("Lỗi khi tải cơ sở:", err);

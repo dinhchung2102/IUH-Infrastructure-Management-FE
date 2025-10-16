@@ -70,14 +70,21 @@ export default function BuildingAreaPage() {
         getAreas(),
       ]);
 
-      const buildingsData = Array.isArray(buildRes?.data) ? buildRes.data : [];
-      const buildings = buildingsData.map((b: any) => ({
-        ...b,
-        type: "BUILDING",
-      }));
+      const buildingsData = buildRes?.data?.buildings || buildRes?.data || [];
+      const buildings = Array.isArray(buildingsData)
+        ? buildingsData.map((b: any) => ({
+            ...b,
+            type: "BUILDING",
+          }))
+        : buildingsData.buildings.map((b: any) => ({
+            ...b,
+            type: "BUILDING",
+          }));
 
-      const areasData = Array.isArray(areaRes?.data) ? areaRes.data : [];
-      const areas = areasData.map((a: any) => ({ ...a, type: "AREA" }));
+      const areasData = areaRes?.data?.areas || areaRes?.data || [];
+      const areas = Array.isArray(areasData)
+        ? areasData.map((a: any) => ({ ...a, type: "AREA" }))
+        : areasData.areas.map((a: any) => ({ ...a, type: "AREA" }));
 
       setItems([...buildings, ...areas]);
     } catch (err) {
@@ -94,7 +101,7 @@ export default function BuildingAreaPage() {
   const fetchCampuses = async () => {
     try {
       const res = await getCampus();
-      const list = Array.isArray(res?.data) ? res.data : [];
+      const list = res?.data?.campuses || [];
       setCampuses(list);
     } catch (err) {
       console.error("Lỗi tải cơ sở:", err);

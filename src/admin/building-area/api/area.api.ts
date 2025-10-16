@@ -56,9 +56,12 @@ export interface QueryAreaDto {
 
 /** Lấy danh sách khu vực */
 export const getAreas = async (query?: QueryAreaDto) => {
-  const res = await api.get<ApiResponse<AreaResponse[]>>("/zone-area/areas", {
-    params: query,
-  });
+  const res = await api.get<ApiResponse<{ areas: AreaResponse[] }>>(
+    "/zone-area/areas",
+    {
+      params: query,
+    }
+  );
   return res.data;
 };
 

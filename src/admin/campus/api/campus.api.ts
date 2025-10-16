@@ -33,9 +33,12 @@ export interface CampusStatistics {
 // API CALLS
 // ============================
 export const getCampus = async (query?: QueryCampusDto) => {
-  const res = await api.get<ApiResponse<CampusResponse[]>>("/campus", {
-    params: query,
-  });
+  const res = await api.get<ApiResponse<{ campuses: CampusResponse[] }>>(
+    "/campus",
+    {
+      params: query,
+    }
+  );
   return res.data;
 };
 
@@ -49,8 +52,14 @@ export const createCampus = async (data: Partial<CampusResponse>) => {
   return res.data;
 };
 
-export const updateCampus = async (id: string, data: Partial<CampusResponse>) => {
-  const res = await api.patch<ApiResponse<CampusResponse>>(`/campus/${id}`, data);
+export const updateCampus = async (
+  id: string,
+  data: Partial<CampusResponse>
+) => {
+  const res = await api.patch<ApiResponse<CampusResponse>>(
+    `/campus/${id}`,
+    data
+  );
   return res.data;
 };
 

@@ -14,17 +14,27 @@ export const getBuildingAreaList = async () => {
     // Gọi song song 2 API
     const [buildRes, areaRes] = await Promise.all([getBuildings(), getAreas()]);
 
-    const buildingsData = Array.isArray(buildRes?.data) ? buildRes.data : [];
-    const buildings = buildingsData.map((b: BuildingResponse) => ({
-      ...b,
-      type: "BUILDING" as const,
-    }));
+    const buildingsData = buildRes?.data?.buildings || buildRes?.data || [];
+    const buildings = Array.isArray(buildingsData)
+      ? buildingsData.map((b: BuildingResponse) => ({
+          ...b,
+          type: "BUILDING" as const,
+        }))
+      : buildingsData.buildings.map((b: BuildingResponse) => ({
+          ...b,
+          type: "BUILDING" as const,
+        }));
 
-    const areasData = Array.isArray(areaRes?.data) ? areaRes.data : [];
-    const areas = areasData.map((a: AreaResponse) => ({
-      ...a,
-      type: "AREA" as const,
-    }));
+    const areasData = areaRes?.data?.areas || areaRes?.data || [];
+    const areas = Array.isArray(areasData)
+      ? areasData.map((a: AreaResponse) => ({
+          ...a,
+          type: "AREA" as const,
+        }))
+      : areasData.areas.map((a: AreaResponse) => ({
+          ...a,
+          type: "AREA" as const,
+        }));
 
     // Gộp & sắp xếp theo createdAt mới nhất
     const merged: BuildingAreaItem[] = [...buildings, ...areas].sort(

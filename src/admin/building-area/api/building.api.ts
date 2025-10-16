@@ -53,7 +53,7 @@ export interface QueryBuildingDto {
 
 /** Lấy danh sách tòa nhà */
 export const getBuildings = async (query?: QueryBuildingDto) => {
-  const res = await api.get<ApiResponse<BuildingResponse[]>>(
+  const res = await api.get<ApiResponse<{ buildings: BuildingResponse[] }>>(
     "/zone-area/buildings",
     { params: query }
   );
@@ -62,7 +62,7 @@ export const getBuildings = async (query?: QueryBuildingDto) => {
 
 /** Lấy chi tiết tòa nhà theo ID */
 export const getBuildingById = async (id: string) => {
-  const res = await api.get<ApiResponse<BuildingResponse>>(
+  const res = await api.get<ApiResponse<{ building: BuildingResponse }>>(
     `/zone-area/buildings/${id}`
   );
   return res.data;
@@ -70,7 +70,7 @@ export const getBuildingById = async (id: string) => {
 
 /** Tạo mới tòa nhà */
 export const createBuilding = async (data: CreateBuildingDto) => {
-  const res = await api.post<ApiResponse<BuildingResponse>>(
+  const res = await api.post<ApiResponse<{ building: BuildingResponse }>>(
     "/zone-area/buildings",
     data
   );
@@ -79,7 +79,7 @@ export const createBuilding = async (data: CreateBuildingDto) => {
 
 /** Cập nhật tòa nhà */
 export const updateBuilding = async (id: string, data: UpdateBuildingDto) => {
-  const res = await api.patch<ApiResponse<BuildingResponse>>(
+  const res = await api.patch<ApiResponse<{ building: BuildingResponse }>>(
     `/zone-area/buildings/${id}`,
     data
   );
@@ -94,7 +94,7 @@ export const deleteBuilding = async (id: string) => {
 
 /** Lấy danh sách tòa nhà theo Campus */
 export const getBuildingsByCampus = async (campusId: string) => {
-  const res = await api.get<ApiResponse<BuildingResponse[]>>(
+  const res = await api.get<ApiResponse<{ buildings: BuildingResponse[] }>>(
     `/zone-area/buildings/campus/${campusId}`
   );
   return res.data;
