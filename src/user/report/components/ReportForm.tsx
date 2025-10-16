@@ -840,7 +840,7 @@ export function ReportForm() {
 
       {/* OTP Dialog with InputOTP */}
       <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
           <DialogHeader className="space-y-3">
             <DialogTitle className="text-center">Xác thực Email</DialogTitle>
             <DialogDescription className="text-center">

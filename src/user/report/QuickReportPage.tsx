@@ -677,7 +677,7 @@ export default function QuickReportPage() {
 
         {/* OTP Dialog - Mobile Optimized with InputOTP */}
         <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
-          <DialogContent className="w-[calc(100vw-2rem)] max-w-md mx-4 sm:mx-auto">
+          <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
             <DialogHeader className="space-y-3">
               <DialogTitle className="text-center text-lg sm:text-xl">
                 Xác thực Email
