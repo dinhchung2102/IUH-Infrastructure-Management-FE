@@ -9,11 +9,9 @@ import {
   BarChart3,
   MessageSquare,
   Calendar,
-  BookOpen,
   ChevronRight,
   Globe,
   Map,
-  DoorClosed,
   Home,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -53,7 +51,7 @@ const navigation = [
     title: "Quản lý",
     items: [
       {
-        title: "Cơ sở vật chất",
+        title: "Cơ sở & Khu vực",
         icon: Building2,
         children: [
           {
@@ -65,11 +63,6 @@ const navigation = [
             title: "Quản lý khu vực",
             href: "/admin/building-area",
             icon: Map,
-          },
-          {
-            title: "Quản lý phòng",
-            href: "/admin/facilities/room",
-            icon: DoorClosed,
           },
         ],
       },
@@ -84,24 +77,9 @@ const navigation = [
         icon: FileText,
       },
       {
-        title: "Tin tức",
-        href: "/admin/news",
-        icon: BookOpen,
-      },
-      {
-        title: "Đặt phòng",
-        href: "/admin/bookings",
-        icon: Calendar,
-      },
-      {
         title: "Thiết bị",
         href: "/admin/equipment",
         icon: Building2,
-      },
-      {
-        title: "Bảo trì",
-        href: "/admin/maintenance-list",
-        icon: Settings,
       },
     ],
   },
