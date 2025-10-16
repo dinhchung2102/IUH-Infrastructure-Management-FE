@@ -377,85 +377,90 @@ export default function QuickReportPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background py-3 px-3 sm:py-8 sm:px-4">
-      <div className="w-full max-w-2xl mx-auto space-y-3 sm:space-y-4">
-        {/* Asset Info Card - Mobile Optimized */}
+      <div className="w-full max-w-2xl md:max-w-4xl mx-auto space-y-3 sm:space-y-4">
+        {/* Asset Info Card - Responsive 2-Column Layout */}
         <Card className="border-primary/20 shadow-lg">
-          <CardHeader className="pb-2 sm:pb-3">
-            <CardTitle className="text-base sm:text-lg flex items-center gap-2">
-              <Package className="h-4 w-4 sm:h-5 sm:w-5 text-primary flex-shrink-0" />
+          <CardHeader className="pb-3 sm:pb-4">
+            <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+              <Package className="h-5 w-5 text-primary flex-shrink-0" />
               <span className="truncate">Thông tin thiết bị</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-2.5 sm:space-y-3 text-sm">
-            {/* Asset Image - Mobile Optimized */}
-            {asset?.image && (
-              <div className="rounded-md sm:rounded-lg overflow-hidden border bg-muted/30">
-                <img
-                  src={`${import.meta.env.VITE_URL_UPLOADS}${asset.image}`}
-                  alt={asset.name}
-                  className="w-full h-auto object-contain max-h-48 sm:max-h-64"
-                />
-              </div>
-            )}
-
-            {/* Asset Details - Mobile Optimized */}
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground mb-0.5">
-                  Tên thiết bị
-                </p>
-                <p className="font-medium text-sm truncate" title={asset.name}>
-                  {asset.name}
-                </p>
-              </div>
-              <div className="min-w-0">
-                <p className="text-xs text-muted-foreground mb-0.5">
-                  Mã thiết bị
-                </p>
-                <p className="font-medium text-sm truncate" title={asset.code}>
-                  {asset.code}
-                </p>
-              </div>
-            </div>
-
-            {/* Location Info - Mobile Optimized */}
-            <div className="pt-2 border-t space-y-1.5 sm:space-y-2">
-              <div className="flex items-start gap-1.5 sm:gap-2">
-                <Building2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] sm:text-xs text-muted-foreground">
-                    Vị trí
-                  </p>
-                  <p className="font-medium text-xs sm:text-sm break-words leading-tight">
-                    {asset.zone?.building.name} - Tầng{" "}
-                    {asset.zone?.building.floor}
-                  </p>
+          <CardContent>
+            {/* 2-Column Grid: Image Left, Info Right */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
+              {/* Left Column: Asset Image */}
+              {asset?.image && (
+                <div className="rounded-lg overflow-hidden border bg-muted/30 h-fit">
+                  <img
+                    src={`${import.meta.env.VITE_URL_UPLOADS}${asset.image}`}
+                    alt={asset.name}
+                    className="w-full h-auto object-cover aspect-square md:aspect-auto md:max-h-[280px]"
+                  />
                 </div>
-              </div>
-              <div className="flex items-start gap-1.5 sm:gap-2">
-                <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
-                  <p className="text-[11px] sm:text-xs text-muted-foreground">
-                    Cơ sở
-                  </p>
-                  <p className="font-medium text-xs sm:text-sm break-words leading-tight">
-                    {asset.zone?.building.campus.name}
-                  </p>
-                </div>
-              </div>
-              {asset.zone?.name && (
-                <div className="flex items-start gap-1.5 sm:gap-2">
-                  <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[11px] sm:text-xs text-muted-foreground">
-                      Khu vực
+              )}
+
+              {/* Right Column: Asset Info */}
+              <div className="space-y-3 sm:space-y-4">
+                {/* Basic Info */}
+                <div className="space-y-3">
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1.5">
+                      Tên thiết bị
                     </p>
-                    <p className="font-medium text-xs sm:text-sm break-words leading-tight">
-                      {asset.zone.name}
+                    <p
+                      className="font-semibold text-base sm:text-lg"
+                      title={asset.name}
+                    >
+                      {asset.name}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-muted-foreground mb-1.5">
+                      Mã thiết bị
+                    </p>
+                    <p
+                      className="font-medium text-base sm:text-lg text-primary"
+                      title={asset.code}
+                    >
+                      {asset.code}
                     </p>
                   </div>
                 </div>
-              )}
+
+                {/* Location Info */}
+                <div className="pt-3 border-t space-y-2.5">
+                  <div className="flex items-start gap-2.5">
+                    <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-base break-words">
+                        {asset.zone.building.campus.name}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2.5">
+                    <Building2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-base break-words">
+                        {asset.zone.building.name} - Tầng{" "}
+                        {asset.zone.floorLocation}
+                      </p>
+                    </div>
+                  </div>
+
+                  {asset.zone.name && (
+                    <div className="flex items-start gap-2.5">
+                      <Package className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-base break-words">
+                          {asset.zone.name}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -464,28 +469,25 @@ export default function QuickReportPage() {
         <Card className="shadow-lg">
           <CardHeader className="pb-3 sm:pb-6">
             <CardTitle className="text-lg sm:text-xl">Báo cáo sự cố</CardTitle>
-            <CardDescription className="text-xs sm:text-sm">
+            <CardDescription className="text-sm">
               Vui lòng điền đầy đủ thông tin về báo cáo sự cố của bạn
             </CardDescription>
           </CardHeader>
           <CardContent className="pb-4 sm:pb-6">
-            <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4">
-              {/* Personal Info - Mobile Optimized */}
-              <div className="space-y-2.5 sm:space-y-3">
-                <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground border-b pb-1.5 sm:pb-2 flex items-center flex-wrap gap-1">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Personal Info */}
+              <div className="space-y-3">
+                <h3 className="text-sm sm:text-base font-semibold text-muted-foreground border-b pb-2 flex items-center flex-wrap gap-1.5">
                   <span>Thông tin người báo cáo</span>
                   {isAuthenticated && (
-                    <span className="text-[10px] sm:text-xs text-green-600 font-normal">
+                    <span className="text-xs text-green-600 font-normal">
                       (Đã xác thực)
                     </span>
                   )}
                 </h3>
-                <div className="space-y-2.5 sm:space-y-3">
-                  <div className="space-y-1 sm:space-y-1.5">
-                    <Label
-                      htmlFor="fullname"
-                      className="text-xs sm:text-sm font-medium"
-                    >
+                <div className="space-y-3">
+                  <div className="space-y-1.5">
+                    <Label htmlFor="fullname" className="text-sm font-medium">
                       Họ và tên *
                     </Label>
                     <Input
@@ -495,16 +497,13 @@ export default function QuickReportPage() {
                       onChange={(e) => setFullName(e.target.value)}
                       required
                       disabled={isAuthenticated}
-                      className="h-11 sm:h-10 text-base sm:text-sm"
+                      className="h-11 text-base"
                       autoComplete="name"
                     />
                   </div>
 
-                  <div className="space-y-1 sm:space-y-1.5">
-                    <Label
-                      htmlFor="email"
-                      className="text-xs sm:text-sm font-medium"
-                    >
+                  <div className="space-y-1.5">
+                    <Label htmlFor="email" className="text-sm font-medium">
                       Email *
                     </Label>
                     <Input
@@ -515,7 +514,7 @@ export default function QuickReportPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={isAuthenticated}
-                      className="h-11 sm:h-10 text-base sm:text-sm"
+                      className="h-11 text-base"
                       autoComplete="email"
                       inputMode="email"
                     />
@@ -523,17 +522,14 @@ export default function QuickReportPage() {
                 </div>
               </div>
 
-              {/* Report Details - Mobile Optimized */}
-              <div className="space-y-2.5 sm:space-y-3">
-                <h3 className="text-xs sm:text-sm font-semibold text-muted-foreground border-b pb-1.5 sm:pb-2">
+              {/* Report Details */}
+              <div className="space-y-3">
+                <h3 className="text-sm sm:text-base font-semibold text-muted-foreground border-b pb-2">
                   Chi tiết sự cố
                 </h3>
 
-                <div className="space-y-1 sm:space-y-1.5">
-                  <Label
-                    htmlFor="report-type"
-                    className="text-xs sm:text-sm font-medium"
-                  >
+                <div className="space-y-1.5">
+                  <Label htmlFor="report-type" className="text-sm font-medium">
                     Loại báo cáo *
                   </Label>
                   <Select
@@ -541,10 +537,7 @@ export default function QuickReportPage() {
                     value={selectedReportType}
                     onValueChange={setSelectedReportType}
                   >
-                    <SelectTrigger
-                      id="report-type"
-                      className="h-11 sm:h-10 text-base sm:text-sm"
-                    >
+                    <SelectTrigger id="report-type" className="h-11 text-base">
                       <SelectValue placeholder="Chọn loại báo cáo" />
                     </SelectTrigger>
                     <SelectContent>
@@ -552,7 +545,7 @@ export default function QuickReportPage() {
                         <SelectItem
                           key={type.value}
                           value={type.value}
-                          className="text-base sm:text-sm py-3 sm:py-2"
+                          className="text-base"
                         >
                           {type.label}
                         </SelectItem>
@@ -561,13 +554,10 @@ export default function QuickReportPage() {
                   </Select>
                 </div>
 
-                <div className="space-y-1 sm:space-y-1.5">
-                  <Label
-                    htmlFor="description"
-                    className="text-xs sm:text-sm font-medium"
-                  >
+                <div className="space-y-1.5">
+                  <Label htmlFor="description" className="text-sm font-medium">
                     Mô tả chi tiết *
-                    <span className="text-[10px] sm:text-xs text-muted-foreground font-normal ml-1">
+                    <span className="text-xs text-muted-foreground font-normal ml-1.5">
                       ({description.length}/1000)
                     </span>
                   </Label>
@@ -578,24 +568,21 @@ export default function QuickReportPage() {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     required
-                    className="resize-none text-base sm:text-sm min-h-[120px]"
+                    className="resize-none text-base min-h-[120px]"
                   />
                 </div>
 
-                {/* File Upload - Mobile Optimized */}
-                <div className="space-y-1 sm:space-y-1.5">
-                  <Label
-                    htmlFor="attachments"
-                    className="text-xs sm:text-sm font-medium"
-                  >
+                {/* File Upload */}
+                <div className="space-y-1.5">
+                  <Label htmlFor="attachments" className="text-sm font-medium">
                     Hình ảnh/Video *
                   </Label>
                   <label
                     htmlFor="attachments"
-                    className="flex items-center justify-center gap-2 h-11 sm:h-10 px-4 border-2 border-dashed rounded-md cursor-pointer hover:border-primary transition-colors bg-muted/30 active:scale-[0.98]"
+                    className="flex items-center justify-center gap-2 h-11 px-4 border-2 border-dashed rounded-md cursor-pointer hover:border-primary transition-colors bg-muted/30 active:scale-[0.98]"
                   >
-                    <Upload className="h-4 w-4 sm:h-5 sm:w-5 text-muted-foreground" />
-                    <span className="text-xs sm:text-sm text-muted-foreground font-medium">
+                    <Upload className="h-5 w-5 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground font-medium">
                       {previewFiles.length > 0
                         ? `${previewFiles.length} file đã chọn`
                         : "Chọn hình ảnh/video"}
@@ -610,38 +597,38 @@ export default function QuickReportPage() {
                     onChange={handleFileChange}
                     required
                   />
-                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     Bắt buộc tải lên ít nhất 1 hình ảnh/video (Tối đa 10MB/file)
                   </p>
 
-                  {/* File Preview - Mobile Optimized */}
+                  {/* File Preview */}
                   {previewFiles.length > 0 && (
-                    <div className="mt-2 sm:mt-3 space-y-1.5 sm:space-y-2">
-                      <Label className="text-[10px] sm:text-xs text-muted-foreground">
+                    <div className="mt-3 space-y-2">
+                      <Label className="text-xs text-muted-foreground">
                         {previewFiles.length}{" "}
                         {previewFiles.length === 1 ? "file" : "files"} đã chọn
                       </Label>
-                      <div className="grid grid-cols-2 gap-1.5 sm:gap-2">
+                      <div className="grid grid-cols-2 gap-2">
                         {previewFiles.map((preview, index) => (
                           <div
                             key={index}
-                            className="rounded-md border p-1.5 sm:p-2 bg-muted/30"
+                            className="rounded-md border p-2 bg-muted/30"
                           >
                             {preview.type.startsWith("image/") ? (
                               <img
                                 src={preview.url}
                                 alt={`Preview ${index + 1}`}
-                                className="w-full h-20 sm:h-24 rounded object-cover"
+                                className="w-full h-24 rounded object-cover"
                               />
                             ) : preview.type.startsWith("video/") ? (
                               <video
                                 src={preview.url}
-                                className="w-full h-20 sm:h-24 rounded object-cover"
+                                className="w-full h-24 rounded object-cover"
                               >
                                 Your browser does not support video.
                               </video>
                             ) : null}
-                            <p className="mt-1 text-[10px] sm:text-xs text-center text-muted-foreground truncate px-0.5">
+                            <p className="mt-1.5 text-xs text-center text-muted-foreground truncate">
                               {preview.name}
                             </p>
                           </div>
@@ -652,22 +639,24 @@ export default function QuickReportPage() {
                 </div>
               </div>
 
-              {/* Submit Button - Mobile Optimized (Touch-friendly 48px) */}
+              {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full h-12 sm:h-11 text-base sm:text-sm font-semibold shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
+                className="w-full h-11 text-base font-semibold shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
                 size="lg"
                 disabled={isSubmitting || isSendingOtp}
               >
                 {isSubmitting || isSendingOtp ? (
                   <>
                     <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                    {isSendingOtp ? "Đang gửi OTP..." : "Đang gửi..."}
+                    <span className="text-base">
+                      {isSendingOtp ? "Đang gửi OTP..." : "Đang gửi..."}
+                    </span>
                   </>
                 ) : (
                   <>
                     <FileText className="h-5 w-5 mr-2" />
-                    Gửi báo cáo
+                    <span className="text-base">Gửi báo cáo</span>
                   </>
                 )}
               </Button>
@@ -675,14 +664,14 @@ export default function QuickReportPage() {
           </CardContent>
         </Card>
 
-        {/* OTP Dialog - Mobile Optimized with InputOTP */}
+        {/* OTP Dialog */}
         <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
           <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
             <DialogHeader className="space-y-3">
-              <DialogTitle className="text-center text-lg sm:text-xl">
+              <DialogTitle className="text-center text-xl">
                 Xác thực Email
               </DialogTitle>
-              <DialogDescription className="text-center text-xs sm:text-sm leading-relaxed">
+              <DialogDescription className="text-center text-sm leading-relaxed">
                 Mã OTP đã được gửi đến email
                 <br />
                 <strong className="text-foreground break-all">{email}</strong>
@@ -690,7 +679,7 @@ export default function QuickReportPage() {
             </DialogHeader>
 
             <div className="space-y-4 py-4">
-              {/* InputOTP - 6 slots riêng biệt */}
+              {/* InputOTP - 6 slots */}
               <div className="flex justify-center">
                 <InputOTP
                   maxLength={6}
@@ -699,43 +688,25 @@ export default function QuickReportPage() {
                   disabled={isVerifyingOtp}
                 >
                   <InputOTPGroup className="gap-2">
-                    <InputOTPSlot
-                      index={0}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl sm:text-2xl"
-                    />
-                    <InputOTPSlot
-                      index={1}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl sm:text-2xl"
-                    />
-                    <InputOTPSlot
-                      index={2}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl sm:text-2xl"
-                    />
-                    <InputOTPSlot
-                      index={3}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl sm:text-2xl"
-                    />
-                    <InputOTPSlot
-                      index={4}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl sm:text-2xl"
-                    />
-                    <InputOTPSlot
-                      index={5}
-                      className="w-10 h-12 sm:w-12 sm:h-14 text-xl sm:text-2xl"
-                    />
+                    <InputOTPSlot index={0} className="w-12 h-14 text-2xl" />
+                    <InputOTPSlot index={1} className="w-12 h-14 text-2xl" />
+                    <InputOTPSlot index={2} className="w-12 h-14 text-2xl" />
+                    <InputOTPSlot index={3} className="w-12 h-14 text-2xl" />
+                    <InputOTPSlot index={4} className="w-12 h-14 text-2xl" />
+                    <InputOTPSlot index={5} className="w-12 h-14 text-2xl" />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
 
               {/* Resend OTP */}
-              <div className="text-center text-xs sm:text-sm">
+              <div className="text-center text-sm">
                 <span className="text-muted-foreground">
                   Không nhận được OTP?{" "}
                 </span>
                 <Button
                   type="button"
                   variant="link"
-                  className="px-1 h-auto text-xs sm:text-sm"
+                  className="px-1 h-auto text-sm"
                   onClick={async () => {
                     try {
                       await sendReportOTP(email);
@@ -760,19 +731,19 @@ export default function QuickReportPage() {
                   setOtp("");
                   setIsSubmitting(false);
                 }}
-                className="flex-1 sm:flex-none h-11 sm:h-10"
+                className="flex-1 sm:flex-none h-11 text-base"
               >
                 Hủy
               </Button>
               <Button
                 onClick={handleVerifyOtp}
                 disabled={isVerifyingOtp || otp.length < 6}
-                className="flex-1 sm:flex-none h-11 sm:h-10"
+                className="flex-1 sm:flex-none h-11 text-base"
               >
                 {isVerifyingOtp ? (
                   <>
                     <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    Đang xác thực...
+                    <span>Đang xác thực...</span>
                   </>
                 ) : (
                   "Xác nhận"

@@ -539,12 +539,16 @@ export function ReportForm() {
                 </p>
               </div>
 
-              {/* Campus, Area Type, Location and Equipment - 4 Columns in 1 Row */}
-              <div className="grid gap-4 md:grid-cols-4">
+              {/* Row 1: Campus + Area Type */}
+              <div className="grid gap-4 md:grid-cols-2">
                 {/* Column 1: Campus */}
                 <div className="space-y-2">
                   <Label htmlFor="campus">Cơ sở *</Label>
-                  <Select required onValueChange={setSelectedCampus}>
+                  <Select
+                    required
+                    value={selectedCampus}
+                    onValueChange={setSelectedCampus}
+                  >
                     <SelectTrigger id="campus" className="w-full">
                       <SelectValue placeholder="Chọn cơ sở" />
                     </SelectTrigger>
@@ -559,31 +563,54 @@ export function ReportForm() {
                 </div>
 
                 {/* Column 2: Area Type */}
-                {selectedCampus && (
-                  <div className="space-y-2">
-                    <Label htmlFor="area-type">Loại khu vực *</Label>
-                    <Select required onValueChange={setAreaType}>
-                      <SelectTrigger id="area-type" className="w-full">
-                        <SelectValue placeholder="Chọn loại" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {areaTypes.map((type) => (
-                          <SelectItem key={type.value} value={type.value}>
-                            {type.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
+                <div className="space-y-2">
+                  <Label htmlFor="area-type">Loại khu vực *</Label>
+                  <Select
+                    required
+                    value={areaType}
+                    onValueChange={setAreaType}
+                    disabled={!selectedCampus}
+                  >
+                    <SelectTrigger id="area-type" className="w-full">
+                      <SelectValue
+                        placeholder={
+                          !selectedCampus
+                            ? "Vui lòng chọn cơ sở trước"
+                            : "Chọn loại khu vực"
+                        }
+                      />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {areaTypes.map((type) => (
+                        <SelectItem key={type.value} value={type.value}>
+                          {type.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-                {/* Column 3: Specific Location (Conditional) */}
-                {areaType === "outdoor" && (
+              {/* Row 2: Location Details (Building/Outdoor) + Floor/Equipment */}
+              <div className="grid gap-4 md:grid-cols-2">
+                {/* Outdoor Area OR Building */}
+                {areaType === "outdoor" ? (
                   <div className="space-y-2">
-                    <Label htmlFor="outdoor-area">Khu vực *</Label>
-                    <Select required onValueChange={setSelectedOutdoorArea}>
+                    <Label htmlFor="outdoor-area">Khu vực ngoài trời *</Label>
+                    <Select
+                      required
+                      value={selectedOutdoorArea}
+                      onValueChange={setSelectedOutdoorArea}
+                      disabled={!areaType}
+                    >
                       <SelectTrigger id="outdoor-area" className="w-full">
-                        <SelectValue placeholder="Chọn khu vực" />
+                        <SelectValue
+                          placeholder={
+                            outdoorAreas.length === 0
+                              ? "Không có khu vực"
+                              : "Chọn khu vực"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {outdoorAreas.length > 0 ? (
@@ -600,15 +627,23 @@ export function ReportForm() {
                       </SelectContent>
                     </Select>
                   </div>
-                )}
-
-                {/* Column 3: Building (when building type selected) */}
-                {areaType === "building" && (
+                ) : areaType === "building" ? (
                   <div className="space-y-2">
                     <Label htmlFor="building">Tòa nhà *</Label>
-                    <Select required onValueChange={setSelectedBuilding}>
+                    <Select
+                      required
+                      value={selectedBuilding}
+                      onValueChange={setSelectedBuilding}
+                      disabled={!areaType}
+                    >
                       <SelectTrigger id="building" className="w-full">
-                        <SelectValue placeholder="Chọn tòa nhà" />
+                        <SelectValue
+                          placeholder={
+                            buildings.length === 0
+                              ? "Không có tòa nhà"
+                              : "Chọn tòa nhà"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {buildings.length > 0 ? (
@@ -625,37 +660,75 @@ export function ReportForm() {
                       </SelectContent>
                     </Select>
                   </div>
-                )}
-
-                {/* Column 4: Floor (when building selected) */}
-                {areaType === "building" && selectedBuilding && (
+                ) : (
                   <div className="space-y-2">
-                    <Label htmlFor="floor">Tầng *</Label>
-                    <Select required onValueChange={setSelectedFloor}>
-                      <SelectTrigger id="floor" className="w-full">
-                        <SelectValue placeholder="Chọn tầng" />
+                    <Label
+                      htmlFor="placeholder-location"
+                      className="text-muted-foreground"
+                    >
+                      Vị trí *
+                    </Label>
+                    <Select disabled>
+                      <SelectTrigger
+                        id="placeholder-location"
+                        className="w-full"
+                      >
+                        <SelectValue placeholder="Vui lòng chọn loại khu vực" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {Array.from(
-                          { length: availableFloors },
-                          (_, i) => i + 1
-                        ).map((floor) => (
-                          <SelectItem key={floor} value={floor.toString()}>
-                            Tầng {floor}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
                     </Select>
                   </div>
                 )}
 
-                {/* Column 4: Equipment (only for outdoor) */}
-                {areaType === "outdoor" && selectedOutdoorArea && (
+                {/* Floor (for building) OR Equipment (for outdoor) */}
+                {areaType === "building" ? (
+                  <div className="space-y-2">
+                    <Label htmlFor="floor">Tầng *</Label>
+                    <Select
+                      required
+                      value={selectedFloor}
+                      onValueChange={setSelectedFloor}
+                      disabled={!selectedBuilding}
+                    >
+                      <SelectTrigger id="floor" className="w-full">
+                        <SelectValue
+                          placeholder={
+                            !selectedBuilding
+                              ? "Vui lòng chọn tòa nhà"
+                              : "Chọn tầng"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableFloors > 0 &&
+                          Array.from(
+                            { length: availableFloors },
+                            (_, i) => i + 1
+                          ).map((floor) => (
+                            <SelectItem key={floor} value={floor.toString()}>
+                              Tầng {floor}
+                            </SelectItem>
+                          ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ) : areaType === "outdoor" ? (
                   <div className="space-y-2">
                     <Label htmlFor="equipment-outdoor">Thiết bị (nếu có)</Label>
-                    <Select onValueChange={setSelectedAsset}>
+                    <Select
+                      value={selectedAsset}
+                      onValueChange={setSelectedAsset}
+                      disabled={!selectedOutdoorArea}
+                    >
                       <SelectTrigger id="equipment-outdoor" className="w-full">
-                        <SelectValue placeholder="Chọn thiết bị" />
+                        <SelectValue
+                          placeholder={
+                            !selectedOutdoorArea
+                              ? "Vui lòng chọn khu vực"
+                              : assets.length === 0
+                              ? "Không có thiết bị"
+                              : "Chọn thiết bị"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {assets.length > 0 ? (
@@ -672,17 +745,44 @@ export function ReportForm() {
                       </SelectContent>
                     </Select>
                   </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="placeholder-floor"
+                      className="text-muted-foreground"
+                    >
+                      Tầng / Thiết bị
+                    </Label>
+                    <Select disabled>
+                      <SelectTrigger id="placeholder-floor" className="w-full">
+                        <SelectValue placeholder="Vui lòng chọn loại khu vực" />
+                      </SelectTrigger>
+                    </Select>
+                  </div>
                 )}
               </div>
 
-              {/* Row 2: Indoor Zone Area + Equipment (when floor is selected) */}
-              {areaType === "building" && selectedBuilding && selectedFloor && (
+              {/* Row 3: Indoor Zone Area + Equipment (only for building) */}
+              {areaType === "building" && (
                 <div className="grid gap-4 md:grid-cols-2">
                   <div className="space-y-2">
                     <Label htmlFor="zone-area">Khu vực nội bộ *</Label>
-                    <Select required onValueChange={setSelectedIndoorZone}>
+                    <Select
+                      required
+                      value={selectedIndoorZone}
+                      onValueChange={setSelectedIndoorZone}
+                      disabled={!selectedFloor}
+                    >
                       <SelectTrigger id="zone-area" className="w-full">
-                        <SelectValue placeholder="Chọn khu vực" />
+                        <SelectValue
+                          placeholder={
+                            !selectedFloor
+                              ? "Vui lòng chọn tầng"
+                              : indoorZoneAreas.length === 0
+                              ? "Không có khu vực"
+                              : "Chọn khu vực"
+                          }
+                        />
                       </SelectTrigger>
                       <SelectContent>
                         {indoorZoneAreas.length > 0 ? (
@@ -699,34 +799,42 @@ export function ReportForm() {
                       </SelectContent>
                     </Select>
                   </div>
-                  {selectedIndoorZone && (
-                    <div className="space-y-2">
-                      <Label htmlFor="equipment-building">
-                        Thiết bị (nếu có)
-                      </Label>
-                      <Select onValueChange={setSelectedAsset}>
-                        <SelectTrigger
-                          id="equipment-building"
-                          className="w-full"
-                        >
-                          <SelectValue placeholder="Chọn thiết bị" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {assets.length > 0 ? (
-                            assets.map((asset) => (
-                              <SelectItem key={asset._id} value={asset._id}>
-                                {asset.name}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem value="empty" disabled>
-                              Không có thiết bị
+
+                  <div className="space-y-2">
+                    <Label htmlFor="equipment-building">
+                      Thiết bị (nếu có)
+                    </Label>
+                    <Select
+                      value={selectedAsset}
+                      onValueChange={setSelectedAsset}
+                      disabled={!selectedIndoorZone}
+                    >
+                      <SelectTrigger id="equipment-building" className="w-full">
+                        <SelectValue
+                          placeholder={
+                            !selectedIndoorZone
+                              ? "Vui lòng chọn khu vực"
+                              : assets.length === 0
+                              ? "Không có thiết bị"
+                              : "Chọn thiết bị"
+                          }
+                        />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {assets.length > 0 ? (
+                          assets.map((asset) => (
+                            <SelectItem key={asset._id} value={asset._id}>
+                              {asset.name}
                             </SelectItem>
-                          )}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
+                          ))
+                        ) : (
+                          <SelectItem value="empty" disabled>
+                            Không có thiết bị
+                          </SelectItem>
+                        )}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               )}
             </div>
