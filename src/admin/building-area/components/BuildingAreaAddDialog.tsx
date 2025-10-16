@@ -1,0 +1,238 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
+import { createBuilding, updateBuilding } from "../api/building.api";
+import { createArea, updateArea } from "../api/area.api";
+
+interface Props {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSuccess?: () => void;
+  mode?: "add" | "edit";
+  item?: any;
+  campuses: any[];
+}
+
+export function BuildingAreaAddDialog({
+  open,
+  onOpenChange,
+  onSuccess,
+  mode = "add",
+  item,
+  campuses = [],
+}: Props) {
+  const defaultForm = {
+    name: "",
+    status: "ACTIVE",
+    description: "",
+    floor: "",
+    campus: "",
+    zoneType: "SERVICE",
+    type: "BUILDING",
+  };
+
+  const [form, setForm] = useState<any>(defaultForm);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+
+    if (mode === "edit" && item) {
+      setForm({
+        ...defaultForm,
+        ...item,
+        campus: item.campus?._id || "",
+        floor: item.floor?.toString() || "",
+        description: item.description || "",
+        zoneType: item.zoneType || "SERVICE",
+      });
+    } else {
+      setForm(defaultForm);
+    }
+  }, [open, mode, item]);
+
+  const handleSubmit = async () => {
+    try {
+      setLoading(true);
+
+      // Validation
+      if (!form.name?.trim()) {
+        toast.error("Tên không được để trống");
+        return;
+      }
+      if (!form.campus) {
+        toast.error("Vui lòng chọn cơ sở");
+        return;
+      }
+      if (form.type === "BUILDING") {
+        const floorNum = Number(form.floor);
+        if (isNaN(floorNum) || floorNum < 0) {
+          toast.error("Vui lòng nhập số tầng hợp lệ");
+          return;
+        }
+      } else if (form.type === "AREA") {
+        if (!form.description?.trim()) {
+          toast.error("Vui lòng nhập mô tả");
+          return;
+        }
+        if (!form.zoneType || !["PUBLIC", "SERVICE"].includes(form.zoneType)) {
+          toast.error("Vui lòng chọn zoneType hợp lệ");
+          return;
+        }
+      }
+
+      // Payload chuẩn
+      const payload: any = {
+        name: form.name.trim(),
+        status: form.status,
+        campus: form.campus,
+      };
+      if (form.type === "BUILDING") payload.floor = Number(form.floor);
+      if (form.type === "AREA") {
+        payload.description = form.description.trim();
+        payload.zoneType = form.zoneType;
+      }
+
+      console.log("Submitting payload:", payload, "Type:", form.type, "Mode:", mode);
+
+      // Call API
+      if (mode === "edit" && item?._id && item.type === form.type) {
+        if (form.type === "BUILDING") await updateBuilding(item._id, payload);
+        else await updateArea(item._id, payload);
+      } else {
+        if (form.type === "BUILDING") await createBuilding(payload);
+        else await createArea(payload);
+      }
+
+      toast.success(mode === "edit" ? "Cập nhật thành công" : "Thêm mới thành công");
+      onSuccess?.();
+      onOpenChange(false);
+    } catch (err: any) {
+      console.error("Submit error:", err.response?.data || err);
+      toast.error(err.response?.data?.message || "Lỗi khi lưu dữ liệu. Vui lòng thử lại.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle>
+            {mode === "edit" ? "Cập nhật" : "Thêm mới"} {form.type === "BUILDING" ? "Tòa nhà" : "Khu vực"}
+          </DialogTitle>
+          <DialogDescription>Nhập thông tin chi tiết</DialogDescription>
+        </DialogHeader>
+
+        <div className="space-y-3 mt-2">
+          {/* Loại */}
+          <div>
+            <Label>Loại</Label>
+            <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn loại" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="BUILDING">Tòa nhà</SelectItem>
+                <SelectItem value="AREA">Khu vực</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Tên */}
+          <div>
+            <Label>Tên</Label>
+            <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+          </div>
+
+          {/* Số tầng / mô tả */}
+          {form.type === "BUILDING" ? (
+            <div>
+              <Label>Số tầng</Label>
+              <Input type="number" value={form.floor} onChange={(e) => setForm({ ...form, floor: e.target.value })} />
+            </div>
+          ) : (
+            <>
+              <div>
+                <Label>Mô tả</Label>
+                <Input value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+              </div>
+              <div>
+                <Label>Zone Type</Label>
+                <Select value={form.zoneType} onValueChange={(v) => setForm({ ...form, zoneType: v })}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn zone type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="PUBLIC">PUBLIC</SelectItem>
+                    <SelectItem value="SERVICE">SERVICE</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </>
+          )}
+
+          {/* Cơ sở */}
+          <div>
+            <Label>Cơ sở</Label>
+            <Select value={form.campus} onValueChange={(v) => setForm({ ...form, campus: v })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn cơ sở" />
+              </SelectTrigger>
+              <SelectContent>
+                {campuses.length > 0 ? (
+                  campuses.map((c) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)
+                ) : (
+                  <SelectItem value="" disabled>Không có dữ liệu</SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Trạng thái */}
+          <div>
+            <Label>Trạng thái</Label>
+            <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Chọn trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+                <SelectItem value="INACTIVE">Ngừng</SelectItem>
+                <SelectItem value="UNDERMAINTENANCE">Bảo trì</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <DialogFooter>
+          <Button onClick={handleSubmit} disabled={loading} className="w-full mt-3">
+            {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {mode === "edit" ? "Lưu thay đổi" : "Thêm mới"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
