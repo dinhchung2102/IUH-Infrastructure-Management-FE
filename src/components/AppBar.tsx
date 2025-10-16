@@ -234,10 +234,11 @@ export default function AppBar() {
         }}
         animate={hidden ? "hidden" : "visible"}
         transition={{ duration: 0.35, ease: "easeInOut" }}
-        className="px-6 sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
+        className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
       >
-        <div className="container flex h-18 items-center justify-between">
-          <div className="flex items-center gap-6 flex-1">
+        <div className="container flex h-18 items-center justify-between gap-4">
+          {/* Logo Section - Fixed Width */}
+          <div className="flex items-center w-[200px] shrink-0">
             <Link
               to="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -248,39 +249,39 @@ export default function AppBar() {
                 className="h-14 w-auto object-contain"
               />
             </Link>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex md:flex-1 items-center justify-center gap-1 w-full">
-              {navItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className={`relative px-8 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 ${
-                    isActive(item.path)
-                      ? "text-primary"
-                      : "text-foreground/70 hover:text-primary"
-                  }`}
-                >
-                  {item.label}
-                  {isActive(item.path) && (
-                    <motion.span
-                      layoutId="navbar-indicator"
-                      className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full"
-                      initial={false}
-                      transition={{
-                        type: "spring",
-                        stiffness: 380,
-                        damping: 30,
-                      }}
-                    />
-                  )}
-                </Link>
-              ))}
-            </nav>
           </div>
 
-          {/* Desktop Auth Section */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop Navigation - Centered */}
+          <nav className="hidden md:flex flex-1 items-center justify-center gap-1">
+            {navItems.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`relative px-8 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 ${
+                  isActive(item.path)
+                    ? "text-primary"
+                    : "text-foreground/70 hover:text-primary"
+                }`}
+              >
+                {item.label}
+                {isActive(item.path) && (
+                  <motion.span
+                    layoutId="navbar-indicator"
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full"
+                    initial={false}
+                    transition={{
+                      type: "spring",
+                      stiffness: 380,
+                      damping: 30,
+                    }}
+                  />
+                )}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Desktop Auth Section - Fixed Width */}
+          <div className="hidden md:flex items-center gap-2 justify-end w-[200px] shrink-0">
             {account ? (
               <Popover>
                 <PopoverTrigger asChild>
