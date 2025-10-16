@@ -37,6 +37,7 @@ export interface AssetResponse {
     name: string;
   };
   zone: {
+    floorLocation: number;
     _id: string;
     name: string;
     building: {
