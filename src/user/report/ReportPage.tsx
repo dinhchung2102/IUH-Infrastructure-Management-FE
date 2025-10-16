@@ -1,25 +1,14 @@
-import {
-  ReportHeroSection,
-  ReportStatsSection,
-  ReportForm,
-  ReportSidebar,
-} from "./components";
+import { ReportForm, ReportHeroSection } from "./components";
 
 export default function ReportPage() {
   return (
-    <div className="flex flex-col">
+    <>
       <ReportHeroSection />
-      <ReportStatsSection />
-
-      {/* Report Form */}
-      <section className="container py-16">
-        <div className="mx-auto max-w-4xl">
-          <div className="grid gap-8 lg:grid-cols-3">
-            <ReportForm />
-            <ReportSidebar />
-          </div>
+      <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gradient-to-b from-background to-muted/50 py-12 px-4">
+        <div className="w-full max-w-3xl">
+          <ReportForm />
         </div>
-      </section>
-    </div>
+      </div>
+    </>
   );
 }
