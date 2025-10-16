@@ -377,10 +377,10 @@ export default function QuickReportPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background py-3 px-3 sm:py-8 sm:px-4">
-      <div className="w-full max-w-2xl md:max-w-4xl mx-auto space-y-3 sm:space-y-4">
+      <div className="w-full max-w-2xl md:max-w-4xl mx-auto space-y-3">
         {/* Asset Info Card - Responsive 2-Column Layout */}
         <Card className="border-primary/20 shadow-lg">
-          <CardHeader className="pb-3 sm:pb-4">
+          <CardHeader className="pb-2">
             <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
               <Package className="h-5 w-5 text-primary flex-shrink-0" />
               <span className="truncate">Thông tin thiết bị</span>
@@ -655,7 +655,7 @@ export default function QuickReportPage() {
                   </>
                 ) : (
                   <>
-                    <FileText className="h-5 w-5 mr-2" />
+                    <FileText className="h-5 w-5" />
                     <span className="text-base">Gửi báo cáo</span>
                   </>
                 )}
