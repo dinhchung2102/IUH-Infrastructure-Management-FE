@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { getBuildings, deleteBuilding } from "../api/building.api";
 import { getAreas, deleteArea } from "../api/area.api";
@@ -65,17 +65,19 @@ export default function BuildingAreaPage() {
   const fetchAll = async () => {
     try {
       setLoading(true);
-      const [buildRes, areaRes] = await Promise.all([getBuildings(), getAreas()]);
+      const [buildRes, areaRes] = await Promise.all([
+        getBuildings(),
+        getAreas(),
+      ]);
 
-      const buildings =
-        buildRes?.data?.buildings?.map((b: any) => ({ ...b, type: "BUILDING" })) ||
-        buildRes?.data?.data?.buildings?.map((b: any) => ({ ...b, type: "BUILDING" })) ||
-        [];
+      const buildingsData = Array.isArray(buildRes?.data) ? buildRes.data : [];
+      const buildings = buildingsData.map((b: any) => ({
+        ...b,
+        type: "BUILDING",
+      }));
 
-      const areas =
-        areaRes?.data?.areas?.map((a: any) => ({ ...a, type: "AREA" })) ||
-        areaRes?.data?.data?.areas?.map((a: any) => ({ ...a, type: "AREA" })) ||
-        [];
+      const areasData = Array.isArray(areaRes?.data) ? areaRes.data : [];
+      const areas = areasData.map((a: any) => ({ ...a, type: "AREA" }));
 
       setItems([...buildings, ...areas]);
     } catch (err) {
@@ -92,11 +94,7 @@ export default function BuildingAreaPage() {
   const fetchCampuses = async () => {
     try {
       const res = await getCampus();
-      const list =
-        res?.data?.campuses ||
-        res?.data?.data?.campuses ||
-        res?.data ||
-        [];
+      const list = Array.isArray(res?.data) ? res.data : [];
       setCampuses(list);
     } catch (err) {
       console.error("Lỗi tải cơ sở:", err);
@@ -114,7 +112,9 @@ export default function BuildingAreaPage() {
   const handleDelete = async (item: any) => {
     try {
       const confirm = window.confirm(
-        `Bạn có chắc chắn muốn xóa ${item.type === "BUILDING" ? "tòa nhà" : "khu vực"} "${item.name}" không?`
+        `Bạn có chắc chắn muốn xóa ${
+          item.type === "BUILDING" ? "tòa nhà" : "khu vực"
+        } "${item.name}" không?`
       );
       if (!confirm) return;
 
@@ -124,7 +124,9 @@ export default function BuildingAreaPage() {
         await deleteArea(item._id);
       }
 
-      toast.success(`Đã xóa ${item.type === "BUILDING" ? "tòa nhà" : "khu vực"} thành công`);
+      toast.success(
+        `Đã xóa ${item.type === "BUILDING" ? "tòa nhà" : "khu vực"} thành công`
+      );
       fetchAll();
     } catch (err) {
       console.error(err);
@@ -136,10 +138,14 @@ export default function BuildingAreaPage() {
    *  FILTER
    *  ========================== */
   const filtered = items.filter((item) => {
-    const matchesSearch = item.name?.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch = item.name
+      ?.toLowerCase()
+      .includes(search.toLowerCase());
     const matchesType = filterType ? item.type === filterType : true;
     const matchesStatus = filterStatus ? item.status === filterStatus : true;
-    const matchesCampus = filterCampus ? item.campus?._id === filterCampus : true;
+    const matchesCampus = filterCampus
+      ? item.campus?._id === filterCampus
+      : true;
     return matchesSearch && matchesType && matchesStatus && matchesCampus;
   });
 
@@ -227,10 +233,9 @@ export default function BuildingAreaPage() {
                   </SelectItem>
                 ))
               ) : (
-               <SelectItem value="no-data" disabled>
-  Không có dữ liệu
-</SelectItem>
-
+                <SelectItem value="no-data" disabled>
+                  Không có dữ liệu
+                </SelectItem>
               )}
             </SelectContent>
           </Select>
@@ -284,7 +289,10 @@ export default function BuildingAreaPage() {
                     {item.type === "BUILDING" ? (
                       <Badge variant="secondary">🏢 Tòa nhà</Badge>
                     ) : (
-                      <Badge variant="outline" className="flex items-center gap-1">
+                      <Badge
+                        variant="outline"
+                        className="flex items-center gap-1"
+                      >
                         <Map className="h-3 w-3" /> Khu vực
                       </Badge>
                     )}

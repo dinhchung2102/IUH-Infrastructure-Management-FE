@@ -1,18 +1,22 @@
 import api from "@/lib/axios";
 import type { ApiResponse } from "@/types/response.type";
 
-export enum CommonStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  UNDERMAINTENANCE = "UNDERMAINTENANCE",
-}
+export const CommonStatus = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  UNDERMAINTENANCE: "UNDERMAINTENANCE",
+} as const;
 
-export enum ZoneType {
-  SERVICE = "SERVICE",
-  LEARNING = "LEARNING",
-  PARKING = "PARKING",
-  OTHER = "OTHER",
-}
+export type CommonStatus = (typeof CommonStatus)[keyof typeof CommonStatus];
+
+export const ZoneType = {
+  SERVICE: "SERVICE",
+  LEARNING: "LEARNING",
+  PARKING: "PARKING",
+  OTHER: "OTHER",
+} as const;
+
+export type ZoneType = (typeof ZoneType)[keyof typeof ZoneType];
 
 export interface AreaResponse {
   _id: string;
@@ -52,10 +56,9 @@ export interface QueryAreaDto {
 
 /** Lấy danh sách khu vực */
 export const getAreas = async (query?: QueryAreaDto) => {
-  const res = await api.get<ApiResponse<AreaResponse[]>>(
-    "/zone-area/areas",
-    { params: query }
-  );
+  const res = await api.get<ApiResponse<AreaResponse[]>>("/zone-area/areas", {
+    params: query,
+  });
   return res.data;
 };
 

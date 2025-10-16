@@ -2,21 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { getCampusStats } from "../api/campus.api";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Building2,
-  CheckCircle2,
-  XCircle,
-  PlusCircle,
-  RefreshCcw,
-} from "lucide-react";
+import { Building2, CheckCircle2, XCircle, PlusCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface CampusStats {
@@ -26,7 +14,13 @@ interface CampusStats {
   newCampusThisMonth: number;
 }
 
-export function CampusStatsCards() {
+interface CampusStatsCardsProps {
+  stats?: any;
+  onRefresh?: () => Promise<void>;
+  loading?: boolean;
+}
+
+export function CampusStatsCards(_props: CampusStatsCardsProps = {}) {
   const [stats, setStats] = useState<CampusStats | null>(null);
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -36,7 +30,7 @@ export function CampusStatsCards() {
     try {
       setLoading(true);
       const res = await getCampusStats();
-      const raw = res?.data?.data || {};
+      const raw: any = res?.data || {};
 
       const total = raw.total || 0;
       const active =
@@ -143,9 +137,9 @@ export function CampusStatsCards() {
                 transition={{ duration: 0.3, delay: idx * 0.1 }}
               >
                 <Card
-                  className={`border-none shadow-sm hover:shadow-md transition-all duration-300 ${item.bgColor} ${
-                    refreshing ? "animate-pulse" : ""
-                  }`}
+                  className={`border-none shadow-sm hover:shadow-md transition-all duration-300 ${
+                    item.bgColor
+                  } ${refreshing ? "animate-pulse" : ""}`}
                 >
                   <CardHeader className="flex flex-row items-start justify-between pb-1">
                     <CardTitle className="text-sm font-medium text-gray-700">

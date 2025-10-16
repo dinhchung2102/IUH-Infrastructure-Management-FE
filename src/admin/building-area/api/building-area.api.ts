@@ -14,31 +14,22 @@ export const getBuildingAreaList = async () => {
     // Gọi song song 2 API
     const [buildRes, areaRes] = await Promise.all([getBuildings(), getAreas()]);
 
-    const buildings =
-      buildRes?.data?.buildings?.map((b: BuildingResponse) => ({
-        ...b,
-        type: "BUILDING" as const,
-      })) ||
-      buildRes?.data?.map((b: BuildingResponse) => ({
-        ...b,
-        type: "BUILDING" as const,
-      })) ||
-      [];
+    const buildingsData = Array.isArray(buildRes?.data) ? buildRes.data : [];
+    const buildings = buildingsData.map((b: BuildingResponse) => ({
+      ...b,
+      type: "BUILDING" as const,
+    }));
 
-    const areas =
-      areaRes?.data?.areas?.map((a: AreaResponse) => ({
-        ...a,
-        type: "AREA" as const,
-      })) ||
-      areaRes?.data?.map((a: AreaResponse) => ({
-        ...a,
-        type: "AREA" as const,
-      })) ||
-      [];
+    const areasData = Array.isArray(areaRes?.data) ? areaRes.data : [];
+    const areas = areasData.map((a: AreaResponse) => ({
+      ...a,
+      type: "AREA" as const,
+    }));
 
     // Gộp & sắp xếp theo createdAt mới nhất
     const merged: BuildingAreaItem[] = [...buildings, ...areas].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     return merged;

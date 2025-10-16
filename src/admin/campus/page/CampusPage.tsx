@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { getCampus, deleteCampus, getCampusStats } from "../api/campus.api";
-import { Building2, RefreshCcw, Plus, BarChart3, Filter } from "lucide-react";
+import { Building2, Plus, BarChart3, Filter } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -19,7 +19,6 @@ import { TableSkeleton } from "@/components/TableSkeleton";
 import { CampusStatsCards } from "../components/CampusStatsCards";
 import { CampusStatsDialog } from "../components/CampusStatsDialog";
 import { CampusAddDialog } from "../components/CampusAddDialog";
-import { AlertTriangle } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -57,7 +56,7 @@ function CampusPage() {
     try {
       setLoading(true);
       const res = await getCampus({});
-      const list = res?.data?.campuses || [];
+      const list = Array.isArray(res?.data) ? res.data : [];
       setCampuses(list);
     } catch (err) {
       console.error("Lỗi khi tải cơ sở:", err);
@@ -85,28 +84,27 @@ function CampusPage() {
    *  Handlers
    *  ============================ */
   const handleDelete = async (id: string) => {
-  if (!id) return toast.error("Không tìm thấy ID cơ sở.");
-  const confirmDelete = confirm("Bạn có chắc muốn xóa cơ sở này?");
+    if (!id) return toast.error("Không tìm thấy ID cơ sở.");
+    const confirmDelete = confirm("Bạn có chắc muốn xóa cơ sở này?");
 
-  if (!confirmDelete) return;
+    if (!confirmDelete) return;
 
-  try {
-    await deleteCampus(id);
-    toast.success("Đã xóa cơ sở thành công!");
-    fetchCampus();
-    fetchStats();
-  } catch (err: any) {
-    console.error("Lỗi khi xóa cơ sở:", err);
-    if (err?.response?.status === 404) {
-      toast.error("Cơ sở không tồn tại hoặc đã bị xóa trước đó.");
-    } else if (err?.response?.status === 409) {
-      toast.error("Không thể xóa cơ sở này (đang được sử dụng).");
-    } else {
-      toast.error("Có lỗi xảy ra khi xóa cơ sở.");
+    try {
+      await deleteCampus(id);
+      toast.success("Đã xóa cơ sở thành công!");
+      fetchCampus();
+      fetchStats();
+    } catch (err: any) {
+      console.error("Lỗi khi xóa cơ sở:", err);
+      if (err?.response?.status === 404) {
+        toast.error("Cơ sở không tồn tại hoặc đã bị xóa trước đó.");
+      } else if (err?.response?.status === 409) {
+        toast.error("Không thể xóa cơ sở này (đang được sử dụng).");
+      } else {
+        toast.error("Có lỗi xảy ra khi xóa cơ sở.");
+      }
     }
-  }
-};
-
+  };
 
   const handleClearFilters = () => {
     setSearch("");
@@ -123,8 +121,7 @@ function CampusPage() {
       c?.name?.toLowerCase().includes(search.toLowerCase()) ||
       c?.email?.toLowerCase().includes(search.toLowerCase());
 
-    const matchStatus =
-      statusFilter === "all" || c.status === statusFilter;
+    const matchStatus = statusFilter === "all" || c.status === statusFilter;
 
     const matchManager =
       managerFilter === "all"
@@ -165,7 +162,11 @@ function CampusPage() {
       </div>
 
       {/* Cards thống kê */}
-      <CampusStatsCards stats={stats} onRefresh={fetchStats} loading={loading} />
+      <CampusStatsCards
+        stats={stats}
+        onRefresh={fetchStats}
+        loading={loading}
+      />
 
       {/* Bộ lọc */}
       <div className="p-4 border bg-white rounded-lg space-y-3">
@@ -223,7 +224,10 @@ function CampusPage() {
           </Select>
 
           {/* Nút xóa lọc */}
-          {(search || statusFilter !== "all" || managerFilter !== "all" || regionFilter !== "all") && (
+          {(search ||
+            statusFilter !== "all" ||
+            managerFilter !== "all" ||
+            regionFilter !== "all") && (
             <Button variant="outline" onClick={handleClearFilters}>
               Xóa bộ lọc
             </Button>
@@ -298,42 +302,43 @@ function CampusPage() {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={c.status === "ACTIVE" ? "success" : "destructive"}
+                      variant={
+                        c.status === "ACTIVE" ? "success" : "destructive"
+                      }
                     >
-                      {c.status === "ACTIVE"
-                        ? "Hoạt động"
-                        : "Ngừng hoạt động"}
+                      {c.status === "ACTIVE" ? "Hoạt động" : "Ngừng hoạt động"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>
-  <DropdownMenuTrigger asChild>
-    <Button variant="ghost" size="icon" className="h-8 w-8 p-0">
-      <MoreHorizontal className="h-4 w-4" />
-    </Button>
-  </DropdownMenuTrigger>
-  <DropdownMenuContent align="end">
-    <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-    <DropdownMenuItem
-      onClick={() => setEditCampus(c)}
-      className="cursor-pointer"
-
-    >
-      <Pencil className="mr-2 h-4 w-4" />
-      Chỉnh sửa
-    </DropdownMenuItem>
-    <DropdownMenuSeparator />
-    <DropdownMenuItem
-  onClick={() => handleDelete(c._id)}
-  className="text-red-600 focus:text-red-600 cursor-pointer"
->
-  <Trash2 className="mr-2 h-4 w-4" />
-  Xóa
-</DropdownMenuItem>
-
-  </DropdownMenuContent>
-</DropdownMenu>
-
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 p-0"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onClick={() => setEditCampus(c)}
+                          className="cursor-pointer"
+                        >
+                          <Pencil className="mr-2 h-4 w-4" />
+                          Chỉnh sửa
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(c._id)}
+                          className="text-red-600 focus:text-red-600 cursor-pointer"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Xóa
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))}
@@ -345,34 +350,32 @@ function CampusPage() {
       <CampusStatsDialog
         open={openStatsDialog}
         onOpenChange={setOpenStatsDialog}
-        stats={stats}
       />
 
       {/* Dialog thêm cơ sở */}
+      <CampusAddDialog
+        open={openAddDialog}
+        onOpenChange={setOpenAddDialog}
+        mode="add"
+        onSuccess={() => {
+          fetchCampus();
+          fetchStats();
+        }}
+      />
+
+      {editCampus && (
         <CampusAddDialog
-  open={openAddDialog}
-  onOpenChange={setOpenAddDialog}
-  mode="add"
-  onSuccess={() => {
-    fetchCampus();
-    fetchStats();
-  }}
-/>
-
-{editCampus && (
-  <CampusAddDialog
-    open={!!editCampus}
-    onOpenChange={(open) => !open && setEditCampus(null)}
-    mode="edit"
-    campus={editCampus}
-    onSuccess={() => {
-      setEditCampus(null);
-      fetchCampus();
-      fetchStats();
-    }}
-  />
-)}
-
+          open={!!editCampus}
+          onOpenChange={(open) => !open && setEditCampus(null)}
+          mode="edit"
+          campus={editCampus}
+          onSuccess={() => {
+            setEditCampus(null);
+            fetchCampus();
+            fetchStats();
+          }}
+        />
+      )}
     </div>
   );
 }

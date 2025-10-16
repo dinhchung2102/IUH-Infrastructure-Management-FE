@@ -8,12 +8,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -45,20 +40,20 @@ export function BuildingAreaStatsDialog({
   onOpenChange,
 }: BuildingAreaStatsDialogProps) {
   // ✅ Giữ UI, mặc định tất cả đều = 0
-  const [stats, setStats] = useState({
+  const [stats, _setStats] = useState({
     totalBuildings: 0,
     totalAreas: 0,
     activeCount: 0,
     maintenanceCount: 0,
   });
 
-  const [loading, setLoading] = useState(false);
+  const [loading, _setLoading] = useState(false);
   const [activeType, setActiveType] = useState<string>("BUILDING");
 
   useEffect(() => {
     if (open) {
       // Không gọi API — chỉ hiển thị dữ liệu mặc định
-      setLoading(false);
+      _setLoading(false);
     }
   }, [open]);
 
@@ -164,7 +159,10 @@ export function BuildingAreaStatsDialog({
           </TabsContent>
 
           {/* 🟣 Tab 2: Theo trạng thái */}
-          <TabsContent value="status" className="data-[state=active]:flex flex-col">
+          <TabsContent
+            value="status"
+            className="data-[state=active]:flex flex-col"
+          >
             <Card className="border-0 shadow-none flex-1 flex flex-col">
               <CardHeader>
                 <CardTitle className="text-base">Theo trạng thái</CardTitle>

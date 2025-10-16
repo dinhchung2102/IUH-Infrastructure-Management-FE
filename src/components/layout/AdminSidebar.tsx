@@ -153,7 +153,7 @@ function SidebarContent() {
           continue;
         }
 
-        if (pathname.startsWith(item.href + "/")) {
+        if (item.href && pathname.startsWith(item.href + "/")) {
           const length = item.href.length;
           if (length > bestMatchLength) {
             bestMatchLength = length;
@@ -231,60 +231,63 @@ function SidebarContent() {
                   {section.items.map((item) => {
                     // Nếu có menu con
                     if (item.children) {
-  // Xác định nếu route hiện tại nằm trong các child => active = true
-  const isActive = item.children.some((child) =>
-    location.pathname.startsWith(child.href)
-  );
+                      // Xác định nếu route hiện tại nằm trong các child => active = true
+                      const isActive = item.children.some((child) =>
+                        location.pathname.startsWith(child.href)
+                      );
 
-  return (
-    <Collapsible key={item.title} defaultOpen={isActive}>
-      <CollapsibleTrigger asChild>
-        <button
-          onClick={(e) => openSection_KeepOpen(section.title, e)}
-          className={cn(
-            "group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all",
-            isActive
-              ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
-              : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-          )}
-        >
-          <div className="flex items-center gap-3">
-            <item.icon className="size-4 shrink-0" />
-            <span>{item.title}</span>
-          </div>
-          <ChevronRight
-            className={cn(
-              "size-3 transition-transform",
-              isActive && "rotate-90"
-            )}
-          />
-        </button>
-      </CollapsibleTrigger>
+                      return (
+                        <Collapsible key={item.title} defaultOpen={isActive}>
+                          <CollapsibleTrigger asChild>
+                            <button
+                              onClick={(e) =>
+                                openSection_KeepOpen(section.title, e)
+                              }
+                              className={cn(
+                                "group flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-all",
+                                isActive
+                                  ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
+                                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                              )}
+                            >
+                              <div className="flex items-center gap-3">
+                                <item.icon className="size-4 shrink-0" />
+                                <span>{item.title}</span>
+                              </div>
+                              <ChevronRight
+                                className={cn(
+                                  "size-3 transition-transform",
+                                  isActive && "rotate-90"
+                                )}
+                              />
+                            </button>
+                          </CollapsibleTrigger>
 
-      <CollapsibleContent className="ml-6 mt-1 space-y-1">
-        {item.children.map((child) => (
-          <NavLink
-            key={child.href}
-            to={child.href}
-            onClick={(e) => openSection_KeepOpen(section.title, e)}
-            className={({ isActive }) =>
-              cn(
-                "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all",
-                isActive
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              )
-            }
-          >
-            <child.icon className="size-4 shrink-0" />
-            {child.title}
-          </NavLink>
-        ))}
-      </CollapsibleContent>
-    </Collapsible>
-  );
-}
-
+                          <CollapsibleContent className="ml-6 mt-1 space-y-1">
+                            {item.children.map((child) => (
+                              <NavLink
+                                key={child.href}
+                                to={child.href}
+                                onClick={(e) =>
+                                  openSection_KeepOpen(section.title, e)
+                                }
+                                className={({ isActive }) =>
+                                  cn(
+                                    "flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm transition-all",
+                                    isActive
+                                      ? "bg-primary text-primary-foreground shadow-sm"
+                                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+                                  )
+                                }
+                              >
+                                <child.icon className="size-4 shrink-0" />
+                                {child.title}
+                              </NavLink>
+                            ))}
+                          </CollapsibleContent>
+                        </Collapsible>
+                      );
+                    }
 
                     // Nếu không có menu con
                     return item.href === "/" ? (

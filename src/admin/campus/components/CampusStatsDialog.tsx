@@ -46,7 +46,7 @@ export function CampusStatsDialog({
   open,
   onOpenChange,
 }: CampusStatsDialogProps) {
-  const [stats, setStats] = useState<any>(null);
+  const [stats, _setStats] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [activeStatus, setActiveStatus] = useState<string>("ACTIVE");
 
@@ -55,7 +55,7 @@ export function CampusStatsDialog({
     try {
       setLoading(true);
       const response = await getCampusStats();
-      const raw = response?.data?.data || {};
+      const raw: any = response?.data || {};
 
       // Chuẩn hóa dữ liệu
       const total = raw.total || 0;
@@ -69,7 +69,7 @@ export function CampusStatsDialog({
         })),
       };
 
-      setStats(formatted);
+      _setStats(formatted);
     } catch (error) {
       console.error("Error fetching campus stats:", error);
     } finally {
@@ -95,7 +95,7 @@ export function CampusStatsDialog({
     })) || [];
 
   const activeStatusIndex = statusData.findIndex(
-    (item) => item.status === activeStatus
+    (item: any) => item.status === activeStatus
   );
 
   // 🟣 Dữ liệu biểu đồ cột (giả lập từ tổng & trạng thái)
@@ -159,7 +159,10 @@ export function CampusStatsDialog({
                             activeIndex={activeStatusIndex}
                             activeShape={({ outerRadius = 0, ...props }) => (
                               <g>
-                                <Sector {...props} outerRadius={outerRadius + 12} />
+                                <Sector
+                                  {...props}
+                                  outerRadius={outerRadius + 12}
+                                />
                                 <Sector
                                   {...props}
                                   outerRadius={outerRadius + 24}
@@ -175,8 +178,13 @@ export function CampusStatsDialog({
                           >
                             <Label
                               content={({ viewBox }) => {
-                                if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                                  const activeData = statusData[activeStatusIndex];
+                                if (
+                                  viewBox &&
+                                  "cx" in viewBox &&
+                                  "cy" in viewBox
+                                ) {
+                                  const activeData =
+                                    statusData[activeStatusIndex];
                                   const statusLabel =
                                     statusChartConfig[
                                       activeData?.status as keyof typeof statusChartConfig
@@ -221,7 +229,7 @@ export function CampusStatsDialog({
 
                     {/* Legend */}
                     <div className="space-y-1 max-h-[280px] overflow-y-auto">
-                      {statusData.map((item) => (
+                      {statusData.map((item: any) => (
                         <button
                           key={item.status}
                           onClick={() => setActiveStatus(item.status)}

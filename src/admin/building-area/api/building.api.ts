@@ -6,11 +6,13 @@ import type { ApiResponse } from "@/types/response.type";
  * ============================ */
 
 /** Trạng thái của tòa nhà */
-export enum CommonStatus {
-  ACTIVE = "ACTIVE",
-  INACTIVE = "INACTIVE",
-  UNDERMAINTENANCE = "UNDERMAINTENANCE",
-}
+export const CommonStatus = {
+  ACTIVE: "ACTIVE",
+  INACTIVE: "INACTIVE",
+  UNDERMAINTENANCE: "UNDERMAINTENANCE",
+} as const;
+
+export type CommonStatus = (typeof CommonStatus)[keyof typeof CommonStatus];
 
 /** Dữ liệu trả về từ API */
 export interface BuildingResponse {
@@ -76,10 +78,7 @@ export const createBuilding = async (data: CreateBuildingDto) => {
 };
 
 /** Cập nhật tòa nhà */
-export const updateBuilding = async (
-  id: string,
-  data: UpdateBuildingDto
-) => {
+export const updateBuilding = async (id: string, data: UpdateBuildingDto) => {
   const res = await api.patch<ApiResponse<BuildingResponse>>(
     `/zone-area/buildings/${id}`,
     data
@@ -89,9 +88,7 @@ export const updateBuilding = async (
 
 /** Xóa tòa nhà */
 export const deleteBuilding = async (id: string) => {
-  const res = await api.delete<ApiResponse<void>>(
-    `/zone-area/buildings/${id}`
-  );
+  const res = await api.delete<ApiResponse<void>>(`/zone-area/buildings/${id}`);
   return res.data;
 };
 
