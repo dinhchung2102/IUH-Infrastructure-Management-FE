@@ -1,50 +1,56 @@
-export type ReportStatus = "PENDING" | "IN_PROGRESS" | "RESOLVED" | "REJECTED";
-export type ReportPriority = "LOW" | "MEDIUM" | "HIGH" | "URGENT";
+export type ReportStatus = "PENDING" | "APPROVED" | "REJECTED";
 
 export interface Report {
   _id: string;
-  reportCode: string;
-  type: {
-    _id: string;
-    value: string;
-    label: string;
-  };
-  description: string;
-  status: ReportStatus;
-  priority: ReportPriority;
-  reporter: {
-    _id: string;
-    fullName: string;
-    email: string;
-    avatar?: string;
-  };
   asset: {
     _id: string;
     name: string;
     code: string;
-    image?: string;
+    status: string;
+    image?: string; // Hình ảnh của thiết bị (hiển thị trong table)
+    zone?: {
+      _id: string;
+      name: string;
+      building: {
+        _id: string;
+        name: string;
+        campus: {
+          _id: string;
+          name: string;
+        };
+      };
+    } | null;
+    area?: {
+      _id: string;
+      name: string;
+      campus: {
+        _id: string;
+        name: string;
+      };
+    } | null;
   };
-  location: {
-    campus: string;
-    building?: string;
-    floor?: number;
-    zone?: string;
-  };
-  images: string[];
-  assignedTo?: {
+  type: string;
+  status: ReportStatus;
+  description: string;
+  images: string[]; // Hình ảnh báo cáo (hiển thị trong detail dialog)
+  createdBy: {
     _id: string;
     fullName: string;
     email: string;
   };
   createdAt: string;
   updatedAt: string;
-  resolvedAt?: string;
+  // Helper field for display
+  location?: {
+    campus: string;
+    building?: string;
+    zone?: string;
+  };
 }
 
 export interface ReportFilters {
   search: string;
   status: string;
-  priority: string;
   type: string;
   dateFrom: string;
   dateTo: string;
@@ -53,8 +59,7 @@ export interface ReportFilters {
 export interface ReportStats {
   total: number;
   pending: number;
-  inProgress: number;
-  resolved: number;
+  approved: number;
   rejected: number;
   avgResolutionTime: string;
   todayReports: number;

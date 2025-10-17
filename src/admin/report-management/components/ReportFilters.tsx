@@ -13,7 +13,6 @@ interface ReportFiltersProps {
   filters: {
     search: string;
     status: string;
-    priority: string;
     type: string;
     dateFrom: string;
     dateTo: string;
@@ -25,24 +24,16 @@ interface ReportFiltersProps {
 const statusOptions = [
   { value: "all", label: "Tất cả trạng thái" },
   { value: "PENDING", label: "Chờ xử lý" },
-  { value: "IN_PROGRESS", label: "Đang xử lý" },
-  { value: "RESOLVED", label: "Đã giải quyết" },
+  { value: "APPROVED", label: "Đã duyệt" },
   { value: "REJECTED", label: "Đã từ chối" },
-];
-
-const priorityOptions = [
-  { value: "all", label: "Tất cả mức độ" },
-  { value: "LOW", label: "Thấp" },
-  { value: "MEDIUM", label: "Trung bình" },
-  { value: "HIGH", label: "Cao" },
-  { value: "URGENT", label: "Khẩn cấp" },
 ];
 
 const typeOptions = [
   { value: "all", label: "Tất cả loại" },
-  { value: "DAMAGE", label: "Hư hỏng" },
+  { value: "DAMAGED", label: "Hư hỏng" },
   { value: "MAINTENANCE", label: "Bảo trì" },
-  { value: "CLEANING", label: "Vệ sinh" },
+  { value: "LOST", label: "Mất thiết bị" },
+  { value: "BUY_NEW", label: "Mua mới" },
   { value: "OTHER", label: "Khác" },
 ];
 
@@ -64,10 +55,7 @@ export function ReportFilters({
   };
 
   const hasActiveFilters =
-    filters.search ||
-    filters.status !== "all" ||
-    filters.priority !== "all" ||
-    filters.type !== "all";
+    filters.search || filters.status !== "all" || filters.type !== "all";
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -94,23 +82,6 @@ export function ReportFilters({
         </SelectTrigger>
         <SelectContent>
           {statusOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      {/* Priority Filter */}
-      <Select
-        value={filters.priority}
-        onValueChange={(value) => onFilterChange("priority", value)}
-      >
-        <SelectTrigger className="w-[180px] bg-white">
-          <SelectValue placeholder="Mức độ" />
-        </SelectTrigger>
-        <SelectContent>
-          {priorityOptions.map((option) => (
             <SelectItem key={option.value} value={option.value}>
               {option.label}
             </SelectItem>

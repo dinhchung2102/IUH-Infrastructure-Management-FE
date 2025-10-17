@@ -6,8 +6,8 @@ interface ReportStatsCardsProps {
   stats: {
     total: number;
     pending: number;
-    inProgress: number;
-    resolved: number;
+    approved: number;
+    rejected: number;
     todayReports: number;
   };
 }
@@ -27,28 +27,28 @@ export function ReportStatsCards({ stats }: ReportStatsCardsProps) {
       title: "Chờ xử lý",
       value: stats.pending,
       icon: AlertCircle,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100",
+      color: "text-yellow-600",
+      bgColor: "bg-yellow-100",
       change: `${((stats.pending / stats.total) * 100).toFixed(0)}% tổng số`,
       trend: "neutral" as const,
     },
     {
-      title: "Đang xử lý",
-      value: stats.inProgress,
-      icon: Clock,
-      color: "text-purple-600",
-      bgColor: "bg-purple-100",
-      change: `${((stats.inProgress / stats.total) * 100).toFixed(0)}% tổng số`,
-      trend: "neutral" as const,
-    },
-    {
-      title: "Đã giải quyết",
-      value: stats.resolved,
+      title: "Đã duyệt",
+      value: stats.approved,
       icon: CheckCircle2,
       color: "text-green-600",
       bgColor: "bg-green-100",
-      change: `${((stats.resolved / stats.total) * 100).toFixed(0)}% tổng số`,
+      change: `${((stats.approved / stats.total) * 100).toFixed(0)}% tổng số`,
       trend: "up" as const,
+    },
+    {
+      title: "Đã từ chối",
+      value: stats.rejected,
+      icon: Clock,
+      color: "text-red-600",
+      bgColor: "bg-red-100",
+      change: `${((stats.rejected / stats.total) * 100).toFixed(0)}% tổng số`,
+      trend: "neutral" as const,
     },
   ];
 
