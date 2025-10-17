@@ -24,6 +24,7 @@ import {
   Mail,
   Phone,
   MapPin,
+  Building2,
 } from "lucide-react";
 import {
   converGenderToDisplay,
@@ -56,6 +57,7 @@ import {
   unlockStaff,
   deleteStaff,
 } from "../api/staff-actions.api";
+import { AssignLocationDialog } from "./AssignLocationDialog";
 
 interface StaffTableProps {
   staff: StaffResponse[];
@@ -82,6 +84,8 @@ export default function StaffTable({
   onStaffStatusUpdate,
 }: StaffTableProps) {
   const [searchInput, setSearchInput] = React.useState(filters.search);
+  const [selectedStaffForAssign, setSelectedStaffForAssign] =
+    React.useState<StaffResponse | null>(null);
 
   // Sync searchInput với filters.search khi clear từ bên ngoài
   React.useEffect(() => {
@@ -435,57 +439,67 @@ export default function StaffTable({
                   <TableCell>
                     <div className="flex items-start gap-1.5 text-sm">
                       <MapPin className="h-3.5 w-3.5 shrink-0 mt-0.5 text-muted-foreground" />
-                      <div className="space-y-1">
-                        {staffMember.campusManaged ? (
-                          <>
-                            <div className="font-medium text-foreground">
+                      <div className="space-y-2">
+                        {staffMember.campusManaged && (
+                          <div>
+                            <div className="font-medium text-foreground text-xs">
                               Cơ sở:
                             </div>
-                            <div className="text-muted-foreground">
+                            <div className="text-muted-foreground text-xs">
                               {staffMember.campusManaged.name}
                             </div>
-                          </>
-                        ) : staffMember.buildingsManaged &&
-                          staffMember.buildingsManaged.length > 0 ? (
-                          <>
-                            <div className="font-medium text-foreground">
-                              Tòa nhà:
-                            </div>
-                            <div className="text-muted-foreground">
-                              {staffMember.buildingsManaged
-                                .map((b) => b.name)
-                                .join(", ")}
-                            </div>
-                          </>
-                        ) : staffMember.zonesManaged &&
-                          staffMember.zonesManaged.length > 0 ? (
-                          <>
-                            <div className="font-medium text-foreground">
-                              Khu vực:
-                            </div>
-                            <div className="text-muted-foreground">
-                              {staffMember.zonesManaged
-                                .map((z) => z.name)
-                                .join(", ")}
-                            </div>
-                          </>
-                        ) : staffMember.areasManaged &&
-                          staffMember.areasManaged.length > 0 ? (
-                          <>
-                            <div className="font-medium text-foreground">
-                              Khu vực:
-                            </div>
-                            <div className="text-muted-foreground">
-                              {staffMember.areasManaged
-                                .map((a) => a.name)
-                                .join(", ")}
-                            </div>
-                          </>
-                        ) : (
-                          <span className="text-muted-foreground">
-                            Chưa phân công
-                          </span>
+                          </div>
                         )}
+                        {staffMember.buildingsManaged &&
+                          staffMember.buildingsManaged.length > 0 && (
+                            <div>
+                              <div className="font-medium text-foreground text-xs">
+                                Tòa nhà:
+                              </div>
+                              <div className="text-muted-foreground text-xs">
+                                {staffMember.buildingsManaged
+                                  .map((b) => b.name)
+                                  .join(", ")}
+                              </div>
+                            </div>
+                          )}
+                        {staffMember.zonesManaged &&
+                          staffMember.zonesManaged.length > 0 && (
+                            <div>
+                              <div className="font-medium text-foreground text-xs">
+                                Khu vực nội bộ:
+                              </div>
+                              <div className="text-muted-foreground text-xs">
+                                {staffMember.zonesManaged
+                                  .map((z) => z.name)
+                                  .join(", ")}
+                              </div>
+                            </div>
+                          )}
+                        {staffMember.areasManaged &&
+                          staffMember.areasManaged.length > 0 && (
+                            <div>
+                              <div className="font-medium text-foreground text-xs">
+                                Khu vực ngoài trời:
+                              </div>
+                              <div className="text-muted-foreground text-xs">
+                                {staffMember.areasManaged
+                                  .map((a) => a.name)
+                                  .join(", ")}
+                              </div>
+                            </div>
+                          )}
+                        {!staffMember.campusManaged &&
+                          (!staffMember.buildingsManaged ||
+                            staffMember.buildingsManaged.length === 0) &&
+                          (!staffMember.zonesManaged ||
+                            staffMember.zonesManaged.length === 0) &&
+                          (!staffMember.areasManaged ||
+                            staffMember.areasManaged.length === 0) && (
+                            <span className="text-muted-foreground text-xs">
+                              Chưa phân công
+                            </span>
+                          )}
                       </div>
                     </div>
                   </TableCell>
@@ -508,6 +522,13 @@ export default function StaffTable({
                         >
                           <Eye className="mr-2 h-4 w-4" />
                           Xem chi tiết
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => setSelectedStaffForAssign(staffMember)}
+                        >
+                          <Building2 className="mr-2 h-4 w-4" />
+                          Phân công khu vực
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
@@ -546,6 +567,18 @@ export default function StaffTable({
           </TableBody>
         </Table>
       </div>
+
+      {/* Assign Location Dialog */}
+      <AssignLocationDialog
+        open={!!selectedStaffForAssign}
+        onOpenChange={(open) => !open && setSelectedStaffForAssign(null)}
+        staff={selectedStaffForAssign}
+        onSuccess={() => {
+          setSelectedStaffForAssign(null);
+          // Trigger refresh by calling a parent callback if available
+          window.location.reload();
+        }}
+      />
     </div>
   );
 }
