@@ -19,13 +19,8 @@ const processQueue = (error: unknown, token: string | null = null) => {
   failedQueue = [];
 };
 
-// Export base URL để sử dụng cho images và static files
-export const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-export const SERVER_BASE_URL = API_BASE_URL.replace("/api", ""); // Remove /api suffix
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:3000/api",
   withCredentials: true,
 });
 

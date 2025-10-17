@@ -154,7 +154,9 @@ export function AuditTable({
                   <div className="flex items-center gap-3">
                     {audit.report.asset.image ? (
                       <img
-                        src={audit.report.asset.image}
+                        src={`${import.meta.env.VITE_URL_UPLOADS}${
+                          audit.report.asset.image
+                        }`}
                         alt={audit.report.asset.name}
                         className="h-12 w-12 rounded object-cover border"
                       />

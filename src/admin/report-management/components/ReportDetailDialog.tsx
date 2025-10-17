@@ -193,7 +193,9 @@ export function ReportDetailDialog({
                 <div className="flex items-start gap-4 bg-muted/30 rounded-lg p-4">
                   {report.asset.image ? (
                     <img
-                      src={report.asset.image}
+                      src={`${import.meta.env.VITE_URL_UPLOADS}${
+                        report.asset.image
+                      }`}
                       alt={report.asset.name}
                       className="h-20 w-20 rounded-lg object-cover border-2 flex-shrink-0"
                     />
@@ -335,7 +337,7 @@ export function ReportDetailDialog({
                           onClick={() => handleImageClick(index)}
                         >
                           <img
-                            src={image}
+                            src={`${import.meta.env.VITE_URL_UPLOADS}${image}`}
                             alt={`Hình ảnh ${index + 1}`}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           />
@@ -375,7 +377,9 @@ export function ReportDetailDialog({
 
       {/* Image Viewer */}
       <ImageViewer
-        images={report.images}
+        images={report.images.map(
+          (img) => `${import.meta.env.VITE_URL_UPLOADS}${img}`
+        )}
         initialIndex={selectedImageIndex}
         open={imageViewerOpen}
         onOpenChange={setImageViewerOpen}

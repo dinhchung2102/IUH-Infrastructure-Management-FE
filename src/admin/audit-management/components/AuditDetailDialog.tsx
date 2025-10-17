@@ -117,8 +117,13 @@ export function AuditDetailDialog({
     setImageViewerOpen(true);
   };
 
-  // Combine report images and audit images
-  const allImages = [...audit.report.images, ...audit.images];
+  // Combine report images and audit images with VITE_URL_UPLOADS
+  const allImages = [
+    ...audit.report.images.map(
+      (img) => `${import.meta.env.VITE_URL_UPLOADS}${img}`
+    ),
+    ...audit.images.map((img) => `${import.meta.env.VITE_URL_UPLOADS}${img}`),
+  ];
 
   return (
     <>
@@ -200,7 +205,9 @@ export function AuditDetailDialog({
                   <div className="flex items-start gap-4 bg-muted/30 rounded-lg p-4">
                     {audit.report.asset.image ? (
                       <img
-                        src={audit.report.asset.image}
+                        src={`${import.meta.env.VITE_URL_UPLOADS}${
+                          audit.report.asset.image
+                        }`}
                         alt={audit.report.asset.name}
                         className="h-20 w-20 rounded-lg object-cover border-2 flex-shrink-0"
                       />
@@ -372,7 +379,7 @@ export function AuditDetailDialog({
                           onClick={() => handleImageClick(index)}
                         >
                           <img
-                            src={image}
+                            src={`${import.meta.env.VITE_URL_UPLOADS}${image}`}
                             alt={`Hình ảnh sự cố ${index + 1}`}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           />
@@ -411,7 +418,7 @@ export function AuditDetailDialog({
                           }
                         >
                           <img
-                            src={image}
+                            src={`${import.meta.env.VITE_URL_UPLOADS}${image}`}
                             alt={`Hình ảnh công việc ${index + 1}`}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           />

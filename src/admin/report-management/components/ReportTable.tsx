@@ -143,7 +143,9 @@ export function ReportTable({
                   <div className="flex items-center gap-3">
                     {report.asset.image ? (
                       <img
-                        src={report.asset.image}
+                        src={`${import.meta.env.VITE_URL_UPLOADS}${
+                          report.asset.image
+                        }`}
                         alt={report.asset.name}
                         className="h-12 w-12 rounded object-cover border"
                       />

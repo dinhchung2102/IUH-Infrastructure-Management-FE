@@ -1,4 +1,4 @@
-import api, { SERVER_BASE_URL } from "@/lib/axios";
+import api from "@/lib/axios";
 import type { ApiResponse } from "@/types/response.type";
 import type { BaseQueryDto } from "@/types/pagination.type";
 import type { Report } from "../types/report.type";
@@ -137,16 +137,6 @@ export const transformReportApiToUI = (
     return null;
   }
 
-  // Helper function to build full image URL
-  const buildImageUrl = (imagePath: string): string => {
-    // If already absolute URL, return as is
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-      return imagePath;
-    }
-    // If relative path, prepend server base URL
-    return `${SERVER_BASE_URL}${imagePath}`;
-  };
-
   // Helper function to build location object
   const buildLocation = () => {
     if (apiReport.asset.zone) {
@@ -175,14 +165,12 @@ export const transformReportApiToUI = (
       status: apiReport.asset.status,
       zone: apiReport.asset.zone,
       area: apiReport.asset.area,
-      image: apiReport.asset.image
-        ? buildImageUrl(apiReport.asset.image)
-        : undefined,
+      image: apiReport.asset.image, // Giữ nguyên path
     },
     type: apiReport.type,
     status: apiReport.status,
     description: apiReport.description,
-    images: apiReport.images.map(buildImageUrl),
+    images: apiReport.images, // Giữ nguyên paths
     createdBy: {
       _id: apiReport.createdBy._id,
       fullName: apiReport.createdBy.fullName,

@@ -1,4 +1,4 @@
-import api, { SERVER_BASE_URL } from "@/lib/axios";
+import api from "@/lib/axios";
 import type { ApiResponse } from "@/types/response.type";
 import type { BaseQueryDto } from "@/types/pagination.type";
 import type { AuditLog } from "../types/audit.type";
@@ -129,14 +129,6 @@ export const getAuditStats = async () => {
 export const transformAuditLogApiToUI = (
   apiAuditLog: AuditLogApiResponse
 ): AuditLog => {
-  // Helper function to build full image URL
-  const buildImageUrl = (imagePath: string): string => {
-    if (imagePath.startsWith("http://") || imagePath.startsWith("https://")) {
-      return imagePath;
-    }
-    return `${SERVER_BASE_URL}${imagePath}`;
-  };
-
   // Helper function to build location object
   const buildLocation = () => {
     if (apiAuditLog.report.asset.zone) {
@@ -160,18 +152,16 @@ export const transformAuditLogApiToUI = (
     _id: apiAuditLog._id,
     report: {
       ...apiAuditLog.report,
-      images: apiAuditLog.report.images.map(buildImageUrl),
+      images: apiAuditLog.report.images, // Giữ nguyên paths
       asset: {
         ...apiAuditLog.report.asset,
-        image: apiAuditLog.report.asset.image
-          ? buildImageUrl(apiAuditLog.report.asset.image)
-          : undefined,
+        image: apiAuditLog.report.asset.image, // Giữ nguyên path
       },
     },
     status: apiAuditLog.status,
     subject: apiAuditLog.subject,
     staffs: apiAuditLog.staffs,
-    images: apiAuditLog.images.map(buildImageUrl),
+    images: apiAuditLog.images, // Giữ nguyên paths
     createdAt: apiAuditLog.createdAt,
     updatedAt: apiAuditLog.updatedAt,
     location: buildLocation(),
