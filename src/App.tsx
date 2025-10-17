@@ -24,6 +24,7 @@ import QRTestPage from "./user/report/QRTestPage";
 // Admin pages
 import DashboardPage from "./admin/pages/DashboardPage";
 import AccountPage from "./admin/account-management/page/AccountPage";
+import StaffPage from "./admin/staff-management/page/StaffPage";
 import CampusPage from "./admin/campus/page/CampusPage";
 import BuildingAreaPage from "./admin/building-area/page/building-areaPage";
 import ReportManagementPage from "./admin/report-management/page/ReportManagementPage";
@@ -58,6 +59,7 @@ function AppRoutes() {
           <Route path="campus" element={<CampusPage />} />
           <Route path="building-area" element={<BuildingAreaPage />} />
           <Route path="account" element={<AccountPage />} />
+          <Route path="staff" element={<StaffPage />} />
           <Route path="reports" element={<ReportManagementPage />} />
           <Route path="news" element={<div>News Management</div>} />
           <Route path="maintenance" element={<div>Maintenance Schedule</div>} />

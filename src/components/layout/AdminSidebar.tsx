@@ -13,6 +13,7 @@ import {
   Globe,
   Map,
   Home,
+  User,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -70,6 +71,11 @@ const navigation = [
         title: "Tài khoản",
         href: "/admin/account",
         icon: Users,
+      },
+      {
+        title: "Nhân sự",
+        href: "/admin/staff",
+        icon: User,
       },
       {
         title: "Báo cáo",
