@@ -28,6 +28,7 @@ import StaffPage from "./admin/staff-management/page/StaffPage";
 import CampusPage from "./admin/campus/page/CampusPage";
 import BuildingAreaPage from "./admin/building-area/page/building-areaPage";
 import ReportManagementPage from "./admin/report-management/page/ReportManagementPage";
+import AuditManagementPage from "./admin/audit-management/page/AuditManagementPage";
 function AppRoutes() {
   const location = useLocation();
 
@@ -61,6 +62,7 @@ function AppRoutes() {
           <Route path="account" element={<AccountPage />} />
           <Route path="staff" element={<StaffPage />} />
           <Route path="reports" element={<ReportManagementPage />} />
+          <Route path="audits" element={<AuditManagementPage />} />
           <Route path="news" element={<div>News Management</div>} />
           <Route path="maintenance" element={<div>Maintenance Schedule</div>} />
           <Route path="feedback" element={<div>Feedback Management</div>} />

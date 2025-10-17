@@ -14,6 +14,7 @@ import {
   Map,
   Home,
   User,
+  Wrench,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -70,17 +71,22 @@ const navigation = [
       {
         title: "Tài khoản",
         href: "/admin/account",
-        icon: Users,
+        icon: User,
       },
       {
         title: "Nhân sự",
         href: "/admin/staff",
-        icon: User,
+        icon: Users,
       },
       {
         title: "Báo cáo",
         href: "/admin/reports",
         icon: FileText,
+      },
+      {
+        title: "Bảo trì & Sửa chữa",
+        href: "/admin/audits",
+        icon: Wrench,
       },
       {
         title: "Thiết bị",
