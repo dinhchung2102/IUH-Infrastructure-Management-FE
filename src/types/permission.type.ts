@@ -3,7 +3,8 @@ export const Permission = {
   READ: "READ",
   UPDATE: "UPDATE",
   DELETE: "DELETE",
-  ADMINACTION: "ADMINACTION",
+  ALL: "ALL",
+  ADMIN_ACTION: "ADMIN_ACTION",
 } as const;
 
 export type Permission = (typeof Permission)[keyof typeof Permission];

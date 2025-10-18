@@ -17,7 +17,7 @@ export function ReportStatsDialog({
 }: ReportStatsDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-[95vw] sm:max-w-4xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Thống kê báo cáo chi tiết</DialogTitle>
           <DialogDescription>
