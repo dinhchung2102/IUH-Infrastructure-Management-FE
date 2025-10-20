@@ -30,6 +30,10 @@ import BuildingAreaPage from "./admin/building-area/page/building-areaPage";
 import ReportManagementPage from "./admin/report-management/page/ReportManagementPage";
 import AuditManagementPage from "./admin/audit-management/page/AuditManagementPage";
 import RoleManagementPage from "./admin/role-management/page/RoleManagementPage";
+import ZonePage from "./admin/zone/page/ZonePage";
+import AssetCategoriesPage from "./admin/asset-management/page/AssetCategoriesPage";
+import Assetpage from "./admin/asset-management/page/AssetPage";
+
 function AppRoutes() {
   const location = useLocation();
 
@@ -60,11 +64,14 @@ function AppRoutes() {
           <Route path="facilities" element={<div>Facilities Management</div>} />
           <Route path="campus" element={<CampusPage />} />
           <Route path="building-area" element={<BuildingAreaPage />} />
+          <Route path="zone" element={<ZonePage />} />
           <Route path="account" element={<AccountPage />} />
           <Route path="staff" element={<StaffPage />} />
           <Route path="reports" element={<ReportManagementPage />} />
           <Route path="audits" element={<AuditManagementPage />} />
           <Route path="roles" element={<RoleManagementPage />} />
+          <Route path="asset-categories" element={<AssetCategoriesPage />} />
+          <Route path="asset" element={<Assetpage />} />
           <Route path="news" element={<div>News Management</div>} />
           <Route path="maintenance" element={<div>Maintenance Schedule</div>} />
           <Route path="feedback" element={<div>Feedback Management</div>} />
