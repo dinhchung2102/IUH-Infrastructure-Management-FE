@@ -35,6 +35,8 @@ const resourceLabels: Record<string, string> = {
   ZONE: "Phân khu",
   ASSET_CATEGORY: "Loại thiết bị",
   ASSET_TYPE: "Nhóm thiết bị",
+  NEWS: "Tin tức",
+  NEWS_CATEGORY: "Danh mục tin tức",
 };
 
 const actionLabels: Record<string, string> = {

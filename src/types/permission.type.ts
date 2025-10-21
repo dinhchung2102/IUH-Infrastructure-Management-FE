@@ -22,6 +22,8 @@ export const Resource = {
   ASSET_CATEGORY: "ASSET_CATEGORY",
   ASSET_TYPE: "ASSET_TYPE",
   AUDIT: "AUDIT",
+  NEWS: "NEWS",
+  NEWS_CATEGORY: "NEWS_CATEGORY",
 } as const;
 
 export type Resource = (typeof Resource)[keyof typeof Resource];

@@ -48,6 +48,11 @@ const resourceLabels: Record<string, { label: string; description: string }> = {
     description: "Quản lý danh mục thiết bị",
   },
   ASSET_TYPE: { label: "Nhóm thiết bị", description: "Quản lý nhóm thiết bị" },
+  NEWS: { label: "Tin tức", description: "Quản lý tin tức" },
+  NEWS_CATEGORY: {
+    label: "Danh mục tin tức",
+    description: "Quản lý danh mục tin tức",
+  },
 };
 
 const actionLabels: Record<string, string> = {
