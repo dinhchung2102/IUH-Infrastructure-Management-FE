@@ -16,6 +16,8 @@ import {
   User,
   Wrench,
   Shield,
+  Newspaper,
+  FolderOpen,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Sheet, SheetContent } from "@/components/ui/sheet";
@@ -93,6 +95,22 @@ const navigation = [
         title: "Phân quyền",
         href: "/admin/roles",
         icon: Shield,
+      },
+      {
+        title: "Tin tức",
+        icon: Newspaper,
+        children: [
+          {
+            title: "Quản lý tin tức",
+            href: "/admin/news",
+            icon: Newspaper,
+          },
+          {
+            title: "Danh mục tin tức",
+            href: "/admin/news-categories",
+            icon: FolderOpen,
+          },
+        ],
       },
       {
         title: "Thiết bị",

@@ -17,6 +17,7 @@ import AboutPage from "./user/about/AboutPage";
 import FacilitiesPage from "./user/facilities/FacilitiesPage";
 import ContactPage from "./user/contact/ContactPage";
 import NewsPage from "./user/news/NewsPage";
+import NewsDetailPage from "./user/news/NewsDetailPage";
 import ReportPage from "./user/report/ReportPage";
 import QuickReportPage from "./user/report/QuickReportPage";
 import QRTestPage from "./user/report/QRTestPage";
@@ -30,6 +31,8 @@ import BuildingAreaPage from "./admin/building-area/page/building-areaPage";
 import ReportManagementPage from "./admin/report-management/page/ReportManagementPage";
 import AuditManagementPage from "./admin/audit-management/page/AuditManagementPage";
 import RoleManagementPage from "./admin/role-management/page/RoleManagementPage";
+import NewsManagementPage from "./admin/news-management/page/NewsManagementPage";
+import NewsCategoryManagementPage from "./admin/news-category-management/page/NewsCategoryManagementPage";
 function AppRoutes() {
   const location = useLocation();
 
@@ -50,6 +53,7 @@ function AppRoutes() {
           <Route path="facilities" element={<FacilitiesPage />} />
           <Route path="contact" element={<ContactPage />} />
           <Route path="news" element={<NewsPage />} />
+          <Route path="news/:slug" element={<NewsDetailPage />} />
           <Route path="report" element={<ReportPage />} />
         </Route>
 
@@ -65,7 +69,11 @@ function AppRoutes() {
           <Route path="reports" element={<ReportManagementPage />} />
           <Route path="audits" element={<AuditManagementPage />} />
           <Route path="roles" element={<RoleManagementPage />} />
-          <Route path="news" element={<div>News Management</div>} />
+          <Route path="news" element={<NewsManagementPage />} />
+          <Route
+            path="news-categories"
+            element={<NewsCategoryManagementPage />}
+          />
           <Route path="maintenance" element={<div>Maintenance Schedule</div>} />
           <Route path="feedback" element={<div>Feedback Management</div>} />
           <Route path="settings" element={<div>Settings</div>} />

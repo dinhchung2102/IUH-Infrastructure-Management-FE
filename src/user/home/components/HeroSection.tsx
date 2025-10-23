@@ -1,7 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { FileText, Building2, ArrowRight } from "lucide-react";
+import { FileText, ArrowRight } from "lucide-react";
 import { Stagger, Parallax } from "@/components/motion";
 
 export function HeroSection() {
@@ -10,10 +9,6 @@ export function HeroSection() {
       <div className="container relative z-10">
         <div className="mx-auto max-w-3xl text-center">
           <Stagger interval={0.15}>
-            <Badge variant="secondary" className="mb-4">
-              <Building2 className="mr-1 h-3 w-3" />
-              IUH Facilities Management
-            </Badge>
             <h1 className="mb-6 text-4xl font-bold tracking-tight md:text-6xl">
               Quản lý{" "}
               <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">

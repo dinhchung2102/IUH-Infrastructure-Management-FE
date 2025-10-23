@@ -1,8 +1,31 @@
+import { useState, useRef } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Newspaper, Search } from "lucide-react";
 
-export function NewsHeroSection() {
+interface NewsHeroSectionProps {
+  onSearch: (query: string) => void;
+}
+
+export function NewsHeroSection({ onSearch }: NewsHeroSectionProps) {
+  const [searchValue, setSearchValue] = useState("");
+  const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchValue(value);
+
+    // Clear previous timeout
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    // Set new timeout
+    debounceTimer.current = setTimeout(() => {
+      onSearch(value);
+    }, 500);
+  };
+
   return (
     <section className="bg-gradient-to-b from-background to-muted/50 py-16 md:py-24">
       <div className="container">
@@ -28,6 +51,8 @@ export function NewsHeroSection() {
               type="search"
               placeholder="Tìm kiếm tin tức..."
               className="pl-10"
+              value={searchValue}
+              onChange={handleSearch}
             />
           </div>
         </div>

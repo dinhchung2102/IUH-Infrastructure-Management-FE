@@ -1,0 +1,106 @@
+@layer components {
+  .editor-container {
+    @apply rounded-lg border border-input bg-white;
+  }
+
+  .editor-inner {
+    @apply relative;
+  }
+
+  .toolbar {
+    @apply flex items-center gap-1 border-b border-input bg-muted/30 p-2;
+    flex-wrap: wrap;
+  }
+
+  .editor-input-wrapper {
+    @apply relative;
+    min-height: 300px;
+  }
+
+  .editor-input {
+    @apply relative min-h-[300px] resize-none p-4 text-base outline-none;
+  }
+
+  .editor-placeholder {
+    @apply pointer-events-none absolute left-4 top-4 select-none text-muted-foreground;
+  }
+
+  /* Typography Styles */
+  .editor-paragraph {
+    @apply my-2;
+  }
+
+  .editor-heading-h1 {
+    @apply mb-4 mt-6 text-4xl font-bold;
+  }
+
+  .editor-heading-h2 {
+    @apply mb-3 mt-5 text-3xl font-bold;
+  }
+
+  .editor-heading-h3 {
+    @apply mb-2 mt-4 text-2xl font-bold;
+  }
+
+  .editor-heading-h4 {
+    @apply mb-2 mt-3 text-xl font-bold;
+  }
+
+  .editor-heading-h5 {
+    @apply mb-1 mt-2 text-lg font-bold;
+  }
+
+  .editor-quote {
+    @apply my-4 border-l-4 border-primary pl-4 italic text-muted-foreground;
+  }
+
+  .editor-list-ol {
+    @apply my-2 list-decimal pl-6;
+  }
+
+  .editor-list-ul {
+    @apply my-2 list-disc pl-6;
+  }
+
+  .editor-listitem {
+    @apply my-1;
+  }
+
+  .editor-nested-listitem {
+    @apply list-none;
+  }
+
+  /* Text Formatting */
+  .editor-text-bold {
+    @apply font-bold;
+  }
+
+  .editor-text-italic {
+    @apply italic;
+  }
+
+  .editor-text-underline {
+    @apply underline;
+  }
+
+  .editor-text-strikethrough {
+    @apply line-through;
+  }
+
+  .editor-text-code {
+    @apply rounded bg-muted px-1.5 py-0.5 font-mono text-sm;
+  }
+
+  .editor-code {
+    @apply my-4 block overflow-x-auto rounded bg-muted p-4 font-mono text-sm;
+  }
+
+  .editor-link {
+    @apply cursor-pointer text-primary underline hover:text-primary/80;
+  }
+
+  /* Focus styles */
+  .editor-input:focus {
+    @apply outline-none;
+  }
+}

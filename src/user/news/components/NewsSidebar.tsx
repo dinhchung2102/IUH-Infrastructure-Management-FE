@@ -1,35 +1,25 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Tag, Calendar } from "lucide-react";
+import { Tag, Calendar, Clock } from "lucide-react";
+import type { PublicNews, PublicNewsCategory } from "../api/news.api";
+import { format } from "date-fns";
+import { vi } from "date-fns/locale";
 
-const categories = [
-  { name: "Tất cả", count: 24 },
-  { name: "Bảo trì", count: 8 },
-  { name: "Nâng cấp", count: 6 },
-  { name: "Thông báo", count: 10 },
-];
+interface NewsSidebarProps {
+  categories: PublicNewsCategory[];
+  selectedCategory: string;
+  onCategoryChange: (categoryId: string) => void;
+  latestNews: PublicNews[];
+}
 
-const featuredNews = [
-  {
-    id: 1,
-    title: "Bảo trì hệ thống điện khu A vào cuối tuần",
-    date: "5 tháng 10, 2025",
-  },
-  {
-    id: 2,
-    title: "Hoàn thành nâng cấp phòng thí nghiệm C204",
-    date: "3 tháng 10, 2025",
-  },
-  {
-    id: 3,
-    title: "Thông báo tạm ngưng cung cấp nước khu B",
-    date: "1 tháng 10, 2025",
-  },
-];
-
-export function NewsSidebar() {
+export function NewsSidebar({
+  categories,
+  selectedCategory,
+  onCategoryChange,
+  latestNews,
+}: NewsSidebarProps) {
   return (
     <aside className="lg:col-span-1">
       <Card>
@@ -38,17 +28,29 @@ export function NewsSidebar() {
         </CardHeader>
         <CardContent>
           <div className="space-y-2">
+            <Button
+              variant={selectedCategory === "" ? "default" : "ghost"}
+              className="w-full justify-between"
+              onClick={() => onCategoryChange("")}
+            >
+              <span className="flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                Tất cả
+              </span>
+            </Button>
             {categories.map((category) => (
               <Button
-                key={category.name}
-                variant="ghost"
+                key={category._id}
+                variant={
+                  selectedCategory === category._id ? "default" : "ghost"
+                }
                 className="w-full justify-between"
+                onClick={() => onCategoryChange(category._id)}
               >
                 <span className="flex items-center gap-2">
                   <Tag className="h-4 w-4" />
                   {category.name}
                 </span>
-                <Badge variant="secondary">{category.count}</Badge>
               </Button>
             ))}
           </div>
@@ -57,23 +59,36 @@ export function NewsSidebar() {
 
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle className="text-lg">Tin nổi bật</CardTitle>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Clock className="h-4 w-4" />
+            Tin mới nhất
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {featuredNews.map((item, index) => (
-            <div key={item.id}>
-              {index > 0 && <Separator className="mb-4" />}
-              <div className="space-y-1">
-                <p className="cursor-pointer text-sm font-medium leading-tight hover:text-primary">
-                  {item.title}
-                </p>
-                <p className="flex items-center gap-1 text-xs text-muted-foreground">
-                  <Calendar className="h-3 w-3" />
-                  {item.date}
-                </p>
+          {latestNews.length === 0 ? (
+            <p className="text-sm text-muted-foreground text-center py-4">
+              Chưa có tin tức nào
+            </p>
+          ) : (
+            latestNews.map((item, index) => (
+              <div key={item._id}>
+                {index > 0 && <Separator className="mb-4" />}
+                <Link to={`/news/${item.slug}`} className="block">
+                  <div className="space-y-1 group">
+                    <p className="text-sm font-medium leading-tight transition-colors group-hover:text-primary line-clamp-2">
+                      {item.title}
+                    </p>
+                    <p className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
+                      {format(new Date(item.createdAt), "dd/MM/yyyy", {
+                        locale: vi,
+                      })}
+                    </p>
+                  </div>
+                </Link>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </CardContent>
       </Card>
     </aside>
