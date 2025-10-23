@@ -45,8 +45,7 @@ export function NewsHeroSection({ onSearch }: NewsHeroSectionProps) {
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${nhaEBackground})` }}
         />
-        <div className="absolute inset-0 bg-gradient-to-br from-black/80 via-black/70 to-black/60" />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-black/70" />
       </div>
 
       {/* Content */}
