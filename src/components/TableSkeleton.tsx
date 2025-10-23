@@ -5,6 +5,7 @@ interface ColumnConfig {
   type?: "text" | "avatar" | "badge" | "number";
   width?: string;
   align?: "left" | "center" | "right";
+  className?: string;
 }
 
 interface TableSkeletonProps {
@@ -50,13 +51,13 @@ export function TableSkeleton({ rows = 5, columns }: TableSkeletonProps) {
           {columns.map((config, colIdx) => (
             <TableCell
               key={colIdx}
-              className={
+              className={`${
                 config.align === "center"
                   ? "text-center"
                   : config.align === "right"
                   ? "text-right"
                   : ""
-              }
+              } ${config.className || ""}`}
             >
               <div
                 className={
