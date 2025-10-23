@@ -1,9 +1,8 @@
 import {
   HeroSection,
   StatsSection,
-  FeaturesSection,
+  AboutIntroSection,
   RecentNewsSection,
-  CTASection,
 } from "./components";
 
 export default function HomePage() {
@@ -11,9 +10,8 @@ export default function HomePage() {
     <div className="flex flex-col">
       <HeroSection />
       <StatsSection />
-      <FeaturesSection />
+      <AboutIntroSection />
       <RecentNewsSection />
-      <CTASection />
     </div>
   );
 }

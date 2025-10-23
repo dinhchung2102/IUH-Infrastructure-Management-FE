@@ -1,30 +1,69 @@
 import { Card, CardContent } from "@/components/ui/card";
-import { Reveal } from "@/components/motion";
-import { CheckCircle2, Clock, TrendingUp } from "lucide-react";
+import { Reveal, Parallax } from "@/components/motion";
+import { CheckCircle2, Clock, TrendingUp, Users } from "lucide-react";
 
 const stats = [
-  { label: "Báo cáo đã xử lý", value: "1,234", icon: CheckCircle2 },
-  { label: "Thời gian trung bình", value: "2.5h", icon: Clock },
-  { label: "Tỷ lệ hài lòng", value: "98%", icon: TrendingUp },
+  {
+    label: "Báo cáo đã xử lý",
+    value: "1,234",
+    icon: CheckCircle2,
+    color: "text-green-600",
+    bgColor: "bg-green-50 dark:bg-green-950/30",
+  },
+  {
+    label: "Thời gian xử lý TB",
+    value: "2.5h",
+    icon: Clock,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 dark:bg-blue-950/30",
+  },
+  {
+    label: "Tỷ lệ hài lòng",
+    value: "98%",
+    icon: TrendingUp,
+    color: "text-purple-600",
+    bgColor: "bg-purple-50 dark:bg-purple-950/30",
+  },
+  {
+    label: "Người dùng hoạt động",
+    value: "5,678",
+    icon: Users,
+    color: "text-orange-600",
+    bgColor: "bg-orange-50 dark:bg-orange-950/30",
+  },
 ];
 
 export function StatsSection() {
   return (
-    <div className="mx-auto mt-16 grid max-w-4xl gap-6 md:grid-cols-3">
-      {stats.map((stat, index) => {
-        const Icon = stat.icon;
-        return (
-          <Reveal key={index} delay={index * 0.2}>
-            <Card className="border-none shadow-sm hover:shadow-lg transition-shadow cursor-pointer">
-              <CardContent className="flex flex-col items-center justify-center p-6 text-center">
-                <Icon className="mb-2 h-8 w-8 text-primary" />
-                <div className="text-3xl font-bold">{stat.value}</div>
-                <p className="text-sm text-muted-foreground">{stat.label}</p>
-              </CardContent>
-            </Card>
-          </Reveal>
-        );
-      })}
-    </div>
+    <section className="container -mt-12 relative z-20 pb-12">
+      <Parallax from={-20} to={20}>
+        <div className="grid gap-3 sm:gap-4 grid-cols-2 lg:grid-cols-4">
+          {stats.map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <Reveal key={index} delay={index * 0.1}>
+                <Card className="border cursor-default border-gray-200/50 dark:border-gray-700/50 shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm">
+                  <CardContent className="p-6">
+                    <div className="flex flex-col items-center text-center space-y-3">
+                      <div
+                        className={`${stat.bgColor} ${stat.color} p-3 rounded-xl shadow-sm`}
+                      >
+                        <Icon className="h-6 w-6 sm:h-8 sm:w-8" />
+                      </div>
+                      <div className="text-3xl sm:text-4xl font-bold text-gray-800 dark:text-gray-100">
+                        {stat.value}
+                      </div>
+                      <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 font-medium">
+                        {stat.label}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Reveal>
+            );
+          })}
+        </div>
+      </Parallax>
+    </section>
   );
 }
