@@ -1,0 +1,293 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  ChevronsUpDown,
+  ChevronUp,
+  ChevronDown,
+  Plus,
+} from "lucide-react";
+import { TableSkeleton } from "@/components/TableSkeleton";
+
+import {
+  getAssetCategories,
+  deleteAssetCategory,
+} from "../api/assetCategories.api";
+import { AssetCategoryAddDialog } from "../components/AssetCategoryAddDialog";
+import type { AssetCategoryResponse } from "@/admin/asset-management/api/assetCategories.api";
+export default function AssetCategoriesPage() {
+  const [categories, setCategories] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [editCategory, setEditCategory] = useState<any>(null);
+  const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+
+  const fetchCategories = async () => {
+    setLoading(true);
+    try {
+      const res = await getAssetCategories();
+      if (res?.success) {
+        let cats = res.data?.assetCategories || [];
+        if (search.trim()) {
+          cats = cats.filter((c: any) =>
+            c.name.toLowerCase().includes(search.toLowerCase())
+          );
+        }
+        const sorted = [...cats].sort((a, b) => {
+            const key = sortBy as keyof AssetCategoryResponse;
+            const valA = String(a[key] ?? "");
+            const valB = String(b[key] ?? "");
+            return sortOrder === "asc"
+                ? valA.localeCompare(valB)
+                : valB.localeCompare(valA);
+            });
+
+        setCategories(sorted);
+      } else {
+        toast.error(res?.message || "Không thể tải danh mục thiết bị.");
+      }
+    } catch (err) {
+      toast.error("Lỗi khi tải danh mục.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, [search, sortBy, sortOrder]);
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
+
+  const getSortIcon = (field: string) => {
+    if (sortBy !== field) return <ChevronsUpDown className="h-4 w-4" />;
+    return sortOrder === "asc" ? (
+      <ChevronUp className="h-4 w-4" />
+    ) : (
+      <ChevronDown className="h-4 w-4" />
+    );
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Bạn có chắc chắn muốn xóa danh mục này?")) return;
+    try {
+      const res = await deleteAssetCategory(id);
+      if (res?.success) {
+        toast.success("Đã xóa danh mục.");
+        fetchCategories();
+      } else toast.error(res?.message || "Không thể xóa.");
+    } catch (err) {
+      toast.error("Lỗi khi xóa danh mục.");
+    }
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchCategories();
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Danh mục thiết bị
+          </h1>
+          <p className="text-muted-foreground">
+            Quản lý các danh mục tài sản trong hệ thống.
+          </p>
+        </div>
+        <Button onClick={() => setDialogOpen(true)}>
+          <Plus className="size-4 mr-2" /> Thêm danh mục
+        </Button>
+      </div>
+
+      {/* Filter */}
+      <div className="flex flex-wrap gap-4">
+        <form
+          onSubmit={handleSearch}
+          className="flex-1 min-w-[250px] flex gap-2"
+        >
+          <Input
+            placeholder="Tìm kiếm danh mục..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-white"
+          />
+          <Button type="submit" variant="default">
+            Tìm kiếm
+          </Button>
+        </form>
+        {search && (
+          <Button variant="outline" onClick={() => setSearch("")}>
+            Xóa bộ lọc
+          </Button>
+        )}
+      </div>
+
+      {/* Table */}
+      <div className="rounded-md border bg-white shadow-sm">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("name")}
+                  className="h-8 px-2"
+                >
+                  Tên danh mục
+                  {getSortIcon("name")}
+                </Button>
+              </TableHead>
+              <TableHead>Mô tả</TableHead>
+              <TableHead>Ảnh</TableHead>
+              <TableHead>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("status")}
+                  className="h-8 px-2"
+                >
+                  Trạng thái
+                  {getSortIcon("status")}
+                </Button>
+              </TableHead>
+              <TableHead>
+                <Button
+                  variant="ghost"
+                  onClick={() => handleSort("createdAt")}
+                  className="h-8 px-2"
+                >
+                  Ngày tạo
+                  {getSortIcon("createdAt")}
+                </Button>
+              </TableHead>
+              <TableHead className="text-center">Thao tác</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading && (
+              <TableSkeleton
+                rows={6}
+                columns={[
+                  { type: "text", width: "w-[200px]" },
+                  { type: "text", width: "w-[300px]" },
+                  { type: "avatar", width: "w-[80px]" },
+                  { type: "badge", width: "w-[120px]" },
+                  { type: "text", width: "w-[100px]" },
+                  { type: "text", width: "w-[60px]" },
+                ]}
+              />
+            )}
+            {!loading && categories.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center">
+                  Không có danh mục nào.
+                </TableCell>
+              </TableRow>
+            )}
+            {!loading &&
+              categories.map((cat) => (
+                <TableRow key={cat._id}>
+                  <TableCell className="font-medium">{cat.name}</TableCell>
+                  <TableCell className="max-w-[300px] truncate text-muted-foreground">
+                    {cat.description}
+                  </TableCell>
+                  <TableCell>
+                    <img
+                      src={cat.image || "/placeholder.png"}
+                      alt={cat.name}
+                      className="size-12 rounded-md border object-cover"
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={cat.status === "ACTIVE" ? "default" : "secondary"}
+                      className="text-xs"
+                    >
+                      {cat.status === "ACTIVE" ? "Hoạt động" : "Không hoạt động"}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(cat.createdAt).toLocaleDateString("vi-VN")}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="h-8 w-8 p-0 cursor-pointer"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditCategory(cat);
+                            setDialogOpen(true);
+                          }}
+                        >
+                          <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDelete(cat._id)}
+                          className="text-red-600"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Xóa
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Dialog */}
+      <AssetCategoryAddDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        mode={editCategory ? "edit" : "add"}
+        category={editCategory}
+        onSuccess={fetchCategories}
+      />
+    </div>
+  );
+}

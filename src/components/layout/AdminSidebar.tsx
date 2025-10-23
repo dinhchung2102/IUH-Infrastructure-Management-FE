@@ -69,6 +69,11 @@ const navigation = [
             href: "/admin/building-area",
             icon: Map,
           },
+          {
+            title: "Quản lý phòng",
+            href: "/admin/zone",
+            icon: Map,
+          },
         ],
       },
       {
@@ -116,6 +121,18 @@ const navigation = [
         title: "Thiết bị",
         href: "/admin/equipment",
         icon: Building2,
+        children: [
+          {
+            title: "Danh mục thiết bị",
+            href: "/admin/asset-categories",
+            icon: Home,
+          },
+          {
+            title: "Quản lý thiết bị",
+            href: "/admin/asset",
+            icon: Map,
+          },
+        ],
       },
     ],
   },
