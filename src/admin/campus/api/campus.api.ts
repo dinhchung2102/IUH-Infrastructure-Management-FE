@@ -19,15 +19,15 @@ export interface QueryCampusDto {
 }
 
 export interface CampusStatistics {
-  totalCampus: number;
-  totalRooms: number;
-  totalAreas: number;
-  createdThisMonth: number;
-  timeSeries?: Array<{
-    period: string;
-    totalCampus: number;
-  }>;
+  stats: {
+    total: number;
+    active: number;
+    inactive: number;
+    newThisMonth: number;
+  };
 }
+
+
 
 // ============================
 // API CALLS
@@ -76,5 +76,6 @@ export const getCampusStats = async (params?: {
   const res = await api.get<ApiResponse<CampusStatistics>>("/campus/stats", {
     params,
   });
-  return res.data;
+  return res.data.data; // ✅ lấy trực tiếp phần { stats: {...} }
 };
+

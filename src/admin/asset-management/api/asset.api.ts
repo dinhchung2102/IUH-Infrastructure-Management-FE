@@ -101,3 +101,16 @@ export const getAssetsByAreaId = async (areaId: string) => {
   );
   return res.data;
 };
+export const getAssetStats = async () => {
+  const res = await api.get<
+    ApiResponse<{
+      stats: {
+        total: number;
+        inUse: number;
+        maintenance: number;
+        broken: number;
+      };
+    }>
+  >("/assets/stats");
+  return res.data;
+};
