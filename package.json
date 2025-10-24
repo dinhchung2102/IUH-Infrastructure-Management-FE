@@ -10,6 +10,10 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@fullcalendar/daygrid": "^6.1.19",
+    "@fullcalendar/interaction": "^6.1.19",
+    "@fullcalendar/react": "^6.1.19",
+    "@fullcalendar/timegrid": "^6.1.19",
     "@hookform/resolvers": "^5.2.2",
     "@lexical/react": "^0.37.0",
     "@radix-ui/react-alert-dialog": "^1.1.15",
@@ -36,6 +40,7 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dayjs": "^1.11.18",
     "dropdown-menu": "^0.1.1",
     "framer-motion": "^12.23.22",
     "input-otp": "^1.4.2",
