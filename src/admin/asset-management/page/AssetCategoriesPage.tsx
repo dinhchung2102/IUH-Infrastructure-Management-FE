@@ -28,7 +28,6 @@ import {
   ChevronsUpDown,
   ChevronUp,
   ChevronDown,
-  Plus,
 } from "lucide-react";
 import { TableSkeleton } from "@/components/TableSkeleton";
 
@@ -37,7 +36,10 @@ import {
   deleteAssetCategory,
 } from "../api/assetCategories.api";
 import { AssetCategoryAddDialog } from "../components/AssetCategoryAddDialog";
+import { AssetCategoryCards } from "../components/AssetCategoryCards";
+import { AssetCategoryStatsDialog } from "../components/AssetCategoryStatsDialog";
 import type { AssetCategoryResponse } from "@/admin/asset-management/api/assetCategories.api";
+
 export default function AssetCategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
@@ -46,32 +48,34 @@ export default function AssetCategoriesPage() {
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [statsOpen, setStatsOpen] = useState(false);
 
   const fetchCategories = async () => {
     setLoading(true);
     try {
       const res = await getAssetCategories();
       if (res?.success) {
-        let cats = res.data?.assetCategories || [];
+        let cats = res.data?.categories || [];
         if (search.trim()) {
           cats = cats.filter((c: any) =>
             c.name.toLowerCase().includes(search.toLowerCase())
           );
         }
+
         const sorted = [...cats].sort((a, b) => {
-            const key = sortBy as keyof AssetCategoryResponse;
-            const valA = String(a[key] ?? "");
-            const valB = String(b[key] ?? "");
-            return sortOrder === "asc"
-                ? valA.localeCompare(valB)
-                : valB.localeCompare(valA);
-            });
+          const key = sortBy as keyof AssetCategoryResponse;
+          const valA = String(a[key] ?? "");
+          const valB = String(b[key] ?? "");
+          return sortOrder === "asc"
+            ? valA.localeCompare(valB)
+            : valB.localeCompare(valA);
+        });
 
         setCategories(sorted);
       } else {
         toast.error(res?.message || "Không thể tải danh mục thiết bị.");
       }
-    } catch (err) {
+    } catch {
       toast.error("Lỗi khi tải danh mục.");
     } finally {
       setLoading(false);
@@ -108,7 +112,7 @@ export default function AssetCategoriesPage() {
         toast.success("Đã xóa danh mục.");
         fetchCategories();
       } else toast.error(res?.message || "Không thể xóa.");
-    } catch (err) {
+    } catch {
       toast.error("Lỗi khi xóa danh mục.");
     }
   };
@@ -118,24 +122,34 @@ export default function AssetCategoriesPage() {
     fetchCategories();
   };
 
+  // ===== Thống kê =====
+  const stats = {
+    total: categories.length,
+    active: categories.filter((c) => c.status === "ACTIVE").length,
+    inactive: categories.filter((c) => c.status === "INACTIVE").length,
+    newThisMonth: categories.filter((c) => {
+      const created = new Date(c.createdAt);
+      const now = new Date();
+      return (
+        created.getMonth() === now.getMonth() &&
+        created.getFullYear() === now.getFullYear()
+      );
+    }).length,
+  };
+
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Danh mục thiết bị
-          </h1>
-          <p className="text-muted-foreground">
-            Quản lý các danh mục tài sản trong hệ thống.
-          </p>
-        </div>
-        <Button onClick={() => setDialogOpen(true)}>
-          <Plus className="size-4 mr-2" /> Thêm danh mục
-        </Button>
-      </div>
+      {/* Cards thống kê */}
+      <AssetCategoryCards
+        stats={stats}
+        onViewStats={() => setStatsOpen(true)}
+        onAddNew={() => {
+          setEditCategory(null);
+          setDialogOpen(true);
+        }}
+      />
 
-      {/* Filter */}
+      {/* Bộ lọc */}
       <div className="flex flex-wrap gap-4">
         <form
           onSubmit={handleSearch}
@@ -158,7 +172,7 @@ export default function AssetCategoriesPage() {
         )}
       </div>
 
-      {/* Table */}
+      {/* Bảng danh mục */}
       <div className="rounded-md border bg-white shadow-sm">
         <Table>
           <TableHeader>
@@ -238,7 +252,9 @@ export default function AssetCategoriesPage() {
                       variant={cat.status === "ACTIVE" ? "default" : "secondary"}
                       className="text-xs"
                     >
-                      {cat.status === "ACTIVE" ? "Hoạt động" : "Không hoạt động"}
+                      {cat.status === "ACTIVE"
+                        ? "Hoạt động"
+                        : "Không hoạt động"}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground">
@@ -280,13 +296,24 @@ export default function AssetCategoriesPage() {
         </Table>
       </div>
 
-      {/* Dialog */}
+      {/* Dialog thêm/sửa */}
       <AssetCategoryAddDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
         mode={editCategory ? "edit" : "add"}
         category={editCategory}
         onSuccess={fetchCategories}
+      />
+
+      {/* Dialog thống kê */}
+      <AssetCategoryStatsDialog
+        open={statsOpen}
+        onOpenChange={setStatsOpen}
+        data={[
+          { name: "Hoạt động", count: stats.active },
+          { name: "Không hoạt động", count: stats.inactive },
+          { name: "Mới tháng này", count: stats.newThisMonth },
+        ]}
       />
     </div>
   );

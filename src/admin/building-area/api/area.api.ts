@@ -104,3 +104,19 @@ export const getAreasByCampus = async (campusId: string) => {
   );
   return res.data;
 };
+
+export interface AreaStatsResponse {
+  stats: {
+    total: number;
+    active: number;
+    inactive: number;
+    newThisMonth: number;
+  };
+}
+
+export const getAreaStats = async () => {
+  const res = await api.get<ApiResponse<AreaStatsResponse>>(
+    "/zone-area/areas-stats"
+  );
+  return res.data.data;
+};

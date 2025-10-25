@@ -50,32 +50,35 @@ export function CampusStatsDialog({
   const [loading, setLoading] = useState(false);
   const [activeStatus, setActiveStatus] = useState<string>("ACTIVE");
 
-  // 🟢 Gọi API
-  const fetchStats = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await getCampusStats();
-      const raw: any = response?.data || {};
+// 🟢 Gọi API
+const fetchStats = useCallback(async () => {
+  try {
+    setLoading(true);
+    const response = await getCampusStats();
+    const stats = (response?.stats ?? {}) as {
+      total?: number;
+      active?: number;
+      inactive?: number;
+      newThisMonth?: number;
+    };
 
-      // Chuẩn hóa dữ liệu
-      const total = raw.total || 0;
-      const byStatus = raw.byStatus || [];
+    const formatted = {
+      total: stats.total ?? 0,
+      byStatus: [
+        { status: "ACTIVE", count: stats.active ?? 0 },
+        { status: "INACTIVE", count: stats.inactive ?? 0 },
+      ],
+    };
 
-      const formatted = {
-        total,
-        byStatus: byStatus.map((s: any) => ({
-          status: s._id,
-          count: s.count,
-        })),
-      };
+    _setStats(formatted);
+  } catch (error) {
+    console.error("Error fetching campus stats:", error);
+  } finally {
+    setLoading(false);
+  }
+}, []);
 
-      _setStats(formatted);
-    } catch (error) {
-      console.error("Error fetching campus stats:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+
 
   useEffect(() => {
     if (open) fetchStats();

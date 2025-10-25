@@ -1,16 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   ChartContainer,
   ChartTooltip,
@@ -20,8 +26,9 @@ import {
 import {
   PieChart,
   Pie,
-  Label,
   Sector,
+  Label,
+  Cell,
   BarChart,
   Bar,
   CartesianGrid,
@@ -29,45 +36,96 @@ import {
   YAxis,
   LabelList,
 } from "recharts";
-
-interface BuildingAreaStatsDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, Building2 } from "lucide-react";
+import { getBuildingAreaStats } from "@/admin/building-area/api/building-area.api";
+import type { BuildingAreaStats } from "@/admin/building-area/api/building-area.api";
 
 export function BuildingAreaStatsDialog({
   open,
   onOpenChange,
-}: BuildingAreaStatsDialogProps) {
-  // ✅ Giữ UI, mặc định tất cả đều = 0
-  const [stats, _setStats] = useState({
-    totalBuildings: 0,
-    totalAreas: 0,
-    activeCount: 0,
-    maintenanceCount: 0,
-  });
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const [loading, setLoading] = useState(false);
+  const [stats, setStats] = useState<BuildingAreaStats | null>(null);
+  const [activeType, setActiveType] = useState<"BUILDING" | "AREA">("BUILDING");
 
-  const [loading, _setLoading] = useState(false);
-  const [activeType, setActiveType] = useState<string>("BUILDING");
+  const fetchStats = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await getBuildingAreaStats();
+      setStats(res);
+    } catch (err) {
+      console.error("❌ Error fetching stats:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (open) {
-      // Không gọi API — chỉ hiển thị dữ liệu mặc định
-      _setLoading(false);
-    }
-  }, [open]);
+    if (open) fetchStats();
+  }, [open, fetchStats]);
 
-  const chartConfig = {
+  if (!stats) {
+    return (
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Đang tải dữ liệu...</DialogTitle>
+          </DialogHeader>
+          <Skeleton className="h-[250px] w-full rounded-lg" />
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  /* ============================
+   * 🔹 Pie Chart: Phân loại
+   * ============================ */
+  const typeData = [
+    {
+      type: "BUILDING",
+      label: "Tòa nhà",
+      count: stats.buildings.stats.total ?? 0,
+      fill: "var(--chart-2)",
+    },
+    {
+      type: "AREA",
+      label: "Khu vực",
+      count: stats.areas.stats.total ?? 0,
+      fill: "var(--chart-3)",
+    },
+  ];
+  const activeIndex = typeData.findIndex((t) => t.type === activeType);
+
+  const typeChartConfig = {
     BUILDING: { label: "Tòa nhà", color: "var(--chart-2)" },
     AREA: { label: "Khu vực", color: "var(--chart-3)" },
   } satisfies ChartConfig;
 
-  const typeData = [
-    { type: "BUILDING", count: stats.totalBuildings, fill: "var(--chart-2)" },
-    { type: "AREA", count: stats.totalAreas, fill: "var(--chart-3)" },
+  /* ============================
+   * 🔹 Bar Chart: Trạng thái
+   * ============================ */
+  const activeStats =
+    activeType === "BUILDING" ? stats.buildings : stats.areas;
+
+  const statusData = [
+    { status: "Hoạt động", count: activeStats.stats.active ?? 0 },
+{ status: "Không hoạt động", count: activeStats.stats.inactive ?? 0 },
   ];
 
-  const activeIndex = typeData.findIndex((t) => t.type === activeType);
+  /* ============================
+   * 🔹 Bar Chart: Mới thêm
+   * ============================ */
+  const newData = [
+    {
+      label:
+        activeType === "BUILDING" ? "Tòa nhà mới" : "Khu vực mới",
+      count: activeStats.stats.newThisMonth ?? 0,
+    },
+  ];
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -75,33 +133,32 @@ export function BuildingAreaStatsDialog({
         <DialogHeader>
           <DialogTitle>Thống kê Tòa nhà & Khu vực</DialogTitle>
           <DialogDescription>
-            Xem biểu đồ tổng quan theo loại và trạng thái
+            Tổng quan theo loại, trạng thái và số lượng mới
           </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="type" className="w-full flex-1 flex flex-col">
-          <TabsList className="grid grid-cols-2">
+          <TabsList className="grid grid-cols-3">
             <TabsTrigger value="type">Phân loại</TabsTrigger>
-            <TabsTrigger value="status">Theo trạng thái</TabsTrigger>
+            <TabsTrigger value="status">Trạng thái</TabsTrigger>
+            <TabsTrigger value="new">Mới thêm</TabsTrigger>
           </TabsList>
 
-          {/* 🟢 Tab 1: Phân loại BUILDING / AREA */}
-          <TabsContent
-            value="type"
-            className="data-[state=active]:flex flex-col"
-          >
+          {/* 🟢 Tab 1: Phân loại */}
+          <TabsContent value="type" className="data-[state=active]:flex flex-col">
             <Card className="border-0 shadow-none flex-1 flex flex-col">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Phân loại</CardTitle>
+                <CardDescription>
+                  Tổng số tòa nhà và khu vực trong hệ thống
+                </CardDescription>
               </CardHeader>
+
               <CardContent className="flex justify-center items-center flex-1">
                 {loading ? (
                   <Skeleton className="h-[250px] w-[250px] rounded-full" />
                 ) : (
-                  <ChartContainer
-                    config={chartConfig}
-                    className="aspect-square w-full max-w-[300px]"
-                  >
+                  <ChartContainer config={typeChartConfig}>
                     <PieChart width={300} height={300}>
                       <ChartTooltip content={<ChartTooltipContent />} />
                       <Pie
@@ -110,22 +167,23 @@ export function BuildingAreaStatsDialog({
                         nameKey="type"
                         innerRadius={60}
                         outerRadius={110}
-                        activeIndex={activeIndex}
+                        activeIndex={activeIndex >= 0 ? activeIndex : 0}
+                        onClick={(_, index) =>
+                          setActiveType(typeData[index].type as "BUILDING" | "AREA")
+                        }
                         activeShape={({ outerRadius = 0, ...props }) => (
                           <g>
                             <Sector {...props} outerRadius={outerRadius + 10} />
                           </g>
                         )}
-                        onClick={(d) => setActiveType(d.type)}
                       >
+                        {typeData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.fill} />
+                        ))}
                         <Label
                           content={({ viewBox }) => {
                             if (viewBox && "cx" in viewBox && "cy" in viewBox) {
-                              const active = typeData[activeIndex];
-                              const label =
-                                chartConfig[
-                                  active?.type as keyof typeof chartConfig
-                                ]?.label;
+                              const active = typeData[activeIndex >= 0 ? activeIndex : 0];
                               return (
                                 <text
                                   x={viewBox.cx}
@@ -137,7 +195,7 @@ export function BuildingAreaStatsDialog({
                                     y={(viewBox.cy || 0) - 10}
                                     className="text-xs fill-muted-foreground"
                                   >
-                                    {label}
+                                    {active?.label}
                                   </tspan>
                                   <tspan
                                     y={(viewBox.cy || 0) + 10}
@@ -155,44 +213,73 @@ export function BuildingAreaStatsDialog({
                   </ChartContainer>
                 )}
               </CardContent>
+
+              <CardFooter className="text-xs text-muted-foreground flex items-center justify-center">
+                Click vào biểu đồ để chuyển loại thống kê
+              </CardFooter>
             </Card>
           </TabsContent>
 
-          {/* 🟣 Tab 2: Theo trạng thái */}
-          <TabsContent
-            value="status"
-            className="data-[state=active]:flex flex-col"
-          >
+          {/* 🟣 Tab 2: Trạng thái */}
+          <TabsContent value="status" className="data-[state=active]:flex flex-col">
             <Card className="border-0 shadow-none flex-1 flex flex-col">
-              <CardHeader>
-                <CardTitle className="text-base">Theo trạng thái</CardTitle>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">
+                  Trạng thái {activeType === "BUILDING" ? "Tòa nhà" : "Khu vực"}
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="flex-1">
                 {loading ? (
                   <Skeleton className="h-[200px] w-full" />
                 ) : (
-                  <ChartContainer
-                    config={{
-                      total: { label: "Số lượng", color: "var(--chart-1)" },
-                    }}
-                  >
-                    <BarChart
-                      data={[
-                        { status: "Hoạt động", total: stats.activeCount },
-                        { status: "Bảo trì", total: stats.maintenanceCount },
-                      ]}
-                    >
+                  <ChartContainer config={{ count: { label: "Số lượng" } }}>
+                    <BarChart data={statusData}>
                       <CartesianGrid vertical={false} />
                       <XAxis dataKey="status" />
                       <YAxis />
                       <ChartTooltip content={<ChartTooltipContent />} />
-                      <Bar dataKey="total" fill="var(--chart-1)" radius={8}>
-                        <LabelList dataKey="total" position="top" />
+                      <Bar dataKey="count" fill="var(--chart-1)" radius={8}>
+                        <LabelList dataKey="count" position="top" />
                       </Bar>
                     </BarChart>
                   </ChartContainer>
                 )}
               </CardContent>
+              <CardFooter className="text-xs text-muted-foreground flex items-center justify-center">
+                <Building2 className="h-4 w-4 mr-1" /> Phân bố trạng thái hoạt động
+              </CardFooter>
+            </Card>
+          </TabsContent>
+
+          {/* 🔵 Tab 3: Mới thêm */}
+          <TabsContent value="new" className="data-[state=active]:flex flex-col">
+            <Card className="border-0 shadow-none flex-1 flex flex-col">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Mới thêm trong tháng</CardTitle>
+                <CardDescription>
+                  Tổng số {activeType === "BUILDING" ? "tòa nhà" : "khu vực"} mới
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="flex-1">
+                {loading ? (
+                  <Skeleton className="h-[200px] w-full" />
+                ) : (
+                  <ChartContainer config={{ count: { label: "Số lượng" } }}>
+                    <BarChart data={newData}>
+                      <CartesianGrid vertical={false} />
+                      <XAxis dataKey="label" />
+                      <YAxis />
+                      <ChartTooltip content={<ChartTooltipContent />} />
+                      <Bar dataKey="count" fill="var(--chart-4)" radius={8}>
+                        <LabelList dataKey="count" position="top" />
+                      </Bar>
+                    </BarChart>
+                  </ChartContainer>
+                )}
+              </CardContent>
+              <CardFooter className="text-xs text-muted-foreground flex items-center justify-center">
+                <TrendingUp className="h-4 w-4 mr-1" /> Số lượng mới trong tháng
+              </CardFooter>
             </Card>
           </TabsContent>
         </Tabs>

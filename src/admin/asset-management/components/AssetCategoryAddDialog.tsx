@@ -12,12 +12,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
-import type { AssetCategoryResponse } from "@/admin/asset-management/api/assetCategories.api";
-import { createAssetCategory, updateAssetCategory } from "../api/assetCategories.api";
+import { Loader2, Upload, X } from "lucide-react";
+import {
+  createAssetCategory,
+  updateAssetCategory,
+} from "../api/assetCategories.api";
 
 interface Props {
   open: boolean;
@@ -40,8 +48,11 @@ export function AssetCategoryAddDialog({
     image: "",
     status: "ACTIVE",
   });
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string>("");
   const [loading, setLoading] = useState(false);
 
+  // Khi mở dialog → set dữ liệu (edit hoặc add)
   useEffect(() => {
     if (mode === "edit" && category) {
       setForm({
@@ -50,37 +61,100 @@ export function AssetCategoryAddDialog({
         image: category.image || "",
         status: category.status || "ACTIVE",
       });
+      setPreview(category.image || "");
+      setFile(null);
     } else {
       setForm({ name: "", description: "", image: "", status: "ACTIVE" });
+      setPreview("");
+      setFile(null);
     }
   }, [category, mode, open]);
+
+  // Cleanup preview URL khi unmount
+  useEffect(() => {
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
+  // 🟢 Upload & xem trước ảnh
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      toast.error("Vui lòng chọn file ảnh (PNG, JPG, JPEG)");
+      return;
+    }
+
+    // Validate size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Ảnh không được vượt quá 5MB");
+      return;
+    }
+
+    setFile(file);
+    const previewUrl = URL.createObjectURL(file);
+    setPreview(previewUrl);
+  };
+
+  // 🗑 Xóa ảnh
+  const handleRemoveImage = () => {
+    if (preview) URL.revokeObjectURL(preview);
+    setFile(null);
+    setPreview("");
+    setForm((prev) => ({ ...prev, image: "" }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!form.name.trim()) return toast.error("Tên danh mục là bắt buộc.");
 
     try {
       setLoading(true);
-      const payload: Partial<AssetCategoryResponse> = {
-        name: form.name,
-        description: form.description,
-        image: form.image,
-        status: form.status as "ACTIVE" | "INACTIVE", // ✅ ép kiểu rõ ràng
-        };
 
+      let res;
 
-      const res =
-        mode === "edit" && category?._id
-          ? await updateAssetCategory(category._id, payload)
-          : await createAssetCategory(payload);
+      if (mode === "edit" && category?._id) {
+        // 🟠 Cập nhật danh mục
+        if (file) {
+          const formData = new FormData();
+          formData.append("name", form.name);
+          formData.append("description", form.description);
+          formData.append("status", form.status);
+          formData.append("image", file);
+          res = await updateAssetCategory(category._id, formData);
+        } else {
+          const payload = {
+            name: form.name,
+            description: form.description,
+            image: form.image, // giữ nguyên ảnh cũ
+            status: form.status as "ACTIVE" | "INACTIVE",
+          };
+          res = await updateAssetCategory(category._id, payload);
+        }
+      } else {
+        // 🟢 Thêm danh mục mới
+        const formData = new FormData();
+        formData.append("name", form.name);
+        formData.append("description", form.description);
+        formData.append("status", form.status);
+        if (file) formData.append("image", file);
+
+        res = await createAssetCategory(formData);
+      }
 
       if (res?.success) {
         toast.success(
-          mode === "edit" ? "Cập nhật danh mục thành công!" : "Thêm danh mục thành công!"
+          mode === "edit"
+            ? "Cập nhật danh mục thành công!"
+            : "Thêm danh mục thành công!"
         );
         onOpenChange(false);
         onSuccess?.();
@@ -97,7 +171,7 @@ export function AssetCategoryAddDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[480px]">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
             {mode === "edit" ? "Chỉnh sửa danh mục" : "Thêm danh mục mới"}
@@ -110,6 +184,7 @@ export function AssetCategoryAddDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          {/* Tên danh mục */}
           <div className="space-y-2">
             <Label>Tên danh mục</Label>
             <Input
@@ -120,6 +195,7 @@ export function AssetCategoryAddDialog({
             />
           </div>
 
+          {/* Mô tả */}
           <div className="space-y-2">
             <Label>Mô tả</Label>
             <Textarea
@@ -129,15 +205,51 @@ export function AssetCategoryAddDialog({
             />
           </div>
 
+          {/* Upload ảnh danh mục */}
           <div className="space-y-2">
-            <Label>Ảnh (URL)</Label>
-            <Input
-              placeholder="https://example.com/image.jpg"
-              value={form.image}
-              onChange={(e) => handleChange("image", e.target.value)}
-            />
+            <Label>Ảnh danh mục</Label>
+            {preview ? (
+              <div className="space-y-2">
+                <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-dashed border-gray-300">
+                  <img
+                    src={preview}
+                    alt="Preview"
+                    className="w-full h-full object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Click vào dấu X để xóa ảnh
+                </p>
+              </div>
+            ) : (
+              <label
+                htmlFor="image-upload"
+                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
+              >
+                <Upload className="h-8 w-8 text-gray-400 mb-2" />
+                <span className="text-sm text-gray-500">Click để chọn ảnh</span>
+                <span className="text-xs text-gray-400 mt-1">
+                  PNG, JPG tối đa 5MB
+                </span>
+                <Input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                />
+              </label>
+            )}
           </div>
 
+          {/* Trạng thái */}
           <div className="space-y-2">
             <Label>Trạng thái</Label>
             <Select
@@ -155,7 +267,12 @@ export function AssetCategoryAddDialog({
           </div>
 
           <DialogFooter className="flex justify-end gap-2 pt-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+              disabled={loading}
+            >
               Hủy
             </Button>
             <Button type="submit" disabled={loading}>

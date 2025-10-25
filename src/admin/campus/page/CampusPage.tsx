@@ -66,14 +66,14 @@ function CampusPage() {
     }
   }, []);
 
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await getCampusStats();
-      setStats(res?.data || null);
-    } catch (err) {
-      console.error("Lỗi khi tải thống kê:", err);
-    }
-  }, []);
+const fetchStats = useCallback(async () => {
+  try {
+    const res = await getCampusStats();
+    setStats(res || null); // ✅ đúng
+  } catch (err) {
+    console.error("Lỗi khi tải thống kê:", err);
+  }
+}, []);
 
   useEffect(() => {
     fetchCampus();

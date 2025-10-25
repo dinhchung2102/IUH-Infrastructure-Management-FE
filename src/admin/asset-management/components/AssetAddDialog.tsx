@@ -79,7 +79,7 @@ export function AssetAddDialog({
       ]);
 
       setTypes(typeRes?.data?.assetTypes || []);
-      setCategories(catRes?.data?.assetCategories || []);
+      setCategories(catRes?.data?.categories || []);
       setZones(zoneRes?.data?.zones || []);
       setAreas(areaRes?.data?.areas || []);
     } catch (err) {
