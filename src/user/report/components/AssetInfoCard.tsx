@@ -12,7 +12,7 @@ export function AssetInfoCard({ asset }: AssetInfoCardProps) {
       <CardHeader className="">
         <div className="flex items-center justify-between">
           <img
-            src="/src/assets/logo/iuh_logo-official.png"
+            src="/iuh_logo-official.png"
             alt="IUH Logo"
             className="h-14 w-auto"
           />

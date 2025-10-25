@@ -292,7 +292,7 @@ export default function QuickReportPage() {
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('/src/assets/background/nhaE.png')`,
+          backgroundImage: `url('/nhaE.png')`,
         }}
       />
       <div className="absolute inset-0 " />
