@@ -1,50 +1,16 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "@/components/ui/input-otp";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  FileText,
-  Upload,
-  AlertCircle,
-  MapPin,
-  Package,
-  Building2,
-} from "lucide-react";
 import { getAssetById, type AssetResponse } from "./api/asset.api";
 import { getReportTypes, createReport, sendReportOTP } from "./api/report.api";
 import type { ReportType } from "./types/report.types";
 import { toast } from "sonner";
+import {
+  AssetInfoCard,
+  ReportFormCard,
+  OtpDialog,
+  LoadingState,
+  ErrorState,
+} from "./components";
 
 export default function QuickReportPage() {
   const { assetId } = useParams<{ assetId: string }>();
@@ -126,27 +92,6 @@ export default function QuickReportPage() {
         setIsLoading(false);
       });
   }, [assetId]);
-
-  // Handle file selection and preview
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files) return;
-
-    // Clear old previews
-    previewFiles.forEach((preview) => URL.revokeObjectURL(preview.url));
-
-    // Store actual files
-    const filesArray = Array.from(files);
-    setSelectedFiles(filesArray);
-
-    // Create new preview URLs
-    const newPreviews = filesArray.map((file) => ({
-      url: URL.createObjectURL(file),
-      type: file.type,
-      name: file.name,
-    }));
-    setPreviewFiles(newPreviews);
-  };
 
   // Cleanup preview URLs on unmount
   useEffect(() => {
@@ -328,430 +273,73 @@ export default function QuickReportPage() {
 
   // Loading state
   if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-2xl">
-          <CardHeader>
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-full mt-2" />
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Skeleton className="h-32 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-24 w-full" />
-          </CardContent>
-        </Card>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   // Error state
   if (error || !asset) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle className="text-destructive flex items-center gap-2">
-              <AlertCircle className="h-5 w-5" />
-              Lỗi
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-            <Button
-              className="w-full mt-4"
-              onClick={() => navigate("/")}
-              variant="outline"
-            >
-              Quay về trang chủ
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+      <ErrorState
+        error={error || "Không tìm thấy thông tin thiết bị"}
+        onGoHome={() => navigate("/")}
+      />
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background py-3 px-3 sm:py-8 sm:px-4">
-      <div className="w-full max-w-2xl md:max-w-4xl mx-auto space-y-3">
-        {/* Asset Info Card - Responsive 2-Column Layout */}
-        <Card className="border-primary/20 shadow-lg">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
-              <Package className="h-5 w-5 text-primary flex-shrink-0" />
-              <span className="truncate">Thông tin thiết bị</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {/* 2-Column Grid: Image Left, Info Right */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
-              {/* Left Column: Asset Image */}
-              {asset?.image && (
-                <div className="rounded-lg overflow-hidden border bg-muted/30 h-fit">
-                  <img
-                    src={`${import.meta.env.VITE_URL_UPLOADS}${asset.image}`}
-                    alt={asset.name}
-                    className="w-full h-auto object-cover aspect-square md:aspect-auto md:max-h-[280px]"
-                  />
-                </div>
-              )}
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Image */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{
+          backgroundImage: `url('/src/assets/background/nhaE.png')`,
+        }}
+      />
+      <div className="absolute inset-0 " />
 
-              {/* Right Column: Asset Info */}
-              <div className="space-y-3 sm:space-y-4">
-                {/* Basic Info */}
-                <div className="space-y-3">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1.5">
-                      Tên thiết bị
-                    </p>
-                    <p
-                      className="font-semibold text-base sm:text-lg"
-                      title={asset.name}
-                    >
-                      {asset.name}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1.5">
-                      Mã thiết bị
-                    </p>
-                    <p
-                      className="font-medium text-base sm:text-lg text-primary"
-                      title={asset.code}
-                    >
-                      {asset.code}
-                    </p>
-                  </div>
-                </div>
+      {/* Content */}
+      <div className="relative z-10 py-4 px-3 sm:py-6 sm:px-4 lg:py-12 lg:px-6">
+        <div className="w-full max-w-4xl mx-auto space-y-4 sm:space-y-6">
+          {/* Asset Info Card */}
+          <AssetInfoCard asset={asset} />
 
-                {/* Location Info */}
-                <div className="pt-3 border-t space-y-2.5">
-                  <div className="flex items-start gap-2.5">
-                    <MapPin className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-base break-words">
-                        {asset.zone.building.campus.name}
-                      </p>
-                    </div>
-                  </div>
+          {/* Report Form Card */}
+          <ReportFormCard
+            fullName={fullName}
+            setFullName={setFullName}
+            email={email}
+            setEmail={setEmail}
+            isAuthenticated={isAuthenticated}
+            selectedReportType={selectedReportType}
+            setSelectedReportType={setSelectedReportType}
+            description={description}
+            setDescription={setDescription}
+            selectedFiles={selectedFiles}
+            setSelectedFiles={setSelectedFiles}
+            previewFiles={previewFiles}
+            setPreviewFiles={setPreviewFiles}
+            reportTypes={reportTypes}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+            isSendingOtp={isSendingOtp}
+          />
 
-                  <div className="flex items-start gap-2.5">
-                    <Building2 className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-base break-words">
-                        {asset.zone.building.name} - Tầng{" "}
-                        {asset.zone.floorLocation}
-                      </p>
-                    </div>
-                  </div>
-
-                  {asset.zone.name && (
-                    <div className="flex items-start gap-2.5">
-                      <Package className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-base break-words">
-                          {asset.zone.name}
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Report Form Card - Mobile Optimized */}
-        <Card className="shadow-lg">
-          <CardHeader className="pb-3 sm:pb-6">
-            <CardTitle className="text-lg sm:text-xl">Báo cáo sự cố</CardTitle>
-            <CardDescription className="text-sm">
-              Vui lòng điền đầy đủ thông tin về báo cáo sự cố của bạn
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="pb-4 sm:pb-6">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Personal Info */}
-              <div className="space-y-3">
-                <h3 className="text-sm sm:text-base font-semibold text-muted-foreground border-b pb-2 flex items-center flex-wrap gap-1.5">
-                  <span>Thông tin người báo cáo</span>
-                  {isAuthenticated && (
-                    <span className="text-xs text-green-600 font-normal">
-                      (Đã xác thực)
-                    </span>
-                  )}
-                </h3>
-                <div className="space-y-3">
-                  <div className="space-y-1.5">
-                    <Label htmlFor="fullname" className="text-sm font-medium">
-                      Họ và tên *
-                    </Label>
-                    <Input
-                      id="fullname"
-                      placeholder="Nguyễn Văn A"
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      required
-                      disabled={isAuthenticated}
-                      className="h-11 text-base"
-                      autoComplete="name"
-                    />
-                  </div>
-
-                  <div className="space-y-1.5">
-                    <Label htmlFor="email" className="text-sm font-medium">
-                      Email *
-                    </Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="email@iuh.edu.vn"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isAuthenticated}
-                      className="h-11 text-base"
-                      autoComplete="email"
-                      inputMode="email"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              {/* Report Details */}
-              <div className="space-y-3">
-                <h3 className="text-sm sm:text-base font-semibold text-muted-foreground border-b pb-2">
-                  Chi tiết sự cố
-                </h3>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="report-type" className="text-sm font-medium">
-                    Loại báo cáo *
-                  </Label>
-                  <Select
-                    required
-                    value={selectedReportType}
-                    onValueChange={setSelectedReportType}
-                  >
-                    <SelectTrigger id="report-type" className="h-11 text-base">
-                      <SelectValue placeholder="Chọn loại báo cáo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {reportTypes.map((type) => (
-                        <SelectItem
-                          key={type.value}
-                          value={type.value}
-                          className="text-base"
-                        >
-                          {type.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label htmlFor="description" className="text-sm font-medium">
-                    Mô tả chi tiết *
-                    <span className="text-xs text-muted-foreground font-normal ml-1.5">
-                      ({description.length}/1000)
-                    </span>
-                  </Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Vui lòng mô tả chi tiết vấn đề bạn gặp phải..."
-                    rows={6}
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                    className="resize-none text-base min-h-[120px]"
-                  />
-                </div>
-
-                {/* File Upload */}
-                <div className="space-y-1.5">
-                  <Label htmlFor="attachments" className="text-sm font-medium">
-                    Hình ảnh/Video *
-                  </Label>
-                  <label
-                    htmlFor="attachments"
-                    className="flex items-center justify-center gap-2 h-11 px-4 border-2 border-dashed rounded-md cursor-pointer hover:border-primary transition-colors bg-muted/30 active:scale-[0.98]"
-                  >
-                    <Upload className="h-5 w-5 text-muted-foreground" />
-                    <span className="text-sm text-muted-foreground font-medium">
-                      {previewFiles.length > 0
-                        ? `${previewFiles.length} file đã chọn`
-                        : "Chọn hình ảnh/video"}
-                    </span>
-                  </label>
-                  <Input
-                    id="attachments"
-                    type="file"
-                    multiple
-                    accept="image/*,video/*"
-                    className="hidden"
-                    onChange={handleFileChange}
-                    required
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Bắt buộc tải lên ít nhất 1 hình ảnh/video (Tối đa 10MB/file)
-                  </p>
-
-                  {/* File Preview */}
-                  {previewFiles.length > 0 && (
-                    <div className="mt-3 space-y-2">
-                      <Label className="text-xs text-muted-foreground">
-                        {previewFiles.length}{" "}
-                        {previewFiles.length === 1 ? "file" : "files"} đã chọn
-                      </Label>
-                      <div className="grid grid-cols-2 gap-2">
-                        {previewFiles.map((preview, index) => (
-                          <div
-                            key={index}
-                            className="rounded-md border p-2 bg-muted/30"
-                          >
-                            {preview.type.startsWith("image/") ? (
-                              <img
-                                src={preview.url}
-                                alt={`Preview ${index + 1}`}
-                                className="w-full h-24 rounded object-cover"
-                              />
-                            ) : preview.type.startsWith("video/") ? (
-                              <video
-                                src={preview.url}
-                                className="w-full h-24 rounded object-cover"
-                              >
-                                Your browser does not support video.
-                              </video>
-                            ) : null}
-                            <p className="mt-1.5 text-xs text-center text-muted-foreground truncate">
-                              {preview.name}
-                            </p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full h-11 text-base font-semibold shadow-md hover:shadow-lg transition-all active:scale-[0.98]"
-                size="lg"
-                disabled={isSubmitting || isSendingOtp}
-              >
-                {isSubmitting || isSendingOtp ? (
-                  <>
-                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-2" />
-                    <span className="text-base">
-                      {isSendingOtp ? "Đang gửi OTP..." : "Đang gửi..."}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <FileText className="h-5 w-5" />
-                    <span className="text-base">Gửi báo cáo</span>
-                  </>
-                )}
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-
-        {/* OTP Dialog */}
-        <Dialog open={showOtpDialog} onOpenChange={setShowOtpDialog}>
-          <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md">
-            <DialogHeader className="space-y-3">
-              <DialogTitle className="text-center text-xl">
-                Xác thực Email
-              </DialogTitle>
-              <DialogDescription className="text-center text-sm leading-relaxed">
-                Mã OTP đã được gửi đến email
-                <br />
-                <strong className="text-foreground break-all">{email}</strong>
-              </DialogDescription>
-            </DialogHeader>
-
-            <div className="space-y-4 py-4">
-              {/* InputOTP - 6 slots */}
-              <div className="flex justify-center">
-                <InputOTP
-                  maxLength={6}
-                  value={otp}
-                  onChange={(value) => setOtp(value)}
-                  disabled={isVerifyingOtp}
-                >
-                  <InputOTPGroup className="gap-2">
-                    <InputOTPSlot index={0} className="w-12 h-14 text-2xl" />
-                    <InputOTPSlot index={1} className="w-12 h-14 text-2xl" />
-                    <InputOTPSlot index={2} className="w-12 h-14 text-2xl" />
-                    <InputOTPSlot index={3} className="w-12 h-14 text-2xl" />
-                    <InputOTPSlot index={4} className="w-12 h-14 text-2xl" />
-                    <InputOTPSlot index={5} className="w-12 h-14 text-2xl" />
-                  </InputOTPGroup>
-                </InputOTP>
-              </div>
-
-              {/* Resend OTP */}
-              <div className="text-center text-sm">
-                <span className="text-muted-foreground">
-                  Không nhận được OTP?{" "}
-                </span>
-                <Button
-                  type="button"
-                  variant="link"
-                  className="px-1 h-auto text-sm"
-                  onClick={async () => {
-                    try {
-                      await sendReportOTP(email);
-                      toast.success("OTP đã được gửi lại");
-                      setOtp("");
-                    } catch {
-                      toast.error("Không thể gửi lại OTP");
-                    }
-                  }}
-                  disabled={isVerifyingOtp}
-                >
-                  Gửi lại mã
-                </Button>
-              </div>
-            </div>
-
-            <DialogFooter className="gap-2 sm:gap-0">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowOtpDialog(false);
-                  setOtp("");
-                  setIsSubmitting(false);
-                }}
-                className="flex-1 sm:flex-none h-11 text-base"
-              >
-                Hủy
-              </Button>
-              <Button
-                onClick={handleVerifyOtp}
-                disabled={isVerifyingOtp || otp.length < 6}
-                className="flex-1 sm:flex-none h-11 text-base"
-              >
-                {isVerifyingOtp ? (
-                  <>
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
-                    <span>Đang xác thực...</span>
-                  </>
-                ) : (
-                  "Xác nhận"
-                )}
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+          {/* OTP Dialog */}
+          <OtpDialog
+            open={showOtpDialog}
+            onOpenChange={setShowOtpDialog}
+            email={email}
+            otp={otp}
+            setOtp={setOtp}
+            isVerifyingOtp={isVerifyingOtp}
+            onVerify={handleVerifyOtp}
+            onCancel={() => {
+              setShowOtpDialog(false);
+              setOtp("");
+              setIsSubmitting(false);
+            }}
+          />
+        </div>
       </div>
     </div>
   );
