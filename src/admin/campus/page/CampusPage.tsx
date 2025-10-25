@@ -66,14 +66,14 @@ function CampusPage() {
     }
   }, []);
 
-const fetchStats = useCallback(async () => {
-  try {
-    const res = await getCampusStats();
-    setStats(res || null); // ✅ đúng
-  } catch (err) {
-    console.error("Lỗi khi tải thống kê:", err);
-  }
-}, []);
+  const fetchStats = useCallback(async () => {
+    try {
+      const res = await getCampusStats();
+      setStats(res || null); // ✅ đúng
+    } catch (err) {
+      console.error("Lỗi khi tải thống kê:", err);
+    }
+  }, []);
 
   useEffect(() => {
     fetchCampus();
@@ -162,11 +162,7 @@ const fetchStats = useCallback(async () => {
       </div>
 
       {/* Cards thống kê */}
-      <CampusStatsCards
-        stats={stats}
-        onRefresh={fetchStats}
-        loading={loading}
-      />
+      <CampusStatsCards stats={stats} loading={loading} />
 
       {/* Bộ lọc */}
       <div className="p-4 border bg-white rounded-lg space-y-3">

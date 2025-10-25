@@ -16,7 +16,7 @@ export default function Footer() {
   const contactInfo = [
     {
       icon: MapPin,
-      text: "12 Nguyễn Văn Bảo, P.4, Q.Gò Vấp, TP.HCM",
+      text: "12 Nguyễn Văn Bảo, Phường 4, Quận Gò Vấp, TP.HCM",
     },
     {
       icon: Phone,
@@ -25,8 +25,8 @@ export default function Footer() {
     },
     {
       icon: Mail,
-      text: "dhcn@iuh.edu.vn",
-      href: "mailto:dhcn@iuh.edu.vn",
+      text: "phongquan@iuh.edu.vn",
+      href: "mailto:phongquan@iuh.edu.vn",
     },
   ];
 

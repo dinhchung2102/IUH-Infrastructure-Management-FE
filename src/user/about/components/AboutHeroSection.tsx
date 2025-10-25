@@ -1,14 +1,6 @@
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  Building2,
-  ArrowRight,
-  Users,
-  Shield,
-  CheckCircle2,
-} from "lucide-react";
+import { Building2, Users, Shield, CheckCircle2 } from "lucide-react";
 import { Stagger, Parallax } from "@/components/motion";
-import { Link } from "react-router-dom";
 import nhaEBackground from "@/assets/background/nhaE.png";
 
 export function AboutHeroSection() {
@@ -30,29 +22,29 @@ export function AboutHeroSection() {
             <div className="mb-6 flex justify-center sm:justify-start">
               <Badge className="bg-primary/20 text-white border-primary/30 backdrop-blur-sm px-4 py-1.5 text-sm">
                 <Building2 className="mr-1.5 h-3.5 w-3.5" />
-                Về chúng tôi
+                Office of Facilities Management
               </Badge>
             </div>
             <h1 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl text-center sm:text-left">
-              Quản lý{" "}
               <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-                Cơ sở vật chất
+                Phòng Quản Trị
               </span>
               <br />
               <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
                 Trường Đại học Công nghiệp TP.HCM
               </span>
             </h1>
-            <p className="mb-8 text-base sm:text-lg md:text-xl text-gray-200 max-w-3xl leading-relaxed text-center sm:text-left">
-              Chúng tôi cam kết cung cấp môi trường học tập và làm việc tốt nhất
-              thông qua việc quản lý, bảo trì và nâng cấp cơ sở vật chất một
-              cách chuyên nghiệp và hiệu quả.
+            <p className="mb-8 text-base sm:text-lg md:text-xl text-gray-200 max-w-3xl leading-relaxed text-center sm:text-justify">
+              Tham mưu và giúp Hiệu trưởng trong việc quản lý, tổng hợp, đề xuất
+              ý kiến, tổ chức thực hiện việc quản lý toàn bộ hệ thống của trường
+              về công tác quản trị, quản lý toàn bộ thiết bị của Trường, quản lý
+              công tác đầu tư xây dựng.
             </p>
             <div className="mb-10 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl">
               <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
                 <Users className="h-5 w-5 text-cyan-400" />
                 <span className="text-sm text-white font-medium">
-                  20,000+ Sinh viên
+                  40,000+ Sinh viên
                 </span>
               </div>
               <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
@@ -67,18 +59,6 @@ export function AboutHeroSection() {
                   98% Hài lòng
                 </span>
               </div>
-            </div>
-            <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-4">
-              <Button className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl hover:scale-105 transition-all border-0 text-base px-6 py-3 h-auto">
-                <Users className="h-5 w-5" />
-                <Link to="/contact">Liên hệ chúng tôi</Link>
-              </Button>
-              <Button className="bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm hover:scale-105 transition-all text-base px-8 py-6 h-auto">
-                <Link to="/report">
-                  Tìm hiểu thêm
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-              </Button>
             </div>
           </Stagger>
         </div>

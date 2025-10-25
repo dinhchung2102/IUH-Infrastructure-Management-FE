@@ -14,23 +14,21 @@ export function NewsCategoryStatsCards({ stats }: NewsCategoryStatsCardsProps) {
         value={stats.total}
         icon={Layers}
         description="Tổng số danh mục"
-        trend={{ value: 0, isPositive: true }}
+        variant="default"
       />
       <StatsCard
         title="Đang hoạt động"
         value={stats.active}
         icon={CheckCircle}
         description="Danh mục đang hiển thị"
-        trend={{ value: 0, isPositive: true }}
-        className="bg-green-50 border-green-200"
+        variant="success"
       />
       <StatsCard
         title="Ngưng hoạt động"
         value={stats.inactive}
         icon={XCircle}
         description="Danh mục đã ẩn"
-        trend={{ value: 0, isPositive: false }}
-        className="bg-red-50 border-red-200"
+        variant="danger"
       />
     </div>
   );

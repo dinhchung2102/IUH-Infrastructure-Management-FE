@@ -2,9 +2,8 @@ import {
   AboutHeroSection,
   AboutStatsSection,
   MissionVisionSection,
-  ValuesSection,
+  FunctionsSection,
   TeamSection,
-  AboutCTASection,
 } from "./components";
 
 export default function AboutPage() {
@@ -13,9 +12,8 @@ export default function AboutPage() {
       <AboutHeroSection />
       <AboutStatsSection />
       <MissionVisionSection />
-      <ValuesSection />
+      <FunctionsSection />
       <TeamSection />
-      <AboutCTASection />
     </div>
   );
 }

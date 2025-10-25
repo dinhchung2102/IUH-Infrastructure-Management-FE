@@ -96,7 +96,6 @@ function ZonePage() {
     try {
       const res = await getZoneStats();
       setStats(res || null);
-
     } catch (err) {
       console.error("Lỗi khi tải thống kê:", err);
     }
@@ -156,8 +155,7 @@ function ZonePage() {
     const matchSearch = z?.name?.toLowerCase().includes(search.toLowerCase());
     const matchStatus = statusFilter === "all" || z.status === statusFilter;
     const matchCampus =
-      campusFilter === "all" ||
-      z.building?.campus?._id === campusFilter;
+      campusFilter === "all" || z.building?.campus?._id === campusFilter;
 
     return matchSearch && matchStatus && matchCampus;
   });
@@ -184,7 +182,7 @@ function ZonePage() {
       </div>
 
       {/* Cards thống kê */}
-      <ZoneStatsCards stats={stats} onRefresh={fetchStats} loading={loading} />
+      <ZoneStatsCards stats={stats} loading={loading} />
 
       {/* Bộ lọc */}
       <div className="p-4 border bg-white rounded-lg space-y-3">
@@ -282,7 +280,8 @@ function ZonePage() {
 
             {!loading &&
               filteredZones.map((z, i) => {
-                const zt = zoneTypeDisplay[z.zoneType as keyof typeof zoneTypeDisplay];
+                const zt =
+                  zoneTypeDisplay[z.zoneType as keyof typeof zoneTypeDisplay];
                 const Icon = zt?.icon;
                 return (
                   <TableRow key={z._id}>
@@ -290,7 +289,9 @@ function ZonePage() {
                     <TableCell className="font-medium">{z.name}</TableCell>
                     <TableCell>
                       {zt ? (
-                        <Badge className={`flex items-center gap-1 ${zt.color}`}>
+                        <Badge
+                          className={`flex items-center gap-1 ${zt.color}`}
+                        >
                           <Icon className="w-4 h-4" />
                           {zt.label}
                         </Badge>

@@ -1,6 +1,5 @@
 export { AboutHeroSection } from "./AboutHeroSection";
 export { AboutStatsSection } from "./AboutStatsSection";
 export { MissionVisionSection } from "./MissionVisionSection";
-export { ValuesSection } from "./ValuesSection";
+export { FunctionsSection } from "./FunctionsSection";
 export { TeamSection } from "./TeamSection";
-export { AboutCTASection } from "./AboutCTASection";

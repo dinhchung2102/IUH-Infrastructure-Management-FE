@@ -5,19 +5,26 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Reveal } from "@/components/motion";
+import { User, Users } from "lucide-react";
 
-const team = [
+const leadership = [
   {
-    role: "Quản lý",
-    description: "Giám sát và điều phối toàn bộ hoạt động",
+    name: "ThS. Nguyễn Quý Tuấn",
+    position: "Trưởng phòng",
+    description:
+      "Chịu trách nhiệm tổng thể về công tác quản trị và quản lý cơ sở hạ tầng của Trường",
+    icon: User,
+    color: "text-blue-600",
+    bgColor: "bg-blue-50 dark:bg-blue-950/30",
   },
   {
-    role: "Kỹ thuật",
-    description: "Xử lý sự cố và bảo trì thiết bị",
-  },
-  {
-    role: "Hỗ trợ",
-    description: "Tiếp nhận và tư vấn cho người dùng",
+    name: "ThS. Đinh Hồng Nam",
+    position: "Phó trưởng phòng",
+    description:
+      "Hỗ trợ Trưởng phòng trong việc quản lý và điều phối các hoạt động chuyên môn",
+    icon: Users,
+    color: "text-green-600",
+    bgColor: "bg-green-50 dark:bg-green-950/30",
   },
 ];
 
@@ -27,23 +34,41 @@ export function TeamSection() {
       <div className="container">
         <Reveal>
           <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold">Đội ngũ của chúng tôi</h2>
+            <h2 className="mb-4 text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              Ban lãnh đạo
+            </h2>
             <p className="mx-auto max-w-2xl text-muted-foreground">
-              Đội ngũ chuyên nghiệp, tận tâm và luôn sẵn sàng hỗ trợ
+              Đội ngũ lãnh đạo chuyên nghiệp, có kinh nghiệm và tận tâm với sự
+              nghiệp giáo dục
             </p>
           </div>
         </Reveal>
-        <div className="grid gap-6 md:grid-cols-3">
-          {team.map((member, index) => (
-            <Reveal key={index} delay={index * 0.15}>
-              <Card className="hover:shadow-lg transition-shadow cursor-pointer">
-                <CardHeader>
-                  <CardTitle className="text-lg">{member.role}</CardTitle>
-                  <CardDescription>{member.description}</CardDescription>
-                </CardHeader>
-              </Card>
-            </Reveal>
-          ))}
+        <div className="grid gap-8 md:grid-cols-2 max-w-4xl mx-auto">
+          {leadership.map((leader, index) => {
+            const Icon = leader.icon;
+            return (
+              <Reveal key={index} delay={index * 0.2}>
+                <Card className="hover:shadow-xl hover:scale-105 transition-all cursor-pointer group">
+                  <CardHeader className="text-center">
+                    <div
+                      className={`mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full ${leader.bgColor} group-hover:scale-110 transition-transform`}
+                    >
+                      <Icon className={`h-8 w-8 ${leader.color}`} />
+                    </div>
+                    <CardTitle className="text-xl font-bold">
+                      {leader.name}
+                    </CardTitle>
+                    <CardDescription className="text-lg font-semibold text-primary mb-3">
+                      {leader.position}
+                    </CardDescription>
+                    <CardDescription className="text-sm leading-relaxed">
+                      {leader.description}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              </Reveal>
+            );
+          })}
         </div>
       </div>
     </section>

@@ -193,7 +193,7 @@ export default function BuildingAreaPage() {
       </div>
 
       {/* Cards thống kê */}
-      <BuildingAreaCards />
+      <BuildingAreaCards stats={undefined} loading={false} />
 
       {/* Bộ lọc */}
       <div className="p-4 border bg-white rounded-lg space-y-3">
