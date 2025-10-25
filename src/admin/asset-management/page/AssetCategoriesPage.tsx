@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -28,6 +29,8 @@ import {
   ChevronsUpDown,
   ChevronUp,
   ChevronDown,
+  BarChart3,
+  Plus,
 } from "lucide-react";
 import { TableSkeleton } from "@/components/TableSkeleton";
 
@@ -139,15 +142,38 @@ export default function AssetCategoriesPage() {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/admin" },
+            { label: "Quản lý", href: "/admin/asset-categories" },
+            { label: "Danh mục thiết bị", isCurrent: true },
+          ]}
+        />
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="outline"
+            onClick={() => setStatsOpen(true)}
+          >
+            <BarChart3 className="h-4 w-4" />
+            Xem thống kê
+          </Button>
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            onClick={() => {
+              setEditCategory(null);
+              setDialogOpen(true);
+            }}
+          >
+            <Plus className="h-4 w-4" />
+            Thêm danh mục
+          </Button>
+        </div>
+      </div>
+
       {/* Cards thống kê */}
-      <AssetCategoryCards
-        stats={stats}
-        onViewStats={() => setStatsOpen(true)}
-        onAddNew={() => {
-          setEditCategory(null);
-          setDialogOpen(true);
-        }}
-      />
+      <AssetCategoryCards stats={stats} />
 
       {/* Bộ lọc */}
       <div className="flex flex-wrap gap-4">
@@ -177,6 +203,7 @@ export default function AssetCategoriesPage() {
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[60px]">STT</TableHead>
               <TableHead>
                 <Button
                   variant="ghost"
@@ -217,6 +244,7 @@ export default function AssetCategoriesPage() {
               <TableSkeleton
                 rows={6}
                 columns={[
+                  { type: "text", width: "w-[60px]" }, // For STT
                   { type: "text", width: "w-[200px]" },
                   { type: "text", width: "w-[300px]" },
                   { type: "avatar", width: "w-[80px]" },
@@ -228,14 +256,15 @@ export default function AssetCategoriesPage() {
             )}
             {!loading && categories.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="text-center">
+                <TableCell colSpan={7} className="text-center">
                   Không có danh mục nào.
                 </TableCell>
               </TableRow>
             )}
             {!loading &&
-              categories.map((cat) => (
+              categories.map((cat, idx) => (
                 <TableRow key={cat._id}>
+                  <TableCell>{idx + 1}</TableCell>
                   <TableCell className="font-medium">{cat.name}</TableCell>
                   <TableCell className="max-w-[300px] truncate text-muted-foreground">
                     {cat.description}
@@ -249,7 +278,9 @@ export default function AssetCategoriesPage() {
                   </TableCell>
                   <TableCell>
                     <Badge
-                      variant={cat.status === "ACTIVE" ? "default" : "secondary"}
+                      variant={
+                        cat.status === "ACTIVE" ? "default" : "secondary"
+                      }
                       className="text-xs"
                     >
                       {cat.status === "ACTIVE"

@@ -157,21 +157,13 @@ export default function NewsManagementPage() {
   ];
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-      {/* Breadcrumb */}
-      <PageBreadcrumb items={breadcrumbItems} />
-
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
-            Quản lý tin tức
-          </h1>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Quản lý các bài viết tin tức của hệ thống
-          </p>
-        </div>
-        <Button onClick={handleCreateNew} className="gap-2 w-full sm:w-auto">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb items={breadcrumbItems} />
+        <Button
+          className="w-full cursor-pointer md:w-auto"
+          onClick={handleCreateNew}
+        >
           <Plus className="h-4 w-4" />
           Tạo tin tức mới
         </Button>

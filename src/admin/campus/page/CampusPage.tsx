@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { getCampus, deleteCampus, getCampusStats } from "../api/campus.api";
-import { Building2, Plus, BarChart3, Filter } from "lucide-react";
+import { Plus, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/TableSkeleton";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { CampusStatsCards } from "../components/CampusStatsCards";
 import { CampusStatsDialog } from "../components/CampusStatsDialog";
 import { CampusAddDialog } from "../components/CampusAddDialog";
@@ -142,21 +143,30 @@ function CampusPage() {
    *  ============================ */
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Building2 className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-semibold">Quản lý cơ sở</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setOpenStatsDialog(true)}>
-            <BarChart3 className="mr-2 h-4 w-4" /> Xem thống kê
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/admin" },
+            { label: "Quản lý", href: "/admin/campus" },
+            { label: "Quản lý cơ sở", isCurrent: true },
+          ]}
+        />
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="outline"
+            onClick={() => setOpenStatsDialog(true)}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Xem thống kê
           </Button>
-          {/* <Button variant="outline" onClick={fetchCampus}>
-            <RefreshCcw className="mr-2 h-4 w-4" /> Làm mới
-          </Button> */}
-          <Button variant="default" onClick={() => setOpenAddDialog(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Thêm cơ sở
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="default"
+            onClick={() => setOpenAddDialog(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Thêm cơ sở
           </Button>
         </div>
       </div>
@@ -165,70 +175,61 @@ function CampusPage() {
       <CampusStatsCards stats={stats} loading={loading} />
 
       {/* Bộ lọc */}
-      <div className="p-4 border bg-white rounded-lg space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <Filter className="text-muted-foreground w-4 h-4" />
+      <div className="flex flex-wrap gap-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="flex-1 min-w-[250px] flex gap-2"
+        >
+          <Input
+            placeholder="Tìm kiếm theo tên hoặc email..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button type="submit">Tìm kiếm</Button>
+        </form>
 
-          {/* Ô tìm kiếm */}
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex gap-2 flex-1 min-w-[260px]"
-          >
-            <Input
-              placeholder="Tìm kiếm theo tên hoặc email..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button type="submit">Tìm kiếm</Button>
-          </form>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Tất cả trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+            <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
+          </SelectContent>
+        </Select>
 
-          {/* Dropdown Trạng thái */}
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tất cả trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-              <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
-            </SelectContent>
-          </Select>
+        <Select value={managerFilter} onValueChange={setManagerFilter}>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Tất cả quản lý" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả quản lý</SelectItem>
+            <SelectItem value="has">Có người quản lý</SelectItem>
+            <SelectItem value="none">Chưa có người quản lý</SelectItem>
+          </SelectContent>
+        </Select>
 
-          {/* Dropdown Người quản lý */}
-          <Select value={managerFilter} onValueChange={setManagerFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tất cả quản lý" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả quản lý</SelectItem>
-              <SelectItem value="has">Có người quản lý</SelectItem>
-              <SelectItem value="none">Chưa có người quản lý</SelectItem>
-            </SelectContent>
-          </Select>
+        <Select value={regionFilter} onValueChange={setRegionFilter}>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Tất cả khu vực" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả khu vực</SelectItem>
+            <SelectItem value="bắc">Miền Bắc</SelectItem>
+            <SelectItem value="trung">Miền Trung</SelectItem>
+            <SelectItem value="nam">Miền Nam</SelectItem>
+          </SelectContent>
+        </Select>
 
-          {/* Dropdown Khu vực */}
-          <Select value={regionFilter} onValueChange={setRegionFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tất cả khu vực" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả khu vực</SelectItem>
-              <SelectItem value="bắc">Miền Bắc</SelectItem>
-              <SelectItem value="trung">Miền Trung</SelectItem>
-              <SelectItem value="nam">Miền Nam</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Nút xóa lọc */}
-          {(search ||
-            statusFilter !== "all" ||
-            managerFilter !== "all" ||
-            regionFilter !== "all") && (
-            <Button variant="outline" onClick={handleClearFilters}>
-              Xóa bộ lọc
-            </Button>
-          )}
-        </div>
+        {(search ||
+          statusFilter !== "all" ||
+          managerFilter !== "all" ||
+          regionFilter !== "all") && (
+          <Button variant="outline" onClick={handleClearFilters}>
+            Xóa bộ lọc
+          </Button>
+        )}
       </div>
 
       {/* Bảng dữ liệu */}

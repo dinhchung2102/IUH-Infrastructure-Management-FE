@@ -16,9 +16,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import {
   RefreshCcw,
-  Building2,
   Map,
   PlusCircle,
   BarChart3,
@@ -168,26 +168,40 @@ export default function BuildingAreaPage() {
    *  ========================== */
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Building2 className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-semibold">Quản lý Tòa nhà & Khu vực</h1>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={fetchAll}>
-            <RefreshCcw className="mr-2 h-4 w-4" /> Làm mới
-          </Button>
-          <Button onClick={() => setOpenStats(true)} variant="outline">
-            <BarChart3 className="mr-2 h-4 w-4" /> Thống kê
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/admin" },
+            { label: "Quản lý", href: "/admin/building-area" },
+            { label: "Quản lý Tòa nhà & Khu vực", isCurrent: true },
+          ]}
+        />
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="outline"
+            onClick={fetchAll}
+          >
+            <RefreshCcw className="mr-2 h-4 w-4" />
+            Làm mới
           </Button>
           <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="outline"
+            onClick={() => setOpenStats(true)}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Thống kê
+          </Button>
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
             onClick={() => {
               setEditingItem(null);
               setOpenAdd(true);
             }}
           >
-            <PlusCircle className="mr-2 h-4 w-4" /> Thêm mới
+            <PlusCircle className="mr-2 h-4 w-4" />
+            Thêm mới
           </Button>
         </div>
       </div>
@@ -196,67 +210,68 @@ export default function BuildingAreaPage() {
       <BuildingAreaCards stats={undefined} loading={false} />
 
       {/* Bộ lọc */}
-      <div className="p-4 border bg-white rounded-lg space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex gap-2 flex-1 min-w-[260px]">
-            <Input
-              placeholder="Tìm kiếm theo tên..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button type="button">Tìm kiếm</Button>
-          </div>
+      <div className="flex flex-wrap gap-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="flex-1 min-w-[250px] flex gap-2"
+        >
+          <Input
+            placeholder="Tìm kiếm theo tên..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button type="submit">Tìm kiếm</Button>
+        </form>
 
-          <Select value={filterType} onValueChange={setFilterType}>
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Chọn loại" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="BUILDING">🏢 Tòa nhà</SelectItem>
-              <SelectItem value="AREA">🌿 Khu vực</SelectItem>
-            </SelectContent>
-          </Select>
+        <Select value={filterType} onValueChange={setFilterType}>
+          <SelectTrigger className="w-[160px] bg-white">
+            <SelectValue placeholder="Chọn loại" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="BUILDING">🏢 Tòa nhà</SelectItem>
+            <SelectItem value="AREA">🌿 Khu vực</SelectItem>
+          </SelectContent>
+        </Select>
 
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-[160px]">
-              <SelectValue placeholder="Chọn trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-              <SelectItem value="UNDERMAINTENANCE">Bảo trì</SelectItem>
-              <SelectItem value="INACTIVE">Ngừng</SelectItem>
-            </SelectContent>
-          </Select>
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-[160px] bg-white">
+            <SelectValue placeholder="Chọn trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+            <SelectItem value="UNDERMAINTENANCE">Bảo trì</SelectItem>
+            <SelectItem value="INACTIVE">Ngừng</SelectItem>
+          </SelectContent>
+        </Select>
 
-          <Select value={filterCampus} onValueChange={setFilterCampus}>
-            <SelectTrigger className="w-[200px]">
-              <SelectValue placeholder="Chọn cơ sở" />
-            </SelectTrigger>
-            <SelectContent>
-              {campuses.length > 0 ? (
-                campuses.map((c) => (
-                  <SelectItem key={c._id} value={c._id}>
-                    {c.name}
-                  </SelectItem>
-                ))
-              ) : (
-                <SelectItem value="no-data" disabled>
-                  Không có dữ liệu
+        <Select value={filterCampus} onValueChange={setFilterCampus}>
+          <SelectTrigger className="w-[200px] bg-white">
+            <SelectValue placeholder="Chọn cơ sở" />
+          </SelectTrigger>
+          <SelectContent>
+            {campuses.length > 0 ? (
+              campuses.map((c) => (
+                <SelectItem key={c._id} value={c._id}>
+                  {c.name}
                 </SelectItem>
-              )}
-            </SelectContent>
-          </Select>
+              ))
+            ) : (
+              <SelectItem value="no-data" disabled>
+                Không có dữ liệu
+              </SelectItem>
+            )}
+          </SelectContent>
+        </Select>
 
-          <Button
-            type="button"
-            variant="outline"
-            onClick={handleClearFilters}
-            className="flex items-center gap-2"
-          >
-            <XCircle className="h-4 w-4" />
-            Xóa bộ lọc
-          </Button>
-        </div>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleClearFilters}
+          className="flex items-center gap-2"
+        >
+          <XCircle className="h-4 w-4" />
+          Xóa bộ lọc
+        </Button>
       </div>
 
       {/* Bảng dữ liệu */}

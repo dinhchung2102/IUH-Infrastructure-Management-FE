@@ -153,21 +153,13 @@ export default function NewsCategoryManagementPage() {
   ];
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Breadcrumb */}
-      <PageBreadcrumb items={breadcrumbItems} />
-
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
-            Quản lý danh mục tin tức
-          </h1>
-          <p className="text-muted-foreground">
-            Quản lý các danh mục tin tức của hệ thống
-          </p>
-        </div>
-        <Button onClick={handleCreateNew} className="gap-2">
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb items={breadcrumbItems} />
+        <Button
+          className="w-full cursor-pointer md:w-auto"
+          onClick={handleCreateNew}
+        >
           <Plus className="h-4 w-4" />
           Tạo danh mục mới
         </Button>

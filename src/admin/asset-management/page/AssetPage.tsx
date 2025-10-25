@@ -8,7 +8,6 @@ import {
   ImageOff,
   Plus,
   BarChart3,
-  Filter,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -25,6 +24,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { TableSkeleton } from "@/components/TableSkeleton";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { AssetStatsCards } from "../components/AssetStatsCards";
 import { AssetStatsDialog } from "../components/AssetStatsDialog";
 import { AssetAddDialog } from "../components/AssetAddDialog";
@@ -130,77 +130,80 @@ function AssetPage() {
    * ========================= */
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <Package className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-semibold">Quản lý thiết bị</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setOpenStatsDialog(true)}>
-            <BarChart3 className="mr-2 h-4 w-4" /> Xem thống kê
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/admin" },
+            { label: "Quản lý", href: "/admin/assets" },
+            { label: "Quản lý thiết bị", isCurrent: true },
+          ]}
+        />
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="outline"
+            onClick={() => setOpenStatsDialog(true)}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Xem thống kê
           </Button>
-          <Button variant="default" onClick={() => setOpenAddDialog(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Thêm thiết bị
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="default"
+            onClick={() => setOpenAddDialog(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Thêm thiết bị
           </Button>
         </div>
       </div>
 
       {/* Cards thống kê */}
-      <AssetStatsCards stats={stats} onRefresh={fetchStats} loading={loading} />
-
+      <AssetStatsCards stats={stats} loading={loading} />
 
       {/* Bộ lọc */}
-      <div className="p-4 border bg-white rounded-lg space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <Filter className="text-muted-foreground w-4 h-4" />
+      <div className="flex flex-wrap gap-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="flex-1 min-w-[250px] flex gap-2"
+        >
+          <Input
+            placeholder="Tìm kiếm theo tên thiết bị..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button type="submit">Tìm kiếm</Button>
+        </form>
 
-          {/* Ô tìm kiếm */}
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex gap-2 flex-1 min-w-[260px]"
-          >
-            <Input
-              placeholder="Tìm kiếm theo tên thiết bị..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button type="submit">Tìm kiếm</Button>
-          </form>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Tất cả trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value="IN_USE">Đang sử dụng</SelectItem>
+            <SelectItem value="MAINTENANCE">Bảo trì</SelectItem>
+            <SelectItem value="BROKEN">Hư hỏng</SelectItem>
+          </SelectContent>
+        </Select>
 
-          {/* Dropdown Trạng thái */}
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tất cả trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value="IN_USE">Đang sử dụng</SelectItem>
-              <SelectItem value="MAINTENANCE">Bảo trì</SelectItem>
-              <SelectItem value="BROKEN">Hư hỏng</SelectItem>
-            </SelectContent>
-          </Select>
+        <Select value={typeFilter} onValueChange={setTypeFilter}>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Tất cả loại thiết bị" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả loại</SelectItem>
+            <SelectItem value="máy tính">Máy tính</SelectItem>
+            <SelectItem value="máy in">Máy in</SelectItem>
+            <SelectItem value="camera">Camera</SelectItem>
+          </SelectContent>
+        </Select>
 
-          {/* Dropdown loại thiết bị */}
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tất cả loại thiết bị" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả loại</SelectItem>
-              <SelectItem value="máy tính">Máy tính</SelectItem>
-              <SelectItem value="máy in">Máy in</SelectItem>
-              <SelectItem value="camera">Camera</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Nút xóa lọc */}
-          {(search || statusFilter !== "all" || typeFilter !== "all") && (
-            <Button variant="outline" onClick={handleClearFilters}>
-              Xóa bộ lọc
-            </Button>
-          )}
-        </div>
+        {(search || statusFilter !== "all" || typeFilter !== "all") && (
+          <Button variant="outline" onClick={handleClearFilters}>
+            Xóa bộ lọc
+          </Button>
+        )}
       </div>
 
       {/* Bảng thiết bị */}

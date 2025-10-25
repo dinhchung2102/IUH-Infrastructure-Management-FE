@@ -5,10 +5,8 @@ import { toast } from "sonner";
 import { getZones, deleteZone, getZoneStats } from "../api/zone.api";
 import { getBuildings } from "../../building-area/api/building.api";
 import {
-  MapPin,
   Plus,
   BarChart3,
-  Filter,
   MoreHorizontal,
   Pencil,
   Trash2,
@@ -45,6 +43,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 
 /* =========================================
    Icon & màu cho loại zone
@@ -165,18 +164,30 @@ function ZonePage() {
    ============================ */
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          <MapPin className="h-6 w-6 text-primary" />
-          <h1 className="text-2xl font-semibold">Quản lý khu vực (Zone)</h1>
-        </div>
-        <div className="flex items-center gap-2">
-          <Button variant="outline" onClick={() => setOpenStatsDialog(true)}>
-            <BarChart3 className="mr-2 h-4 w-4" /> Xem thống kê
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
+        <PageBreadcrumb
+          items={[
+            { label: "Dashboard", href: "/admin" },
+            { label: "Quản lý", href: "/admin/zone" },
+            { label: "Quản lý phòng", isCurrent: true },
+          ]}
+        />
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="outline"
+            onClick={() => setOpenStatsDialog(true)}
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Xem thống kê
           </Button>
-          <Button variant="default" onClick={() => setOpenAddDialog(true)}>
-            <Plus className="mr-2 h-4 w-4" /> Thêm khu vực
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="default"
+            onClick={() => setOpenAddDialog(true)}
+          >
+            <Plus className="mr-2 h-4 w-4" />
+            Thêm khu vực
           </Button>
         </div>
       </div>
@@ -185,56 +196,49 @@ function ZonePage() {
       <ZoneStatsCards stats={stats} loading={loading} />
 
       {/* Bộ lọc */}
-      <div className="p-4 border bg-white rounded-lg space-y-3">
-        <div className="flex flex-wrap items-center gap-3">
-          <Filter className="text-muted-foreground w-4 h-4" />
+      <div className="flex flex-wrap gap-4">
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="flex-1 min-w-[250px] flex gap-2"
+        >
+          <Input
+            placeholder="Tìm kiếm khu vực..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+          <Button type="submit">Tìm kiếm</Button>
+        </form>
 
-          {/* Ô tìm kiếm */}
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex gap-2 flex-1 min-w-[260px]"
-          >
-            <Input
-              placeholder="Tìm kiếm khu vực..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-            <Button type="submit">Tìm kiếm</Button>
-          </form>
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-[180px] bg-white">
+            <SelectValue placeholder="Tất cả trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả trạng thái</SelectItem>
+            <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+            <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
+          </SelectContent>
+        </Select>
 
-          {/* Dropdown Trạng thái */}
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Tất cả trạng thái" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả trạng thái</SelectItem>
-              <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-              <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
-            </SelectContent>
-          </Select>
+        <Select value={campusFilter} onValueChange={setCampusFilter}>
+          <SelectTrigger className="w-[220px] bg-white">
+            <SelectValue placeholder="Tất cả cơ sở" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả cơ sở</SelectItem>
+            {campuses.map((c) => (
+              <SelectItem key={c._id} value={c._id}>
+                {c.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
-          {/* Dropdown Cơ sở */}
-          <Select value={campusFilter} onValueChange={setCampusFilter}>
-            <SelectTrigger className="w-[220px]">
-              <SelectValue placeholder="Tất cả cơ sở" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Tất cả cơ sở</SelectItem>
-              {campuses.map((c) => (
-                <SelectItem key={c._id} value={c._id}>
-                  {c.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          {(search || statusFilter !== "all" || campusFilter !== "all") && (
-            <Button variant="outline" onClick={handleClearFilters}>
-              Xóa bộ lọc
-            </Button>
-          )}
-        </div>
+        {(search || statusFilter !== "all" || campusFilter !== "all") && (
+          <Button variant="outline" onClick={handleClearFilters}>
+            Xóa bộ lọc
+          </Button>
+        )}
       </div>
 
       {/* Bảng dữ liệu */}
