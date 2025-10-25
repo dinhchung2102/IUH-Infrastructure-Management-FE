@@ -145,11 +145,6 @@ const navigation = [
         icon: Calendar,
       },
       {
-        title: "Phân quyền người dùng",
-        href: "/admin/roles",
-        icon: User,
-      },
-      {
         title: "Phản hồi",
         href: "/admin/feedback",
         icon: MessageSquare,

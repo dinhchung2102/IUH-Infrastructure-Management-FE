@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { getAssets, deleteAsset, getAssetStats } from "../api/asset.api";
 import {
-  Package,
   ImageOff,
   Plus,
   BarChart3,
