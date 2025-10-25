@@ -25,31 +25,33 @@ export function CampusStatsCards(_props: CampusStatsCardsProps = {}) {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // 🟢 Fetch thống kê
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      const res = await getCampusStats();
-      const raw: any = res?.data || {};
+ const fetchStats = async () => {
+  try {
+    setLoading(true);
+    const res = await getCampusStats();
 
-      const total = raw.total || 0;
-      const active =
-        raw.byStatus?.find((s: any) => s._id === "ACTIVE")?.count || 0;
-      const inactive =
-        raw.byStatus?.find((s: any) => s._id === "INACTIVE")?.count || 0;
+    // ✅ ép kiểu rõ ràng để tránh lỗi
+    const stats = (res?.stats ?? {}) as {
+      total?: number;
+      active?: number;
+      inactive?: number;
+      newThisMonth?: number;
+    };
 
-      setStats({
-        totalCampus: total,
-        activeCampus: active,
-        inactiveCampus: inactive,
-        newCampusThisMonth: 0, // giả định chưa có trong API
-      });
-    } catch (err) {
-      console.error("[CampusStatsCards] fetchStats error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setStats({
+      totalCampus: stats.total ?? 0,
+      activeCampus: stats.active ?? 0,
+      inactiveCampus: stats.inactive ?? 0,
+      newCampusThisMonth: stats.newThisMonth ?? 0,
+    });
+  } catch (err) {
+    console.error("[CampusStatsCards] fetchStats error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
+
 
   // ⏱ Auto refresh mỗi 60 giây
   useEffect(() => {

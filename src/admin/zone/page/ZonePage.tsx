@@ -95,7 +95,8 @@ function ZonePage() {
   const fetchStats = useCallback(async () => {
     try {
       const res = await getZoneStats();
-      setStats(res?.data || null);
+      setStats(res || null);
+
     } catch (err) {
       console.error("Lỗi khi tải thống kê:", err);
     }

@@ -33,7 +33,7 @@ export interface QueryAssetCategoryDto {
  * Lấy danh sách danh mục tài sản (Asset Category)
  */
 export const getAssetCategories = async (query?: QueryAssetCategoryDto) => {
-  const res = await api.get<ApiResponse<{ assetCategories: AssetCategoryResponse[] }>>(
+  const res = await api.get<ApiResponse<{ categories: AssetCategoryResponse[] }>>(
     "/assets/categories",
     { params: query }
   );
@@ -53,27 +53,44 @@ export const getAssetCategoryById = async (id: string) => {
 /**
  * Tạo danh mục tài sản mới
  */
-export const createAssetCategory = async (data: Partial<AssetCategoryResponse>) => {
+export const createAssetCategory = async (
+  data: Partial<AssetCategoryResponse> | FormData
+) => {
+  const isFormData = data instanceof FormData;
+
   const res = await api.post<ApiResponse<AssetCategoryResponse>>(
     "/assets/categories",
-    data
+    data,
+    {
+      headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+    }
   );
   return res.data;
 };
 
+
+/**
+ * Cập nhật danh mục tài sản
+ */
 /**
  * Cập nhật danh mục tài sản
  */
 export const updateAssetCategory = async (
   id: string,
-  data: Partial<AssetCategoryResponse>
+  data: Partial<AssetCategoryResponse> | FormData
 ) => {
+  const isFormData = data instanceof FormData;
+
   const res = await api.patch<ApiResponse<AssetCategoryResponse>>(
     `/assets/categories/${id}`,
-    data
+    data,
+    {
+      headers: isFormData ? { "Content-Type": "multipart/form-data" } : {},
+    }
   );
   return res.data;
 };
+
 
 /**
  * Xóa danh mục tài sản

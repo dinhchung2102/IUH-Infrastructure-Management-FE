@@ -99,3 +99,24 @@ export const getBuildingsByCampus = async (campusId: string) => {
   );
   return res.data;
 };
+/** ============================
+ *  Thống kê tòa nhà (Buildings)
+ *  Endpoint: /zone-area/buildings-stats
+ * ============================ */
+
+
+export interface BuildingStatsResponse {
+  stats: {
+    total: number;
+    active: number;
+    inactive: number;
+    newThisMonth: number;
+  };
+}
+
+export const getBuildingStats = async () => {
+  const res = await api.get<ApiResponse<BuildingStatsResponse>>(
+    "/zone-area/buildings-stats"
+  );
+  return res.data.data;
+};

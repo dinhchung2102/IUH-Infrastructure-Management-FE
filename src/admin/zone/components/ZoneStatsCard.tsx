@@ -25,32 +25,28 @@ export function ZoneStatsCards(_props: ZoneStatsCardsProps = {}) {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-  // 🟢 Lấy thống kê zone
-  const fetchStats = async () => {
-    try {
-      setLoading(true);
-      const res = await getZoneStats();
-      const raw: any = res?.data || {};
+ // 🟢 Lấy thống kê zone
+const fetchStats = async () => {
+  try {
+    setLoading(true);
 
-      const total = raw.total || 0;
-      const active =
-        raw.byStatus?.find((s: any) => s._id === "ACTIVE")?.count || 0;
-      const inactive =
-        raw.byStatus?.find((s: any) => s._id === "INACTIVE")?.count || 0;
-      const createdThisMonth = raw.createdThisMonth || 0;
+    // Gọi API mới
+    const res = await getZoneStats();
+    const stats = res?.stats || {};
 
-      setStats({
-        totalZones: total,
-        activeZones: active,
-        inactiveZones: inactive,
-        newZonesThisMonth: createdThisMonth,
-      });
-    } catch (err) {
-      console.error("[ZoneStatsCards] fetchStats error:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    setStats({
+      totalZones: stats.total ?? 0,
+      activeZones: stats.active ?? 0,
+      inactiveZones: stats.inactive ?? 0,
+      newZonesThisMonth: stats.newThisMonth ?? 0,
+    });
+  } catch (err) {
+    console.error("[ZoneStatsCards] fetchStats error:", err);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   // ⏱ Auto refresh mỗi 60 giây
   useEffect(() => {

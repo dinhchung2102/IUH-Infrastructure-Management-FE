@@ -37,6 +37,7 @@ import NewsCategoryManagementPage from "./admin/news-category-management/page/Ne
 import ZonePage from "./admin/zone/page/ZonePage";
 import AssetCategoriesPage from "./admin/asset-management/page/AssetCategoriesPage";
 import Assetpage from "./admin/asset-management/page/AssetPage";
+import MaintenancePage from "./admin/maintenance/page/MaintenancePage";
 
 function AppRoutes() {
   const location = useLocation();
@@ -83,7 +84,7 @@ function AppRoutes() {
           <Route path="asset-categories" element={<AssetCategoriesPage />} />
           <Route path="asset" element={<Assetpage />} />
           <Route path="news" element={<div>News Management</div>} />
-          <Route path="maintenance" element={<div>Maintenance Schedule</div>} />
+          <Route path="maintenance" element={<MaintenancePage />} />
           <Route path="feedback" element={<div>Feedback Management</div>} />
           <Route path="settings" element={<div>Settings</div>} />
           <Route path="profile" element={<div>Profile</div>} />

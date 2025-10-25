@@ -23,6 +23,16 @@ export interface QueryZoneDto {
   limit?: number;
 }
 
+/** ✅ Dữ liệu thống kê zone trả về từ API */
+export interface ZoneStatsResponse {
+  stats: {
+    total: number;
+    active: number;
+    inactive: number;
+    newThisMonth: number;
+  };
+}
+
 // ============================
 // API CALLS
 // ============================
@@ -31,9 +41,7 @@ export interface QueryZoneDto {
 export const getZones = async (query?: QueryZoneDto) => {
   const res = await api.get<ApiResponse<{ zones: ZoneResponse[] }>>(
     "/zone-area/zones",
-    {
-      params: query,
-    }
+    { params: query }
   );
   return res.data;
 };
@@ -69,10 +77,26 @@ export const deleteZone = async (id: string) => {
   const res = await api.delete<ApiResponse<void>>(`/zone-area/zones/${id}`);
   return res.data;
 };
-// 🟢 Lấy thống kê khu vực (dành cho ZoneStatsCards & ZoneStatsDialog)
-export const getZoneStats = async () => {
-  return api.get("/zones/stats");
+
+// ✅ Lấy thống kê khu vực (Zone Stats)
+export const getZoneStats = async (): Promise<ZoneStatsResponse> => {
+  const res = await api.get<ApiResponse<ZoneStatsResponse>>(
+    "/zone-area/zones-stats"
+  );
+
+  // Đảm bảo luôn trả về giá trị mặc định, tránh undefined
+  return (
+    res.data.data ?? {
+      stats: {
+        total: 0,
+        active: 0,
+        inactive: 0,
+        newThisMonth: 0,
+      },
+    }
+  );
 };
+
 // Lấy tất cả zones theo buildingId
 export const getZonesByBuildingId = async (buildingId: string) => {
   const res = await api.get<ApiResponse<{ zones: ZoneResponse[] }>>(
