@@ -36,12 +36,12 @@ export const register = async (
 };
 
 // Refresh token
-export const refreshToken = async (
-  data: RefreshTokenRequest
-): Promise<RefreshTokenResponse> => {
+// Web Client: No need to send refresh token in body, backend reads from httpOnly cookie
+// Mobile Client: Should send refreshToken in body (not implemented here, this is for Web)
+export const refreshToken = async (): Promise<RefreshTokenResponse> => {
   const response = await api.post<RefreshTokenResponse>(
-    "/auth/refresh-token",
-    data
+    "/auth/refresh-token"
+    // No body needed for Web Client - refresh token is in httpOnly cookie
   );
   return response.data;
 };

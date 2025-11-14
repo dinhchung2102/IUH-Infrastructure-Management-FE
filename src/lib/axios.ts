@@ -113,10 +113,20 @@ api.interceptors.response.use(
 
       try {
         // Try to refresh using cookie-based refresh token
+        // Web Client: No need to send refresh token in body, backend reads from cookie
         const res = await api.post("/auth/refresh-token");
 
+        // Response format for Web Client: { message: string, access_token: string }
+        // Note: field name is "access_token" (synchronized with login endpoint)
         const newAccessToken =
-          res.data.data?.access_token || res.data.access_token;
+          res.data.data?.access_token ||
+          res.data.access_token ||
+          res.data.data?.accessToken ||
+          res.data.accessToken;
+
+        if (!newAccessToken) {
+          throw new Error("No access token in refresh response");
+        }
 
         // Lưu access token mới
         localStorage.setItem("access_token", newAccessToken);
