@@ -7,7 +7,6 @@ import {
   FileText,
   Settings,
   BarChart3,
-  MessageSquare,
   Calendar,
   ChevronRight,
   Globe,
@@ -143,11 +142,6 @@ const navigation = [
         title: "Lịch bảo trì",
         href: "/admin/maintenance",
         icon: Calendar,
-      },
-      {
-        title: "Phản hồi",
-        href: "/admin/feedback",
-        icon: MessageSquare,
       },
       {
         title: "Cài đặt",

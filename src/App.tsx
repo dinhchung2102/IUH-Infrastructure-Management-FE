@@ -38,6 +38,8 @@ import ZonePage from "./admin/zone/page/ZonePage";
 import AssetCategoriesPage from "./admin/asset-management/page/AssetCategoriesPage";
 import Assetpage from "./admin/asset-management/page/AssetPage";
 import MaintenancePage from "./admin/maintenance/page/MaintenancePage";
+import AnalyticsPage from "./admin/pages/AnalyticsPage";
+import SettingsPage from "./admin/pages/SettingsPage";
 
 function AppRoutes() {
   const location = useLocation();
@@ -66,7 +68,7 @@ function AppRoutes() {
         {/* Admin Routes with AdminLayout */}
         <Route path="/admin" element={<AdminLayout />}>
           <Route index element={<DashboardPage />} />
-          <Route path="analytics" element={<div>Analytics Page</div>} />
+          <Route path="analytics" element={<AnalyticsPage />} />
           <Route path="facilities" element={<div>Facilities Management</div>} />
           <Route path="campus" element={<CampusPage />} />
           <Route path="building-area" element={<BuildingAreaPage />} />
@@ -85,8 +87,7 @@ function AppRoutes() {
           <Route path="asset" element={<Assetpage />} />
           <Route path="news" element={<div>News Management</div>} />
           <Route path="maintenance" element={<MaintenancePage />} />
-          <Route path="feedback" element={<div>Feedback Management</div>} />
-          <Route path="settings" element={<div>Settings</div>} />
+          <Route path="settings" element={<SettingsPage />} />
           <Route path="profile" element={<div>Profile</div>} />
         </Route>
 

@@ -1,6 +1,5 @@
-import { Menu, Bell, Search, Home } from "lucide-react";
+import { Menu, Bell, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,6 +26,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { CommandPalette } from "@/components/CommandPalette";
 
 interface AdminTopBarProps {
   onMenuClick: () => void;
@@ -85,14 +85,7 @@ export default function AdminTopBar({ onMenuClick }: AdminTopBarProps) {
 
         {/* Search */}
         <div className="flex-1">
-          <form className="relative max-w-md">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Tìm kiếm..."
-              className="pl-9 md:w-[300px] lg:w-[400px]"
-            />
-          </form>
+          <CommandPalette />
         </div>
 
         {/* Actions */}
