@@ -4,7 +4,6 @@ import type {
   LoginRequest,
   RegisterRequest,
   SendOTPRequest,
-  RefreshTokenRequest,
   RefreshTokenResponse,
 } from "@/types/response.type";
 
