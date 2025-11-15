@@ -84,35 +84,37 @@ export default function AdminTopBar({ onMenuClick }: AdminTopBarProps) {
         </Button>
 
         {/* Search */}
-        <div className="flex-1">
+        <div className="flex-1 hidden md:flex">
           <CommandPalette />
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center flex-1 justify-end">
           {/* Back to Home */}
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/admin")}
             title="Về trang chủ"
+            className="hidden md:block"
           >
-            <Home className="size-5" />
+            <Home className="size-6" />
           </Button>
 
           {/* Notifications */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
+            <DropdownMenuTrigger asChild className="mr-4 hidden md:flex">
               <Button variant="ghost" size="icon" className="relative">
-                <Bell className="size-5" />
+                <Bell className="size-6" />
                 <Badge
                   variant="destructive"
-                  className="absolute -right-1 -top-1 flex size-5 items-center justify-center rounded-full p-0 text-xs"
+                  className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full p-0 text-xs"
                 >
                   3
                 </Badge>
               </Button>
             </DropdownMenuTrigger>
+
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel>Thông báo</DropdownMenuLabel>
               <DropdownMenuSeparator />
@@ -156,7 +158,7 @@ export default function AdminTopBar({ onMenuClick }: AdminTopBarProps) {
                   variant="ghost"
                   className="flex items-center gap-2 px-2"
                 >
-                  <Avatar className="size-8">
+                  <Avatar className="size-10">
                     <AvatarImage
                       src={account.avatar || undefined}
                       alt={account.fullName || "User"}

@@ -40,7 +40,7 @@ const navigation = [
     title: "Tổng quan",
     items: [
       {
-        title: "Dashboard",
+        title: "Tổng quan hệ thống",
         href: "/admin",
         icon: LayoutDashboard,
       },
@@ -382,7 +382,7 @@ export default function AdminSidebar({
   if (mobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="left" className="w-full p-0">
+        <SheetContent side="left" className="w-[280px] max-w-[85vw] p-0">
           <SidebarContent />
         </SheetContent>
       </Sheet>

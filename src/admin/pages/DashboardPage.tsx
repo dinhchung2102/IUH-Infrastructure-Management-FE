@@ -273,7 +273,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Tổng quan</h1>
         <p className="text-muted-foreground">
           Chào mừng trở lại! Đây là tổng quan về hệ thống quản lý cơ sở vật
           chất.
