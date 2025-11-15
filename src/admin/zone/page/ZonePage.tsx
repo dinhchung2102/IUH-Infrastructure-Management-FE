@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { getZones, deleteZone, getZoneStats } from "../api/zone.api";
 import { getBuildings } from "../../building-area/api/building.api";
 import { Plus, BarChart3, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -226,11 +227,7 @@ function ZonePage() {
           </SelectContent>
         </Select>
 
-        {(search || statusFilter !== "all" || campusFilter !== "all") && (
-          <Button variant="outline" onClick={handleClearFilters}>
-            Xóa bộ lọc
-          </Button>
-        )}
+        <ClearFiltersButton onClick={handleClearFilters} />
       </div>
 
       {/* Bảng dữ liệu */}

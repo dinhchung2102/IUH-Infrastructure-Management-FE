@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { getCampus, deleteCampus, getCampusStats } from "../api/campus.api";
-import { Plus, BarChart3 } from "lucide-react";
+import { Plus, BarChart3, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -36,6 +36,7 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 
 function CampusPage() {
   const [campuses, setCampuses] = useState<any[]>([]);
@@ -157,7 +158,7 @@ function CampusPage() {
             variant="outline"
             onClick={() => setOpenStatsDialog(true)}
           >
-            <BarChart3 className="mr-2 h-4 w-4" />
+            <BarChart3 className="h-4 w-4" />
             Xem thống kê
           </Button>
           <Button
@@ -165,7 +166,7 @@ function CampusPage() {
             variant="default"
             onClick={() => setOpenAddDialog(true)}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className="h-4 w-4" />
             Thêm cơ sở
           </Button>
         </div>
@@ -185,7 +186,10 @@ function CampusPage() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <Button type="submit">Tìm kiếm</Button>
+          <Button type="submit">
+            <Search className="h-4 w-4" />
+            Tìm kiếm
+          </Button>
         </form>
 
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -222,14 +226,7 @@ function CampusPage() {
           </SelectContent>
         </Select>
 
-        {(search ||
-          statusFilter !== "all" ||
-          managerFilter !== "all" ||
-          regionFilter !== "all") && (
-          <Button variant="outline" onClick={handleClearFilters}>
-            Xóa bộ lọc
-          </Button>
-        )}
+        <ClearFiltersButton onClick={handleClearFilters} />
       </div>
 
       {/* Bảng dữ liệu */}

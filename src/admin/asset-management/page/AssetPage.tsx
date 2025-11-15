@@ -12,6 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -198,11 +199,7 @@ function AssetPage() {
           </SelectContent>
         </Select>
 
-        {(search || statusFilter !== "all" || typeFilter !== "all") && (
-          <Button variant="outline" onClick={handleClearFilters}>
-            Xóa bộ lọc
-          </Button>
-        )}
+        <ClearFiltersButton onClick={handleClearFilters} />
       </div>
 
       {/* Bảng thiết bị */}

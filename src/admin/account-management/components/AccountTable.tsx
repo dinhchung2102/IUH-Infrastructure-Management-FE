@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { getAccountStatusBadge } from "@/config/badge.config";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Mars,
@@ -264,25 +265,17 @@ export default function AccountTable({
             <SelectItem value="FEMALE">Nữ</SelectItem>
           </SelectContent>
         </Select>
-        {(filters.search ||
-          filters.isActive !== undefined ||
-          filters.gender ||
-          filters.role) && (
-          <Button
-            variant="outline"
-            onClick={() => {
-              setSearchInput("");
-              onFiltersChange({
-                search: "",
-                isActive: undefined,
-                gender: undefined,
-                role: undefined,
-              });
-            }}
-          >
-            Xóa bộ lọc
-          </Button>
-        )}
+        <ClearFiltersButton
+          onClick={() => {
+            setSearchInput("");
+            onFiltersChange({
+              search: "",
+              isActive: undefined,
+              gender: undefined,
+              role: undefined,
+            });
+          }}
+        />
       </div>
 
       {/* Table Section */}

@@ -25,10 +25,10 @@ import {
   PlusCircle,
   BarChart3,
   Edit3,
-  XCircle,
   MoreHorizontal,
   Trash2,
 } from "lucide-react";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { BuildingAreaCards } from "../components/BuildingAreaCards";
 import { BuildingAreaAddDialog } from "../components/BuildingAreaAddDialog";
 import { BuildingAreaStatsDialog } from "../components/BuildingAreaStatsDialog";
@@ -265,15 +265,7 @@ export default function BuildingAreaPage() {
           </SelectContent>
         </Select>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleClearFilters}
-          className="flex items-center gap-2"
-        >
-          <XCircle className="h-4 w-4" />
-          Xóa bộ lọc
-        </Button>
+        <ClearFiltersButton onClick={handleClearFilters} />
       </div>
 
       {/* Bảng dữ liệu */}
