@@ -93,7 +93,7 @@ export function BuildingAreaStatsDialog({
     },
     {
       type: "AREA",
-      label: "Khu vực",
+      label: "Khu vực ngoài trời",
       count: stats.areas.stats.total ?? 0,
       fill: "var(--chart-3)",
     },
@@ -102,7 +102,7 @@ export function BuildingAreaStatsDialog({
 
   const typeChartConfig = {
     BUILDING: { label: "Tòa nhà", color: "var(--chart-2)" },
-    AREA: { label: "Khu vực", color: "var(--chart-3)" },
+    AREA: { label: "Khu vực ngoài trời", color: "var(--chart-3)" },
   } satisfies ChartConfig;
 
   /* ============================
@@ -122,7 +122,7 @@ export function BuildingAreaStatsDialog({
   const newData = [
     {
       label:
-        activeType === "BUILDING" ? "Tòa nhà mới" : "Khu vực mới",
+        activeType === "BUILDING" ? "Tòa nhà mới" : "Khu vực ngoài trời mới",
       count: activeStats.stats.newThisMonth ?? 0,
     },
   ];
@@ -131,7 +131,7 @@ export function BuildingAreaStatsDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="!max-w-[700px] max-h-[85vh] overflow-hidden flex flex-col">
         <DialogHeader>
-          <DialogTitle>Thống kê Tòa nhà & Khu vực</DialogTitle>
+          <DialogTitle>Thống kê Tòa nhà & Khu vực ngoài trời</DialogTitle>
           <DialogDescription>
             Tổng quan theo loại, trạng thái và số lượng mới
           </DialogDescription>
@@ -150,7 +150,7 @@ export function BuildingAreaStatsDialog({
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Phân loại</CardTitle>
                 <CardDescription>
-                  Tổng số tòa nhà và khu vực trong hệ thống
+                  Tổng số tòa nhà và khu vực ngoài trời trong hệ thống
                 </CardDescription>
               </CardHeader>
 
@@ -225,7 +225,7 @@ export function BuildingAreaStatsDialog({
             <Card className="border-0 shadow-none flex-1 flex flex-col">
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">
-                  Trạng thái {activeType === "BUILDING" ? "Tòa nhà" : "Khu vực"}
+                  Trạng thái {activeType === "BUILDING" ? "Tòa nhà" : "Khu vực ngoài trời"}
                 </CardTitle>
               </CardHeader>
               <CardContent className="flex-1">
@@ -257,7 +257,7 @@ export function BuildingAreaStatsDialog({
               <CardHeader className="pb-2">
                 <CardTitle className="text-base">Mới thêm trong tháng</CardTitle>
                 <CardDescription>
-                  Tổng số {activeType === "BUILDING" ? "tòa nhà" : "khu vực"} mới
+                  Tổng số {activeType === "BUILDING" ? "tòa nhà" : "khu vực ngoài trời"} mới
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex-1">

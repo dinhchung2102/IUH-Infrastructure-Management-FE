@@ -11,7 +11,7 @@ export interface ZoneResponse {
   description?: string;
   status: "ACTIVE" | "INACTIVE";
   building: string;
-  zoneType: "ROOM" | "AREA" | "OTHER";
+  zoneType: "FUNCTIONAL" | "TECHNICAL" | "SERVICE" | "PUBLIC";
   floorLocation?: number;
   createdAt: string;
   updatedAt: string;

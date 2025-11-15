@@ -43,14 +43,21 @@ import { PageBreadcrumb } from "@/components/PageBreadcrumb";
    Icon & màu cho loại zone
 ========================================= */
 const zoneTypeDisplay = {
+  FUNCTIONAL: {
+    label: "Chức năng",
+    color: "bg-purple-100 text-purple-700 border border-purple-300",
+  },
+  TECHNICAL: {
+    label: "Kỹ thuật",
+    color: "bg-blue-100 text-blue-700 border border-blue-300",
+  },
   SERVICE: {
     label: "Dịch vụ",
     color: "bg-yellow-100 text-yellow-700 border border-yellow-300",
   },
-  FUNCTIONAL: {
-    label: "Chức năng",
-
-    color: "bg-purple-100 text-purple-700 border border-purple-300",
+  PUBLIC: {
+    label: "Công cộng",
+    color: "bg-green-100 text-green-700 border border-green-300",
   },
 };
 

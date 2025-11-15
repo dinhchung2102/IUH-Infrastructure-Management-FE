@@ -29,31 +29,31 @@ export function BuildingAreaCards({ stats, loading }: BuildingAreaCardsProps) {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
-        title="Tổng tòa nhà & khu vực"
+        title="Tổng tòa nhà & K.V. Ngoài trời"
         value={stats?.totalAll || 0}
         icon={Building2}
-        description="Tổng số tòa nhà và khu vực"
+        description="Tổng số tòa nhà và K.V. Ngoài trời"
         variant="default"
       />
       <StatsCard
         title="Đang hoạt động"
         value={stats?.totalActive || 0}
         icon={CheckCircle2}
-        description="Tòa nhà và khu vực đang hoạt động"
+        description="Tòa nhà và K.V. Ngoài trời đang hoạt động"
         variant="success"
       />
       <StatsCard
         title="Ngừng hoạt động"
         value={stats?.totalInactive || 0}
         icon={XCircle}
-        description="Tòa nhà và khu vực ngừng hoạt động"
+        description="Tòa nhà và K.V. Ngoài trời ngừng hoạt động"
         variant="danger"
       />
       <StatsCard
         title="Đang bảo trì"
         value={stats?.totalUnderMaintenance || 0}
         icon={Wrench}
-        description="Tòa nhà và khu vực đang bảo trì"
+        description="Tòa nhà và K.V. Ngoài trời đang bảo trì"
         variant="warning"
       />
     </div>
