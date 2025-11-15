@@ -6,16 +6,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, CheckCircle, XCircle } from "lucide-react";
+import { Eye, CheckCircle, XCircle } from "lucide-react";
+import { TableActionMenu, type TableAction } from "@/components/TableActionMenu";
 import type { Report, ReportStatus } from "../types/report.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -133,42 +125,33 @@ export function ReportTable({
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => onViewDetails(report)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Xem chi tiết
-                      </DropdownMenuItem>
-                      {report.status === "PENDING" && (
-                        <>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onUpdateStatus(report._id, "APPROVED")
-                            }
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Duyệt báo cáo
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onUpdateStatus(report._id, "REJECTED")
-                            }
-                            className="text-destructive"
-                          >
-                            <XCircle className="mr-2 h-4 w-4" />
-                            Từ chối
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <TableActionMenu
+                    showLabel
+                    actions={[
+                      {
+                        label: "Xem chi tiết",
+                        icon: Eye,
+                        onClick: () => onViewDetails(report),
+                      },
+                      ...(report.status === "PENDING"
+                        ? [
+                            {
+                              label: "Duyệt báo cáo",
+                              icon: CheckCircle,
+                              onClick: () =>
+                                onUpdateStatus(report._id, "APPROVED"),
+                            } as TableAction,
+                            {
+                              label: "Từ chối",
+                              icon: XCircle,
+                              onClick: () =>
+                                onUpdateStatus(report._id, "REJECTED"),
+                              variant: "destructive" as const,
+                            } as TableAction,
+                          ]
+                        : []),
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             );

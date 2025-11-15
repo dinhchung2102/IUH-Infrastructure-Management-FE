@@ -6,22 +6,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
-import {
-  Edit,
-  MoreHorizontal,
-  Trash2,
-  PlayCircle,
-  PauseCircle,
-} from "lucide-react";
+import { Edit, Trash2, PlayCircle, PauseCircle } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
 import { getActiveStatusBadge } from "@/config/badge.config";
 import { TableSkeleton } from "@/components/TableSkeleton";
 
@@ -127,52 +113,43 @@ export function CampusTable({
                   )}
                 </TableCell>
                 <TableCell className="text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 p-0"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                      <DropdownMenuItem
-                        onClick={() => onEdit(c)}
-                        className="cursor-pointer"
-                      >
-                        <Edit className="h-4 w-4" />
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => onToggleStatus(c)}
-                        className="cursor-pointer"
-                      >
-                        {c.status === "ACTIVE" ? (
+                  <TableActionMenu
+                    showLabel
+                    actions={[
+                      {
+                        label: "Chỉnh sửa",
+                        icon: Edit,
+                        onClick: () => onEdit(c),
+                      },
+                      {
+                        label:
+                          c.status === "ACTIVE" ? "Tạm ngưng" : "Kích hoạt",
+                        icon: PauseCircle, // Fallback, sẽ dùng customContent
+                        onClick: () => onToggleStatus(c),
+                        customContent: (
                           <>
-                            <PauseCircle className="h-4 w-4" />
-                            Tạm ngưng
+                            {c.status === "ACTIVE" ? (
+                              <>
+                                <PauseCircle className="h-4 w-4" />
+                                Tạm ngưng
+                              </>
+                            ) : (
+                              <>
+                                <PlayCircle className="h-4 w-4" />
+                                Kích hoạt
+                              </>
+                            )}
                           </>
-                        ) : (
-                          <>
-                            <PlayCircle className="h-4 w-4" />
-                            Kích hoạt
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onClick={() => onDelete(c._id)}
-                        className="text-red-600 focus:text-red-600 cursor-pointer"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                        Xóa
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                        ),
+                      },
+                      {
+                        label: "Xóa",
+                        icon: Trash2,
+                        onClick: () => onDelete(c._id),
+                        variant: "destructive",
+                      },
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             ))}

@@ -6,18 +6,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Edit3, MoreHorizontal, Trash2 } from "lucide-react";
+import { Edit3, Trash2 } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
 import {
   getActiveStatusBadge,
   getBuildingAreaTypeBadge,
 } from "@/config/badge.config";
+import { ZoneTypeHoverCard } from "./ZoneTypeHoverCard";
 
 interface BuildingAreaItem {
   _id: string;
@@ -26,10 +21,13 @@ interface BuildingAreaItem {
   status: string;
   floor?: number;
   description?: string;
+  zoneType?: string; // For AREA
   campus?: {
     _id: string;
     name: string;
   };
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 interface BuildingAreaTableProps {
@@ -54,7 +52,8 @@ export function BuildingAreaTable({
             <TableHead>Tòa nhà/ Khu vực ngoài trời</TableHead>
             <TableHead>Loại</TableHead>
             <TableHead>Cơ sở</TableHead>
-            <TableHead>Chi tiết</TableHead>
+            <TableHead>Số tầng</TableHead>
+            <TableHead>Chức năng</TableHead>
             <TableHead>Trạng thái</TableHead>
             <TableHead className="text-center w-20">Thao tác</TableHead>
           </TableRow>
@@ -63,13 +62,13 @@ export function BuildingAreaTable({
         <TableBody>
           {loading ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 Đang tải dữ liệu...
               </TableCell>
             </TableRow>
           ) : items.length === 0 ? (
             <TableRow>
-              <TableCell colSpan={7} className="text-center py-4">
+              <TableCell colSpan={8} className="text-center py-4">
                 Không có dữ liệu
               </TableCell>
             </TableRow>
@@ -81,9 +80,20 @@ export function BuildingAreaTable({
                 <TableCell>{getBuildingAreaTypeBadge(item.type)}</TableCell>
                 <TableCell>{item.campus?.name || "Không rõ"}</TableCell>
                 <TableCell>
-                  {item.type === "BUILDING"
-                    ? `Tầng: ${item.floor ?? "—"}`
-                    : item.description || "—"}
+                  {item.type === "BUILDING" ? (
+                    <span className="text-sm font-medium">
+                      {item.floor ?? "—"}
+                    </span>
+                  ) : (
+                    "—"
+                  )}
+                </TableCell>
+                <TableCell>
+                  {item.type === "AREA" && item.zoneType ? (
+                    <ZoneTypeHoverCard zoneType={item.zoneType} />
+                  ) : (
+                    "—"
+                  )}
                 </TableCell>
                 <TableCell>
                   {getActiveStatusBadge(
@@ -95,29 +105,22 @@ export function BuildingAreaTable({
                   )}
                 </TableCell>
                 <TableCell className="text-center">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        onClick={() => onEdit(item)}
-                        className="cursor-pointer"
-                      >
-                        <Edit3 className="mr-2 h-4 w-4" />
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="text-destructive cursor-pointer"
-                        onClick={() => onDelete(item)}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Xóa
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <TableActionMenu
+                    showLabel
+                    actions={[
+                      {
+                        label: "Chỉnh sửa",
+                        icon: Edit3,
+                        onClick: () => onEdit(item),
+                      },
+                      {
+                        label: "Xóa",
+                        icon: Trash2,
+                        onClick: () => onDelete(item),
+                        variant: "destructive",
+                      },
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             ))

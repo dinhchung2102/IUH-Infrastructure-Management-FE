@@ -336,9 +336,9 @@ export const BUILDING_AREA_TYPE_BADGE: Record<BuildingAreaType, BadgeStyle> = {
     variant: "secondary",
   },
   AREA: {
-    label: "Khu vực",
+    label: "Khu vực ngoài trời",
     className:
-      "bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200",
+      "bg-orange-100 text-orange-700 hover:bg-orange-100 border-orange-200",
     variant: "outline",
   },
 };

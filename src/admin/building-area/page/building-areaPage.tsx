@@ -40,21 +40,24 @@ export default function BuildingAreaPage() {
         getAreas(),
       ]);
 
-      const buildingsData = buildRes?.data?.buildings || buildRes?.data || [];
+      // Handle buildings response - API returns { data: { buildings: [...] } }
+      const buildingsData = buildRes?.data?.buildings || [];
       const buildings = Array.isArray(buildingsData)
         ? buildingsData.map((b: any) => ({
-            ...b,
+            ...b, // Preserve all fields including floor, status, campus, createdAt, updatedAt
             type: "BUILDING",
           }))
-        : buildingsData.buildings.map((b: any) => ({
-            ...b,
-            type: "BUILDING",
-          }));
+        : [];
 
-      const areasData = areaRes?.data?.areas || areaRes?.data || [];
+      // Handle areas response - API returns { data: { areas: [...] } }
+      // AreaResponse includes: _id, name, status, description, zoneType, campus, createdAt, updatedAt
+      const areasData = areaRes?.data?.areas || [];
       const areas = Array.isArray(areasData)
-        ? areasData.map((a: any) => ({ ...a, type: "AREA" }))
-        : areasData.areas.map((a: any) => ({ ...a, type: "AREA" }));
+        ? areasData.map((a: any) => ({
+            ...a, // Preserve all fields including description, zoneType, campus, createdAt, updatedAt
+            type: "AREA",
+          }))
+        : [];
 
       setItems([...buildings, ...areas]);
     } catch (err) {

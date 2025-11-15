@@ -18,12 +18,12 @@ import {
   ChevronsUpDown,
   ChevronDown,
   ChevronUp,
-  MoreHorizontal,
   Eye,
   Trash2,
   UserCheck,
   UserX,
 } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
 import {
   converGenderToDisplay,
   converRoleToDisplay,
@@ -39,14 +39,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import {
@@ -398,56 +390,48 @@ export default function AccountTable({
                     {getAccountStatusBadge(account.isActive)}
                   </TableCell>
                   <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="h-8 w-8 p-0 cursor-pointer"
-                        >
-                          <span className="sr-only">Mở menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleViewDetails(account._id)}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          Xem chi tiết
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() =>
+                    <TableActionMenu
+                      showLabel
+                      actions={[
+                        {
+                          label: "Xem chi tiết",
+                          icon: Eye,
+                          onClick: () => handleViewDetails(account._id),
+                        },
+                        {
+                          label: account.isActive
+                            ? "Khóa tài khoản"
+                            : "Mở khóa tài khoản",
+                          icon: account.isActive ? UserX : UserCheck,
+                          onClick: () =>
                             handleToggleAccountStatus(
                               account._id,
                               account.isActive
-                            )
-                          }
-                        >
-                          {account.isActive ? (
+                            ),
+                          customContent: (
                             <>
-                              <UserX className="mr-2 h-4 w-4" />
-                              Khóa tài khoản
+                              {account.isActive ? (
+                                <>
+                                  <UserX className="h-4 w-4" />
+                                  Khóa tài khoản
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="h-4 w-4" />
+                                  Mở khóa tài khoản
+                                </>
+                              )}
                             </>
-                          ) : (
-                            <>
-                              <UserCheck className="mr-2 h-4 w-4" />
-                              Mở khóa tài khoản
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteAccount(account._id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa tài khoản
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          ),
+                        },
+                        {
+                          label: "Xóa tài khoản",
+                          icon: Trash2,
+                          onClick: () => handleDeleteAccount(account._id),
+                          variant: "destructive",
+                        },
+                      ]}
+                    />
                   </TableCell>
                 </TableRow>
               ))}

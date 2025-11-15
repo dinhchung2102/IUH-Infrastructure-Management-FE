@@ -7,16 +7,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
+import { Eye, Edit, Trash2 } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
 import type { NewsCategory } from "../types/news-category.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -116,33 +108,27 @@ export function NewsCategoryTable({
                   })}
                 </TableCell>
                 <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Mở menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => onViewDetails(category)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Xem chi tiết
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => onEdit(category)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onDelete(category._id, category.name)}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Xóa
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <TableActionMenu
+                    showLabel
+                    actions={[
+                      {
+                        label: "Xem chi tiết",
+                        icon: Eye,
+                        onClick: () => onViewDetails(category),
+                      },
+                      {
+                        label: "Chỉnh sửa",
+                        icon: Edit,
+                        onClick: () => onEdit(category),
+                      },
+                      {
+                        label: "Xóa",
+                        icon: Trash2,
+                        onClick: () => onDelete(category._id, category.name),
+                        variant: "destructive",
+                      },
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             ))

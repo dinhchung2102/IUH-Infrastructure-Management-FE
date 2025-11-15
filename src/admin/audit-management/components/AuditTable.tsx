@@ -6,22 +6,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  MoreHorizontal,
-  Eye,
-  PlayCircle,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
+import { Eye, PlayCircle, CheckCircle, XCircle } from "lucide-react";
+import { TableActionMenu, type TableAction } from "@/components/TableActionMenu";
 import type { AuditLog, AuditStatus } from "../types/audit.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -164,52 +150,43 @@ export function AuditTable({
                   </div>
                 </TableCell>
                 <TableCell className="text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon">
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => onViewDetails(audit)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        Xem chi tiết
-                      </DropdownMenuItem>
-                      {audit.status === "PENDING" && (
-                        <DropdownMenuItem
-                          onClick={() =>
-                            onUpdateStatus(audit._id, "IN_PROGRESS")
-                          }
-                        >
-                          <PlayCircle className="mr-2 h-4 w-4" />
-                          Bắt đầu xử lý
-                        </DropdownMenuItem>
-                      )}
-                      {audit.status === "IN_PROGRESS" && (
-                        <>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onUpdateStatus(audit._id, "COMPLETED")
-                            }
-                          >
-                            <CheckCircle className="mr-2 h-4 w-4" />
-                            Hoàn thành
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            onClick={() =>
-                              onUpdateStatus(audit._id, "CANCELLED")
-                            }
-                            className="text-destructive"
-                          >
-                            <XCircle className="mr-2 h-4 w-4" />
-                            Hủy
-                          </DropdownMenuItem>
-                        </>
-                      )}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <TableActionMenu
+                    showLabel
+                    actions={[
+                      {
+                        label: "Xem chi tiết",
+                        icon: Eye,
+                        onClick: () => onViewDetails(audit),
+                      },
+                      ...(audit.status === "PENDING"
+                        ? [
+                            {
+                              label: "Bắt đầu xử lý",
+                              icon: PlayCircle,
+                              onClick: () =>
+                                onUpdateStatus(audit._id, "IN_PROGRESS"),
+                            } as TableAction,
+                          ]
+                        : []),
+                      ...(audit.status === "IN_PROGRESS"
+                        ? [
+                            {
+                              label: "Hoàn thành",
+                              icon: CheckCircle,
+                              onClick: () =>
+                                onUpdateStatus(audit._id, "COMPLETED"),
+                            } as TableAction,
+                            {
+                              label: "Hủy",
+                              icon: XCircle,
+                              onClick: () =>
+                                onUpdateStatus(audit._id, "CANCELLED"),
+                              variant: "destructive" as const,
+                            } as TableAction,
+                          ]
+                        : []),
+                    ]}
+                  />
                 </TableCell>
               </TableRow>
             );

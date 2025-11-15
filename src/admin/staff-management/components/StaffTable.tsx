@@ -18,7 +18,6 @@ import {
   ChevronsUpDown,
   ChevronDown,
   ChevronUp,
-  MoreHorizontal,
   Eye,
   Trash2,
   UserCheck,
@@ -28,6 +27,7 @@ import {
   MapPin,
   Building2,
 } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
 import {
   converGenderToDisplay,
   converRoleToDisplay,
@@ -43,14 +43,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import {
@@ -493,63 +485,53 @@ export default function StaffTable({
                     </div>
                   </TableCell>
                   <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="h-8 w-8 p-0 cursor-pointer"
-                        >
-                          <span className="sr-only">Mở menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleViewDetails(staffMember._id)}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          Xem chi tiết
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => setSelectedStaffForAssign(staffMember)}
-                        >
-                          <Building2 className="mr-2 h-4 w-4" />
-                          Phân công khu vực
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() =>
+                    <TableActionMenu
+                      showLabel
+                      actions={[
+                        {
+                          label: "Xem chi tiết",
+                          icon: Eye,
+                          onClick: () => handleViewDetails(staffMember._id),
+                        },
+                        {
+                          label: "Phân công khu vực",
+                          icon: Building2,
+                          onClick: () => setSelectedStaffForAssign(staffMember),
+                        },
+                        {
+                          label: staffMember.isActive
+                            ? "Khóa tài khoản"
+                            : "Mở khóa tài khoản",
+                          icon: staffMember.isActive ? UserX : UserCheck,
+                          onClick: () =>
                             handleToggleStaffStatus(
                               staffMember._id,
                               staffMember.isActive
-                            )
-                          }
-                        >
-                          {staffMember.isActive ? (
+                            ),
+                          customContent: (
                             <>
-                              <UserX className="mr-2 h-4 w-4" />
-                              Khóa tài khoản
+                              {staffMember.isActive ? (
+                                <>
+                                  <UserX className="h-4 w-4" />
+                                  Khóa tài khoản
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="h-4 w-4" />
+                                  Mở khóa tài khoản
+                                </>
+                              )}
                             </>
-                          ) : (
-                            <>
-                              <UserCheck className="mr-2 h-4 w-4" />
-                              Mở khóa tài khoản
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteStaff(staffMember._id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa tài khoản
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          ),
+                        },
+                        {
+                          label: "Xóa tài khoản",
+                          icon: Trash2,
+                          onClick: () => handleDeleteStaff(staffMember._id),
+                          variant: "destructive",
+                        },
+                      ]}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
