@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { createCampus, updateCampus } from "../api/campus.api";
 import { getAccounts } from "@/admin/account-management/api/account.api";
+import { validateCampusForm } from "../validations/campus.validation";
 
 interface CampusAddDialogProps {
   open: boolean;
@@ -47,6 +48,13 @@ export function CampusAddDialog({
   });
   const [loading, setLoading] = useState(false);
   const [managers, setManagers] = useState<any[]>([]);
+  const [errors, setErrors] = useState<{
+    name?: string;
+    address?: string;
+    phone?: string;
+    email?: string;
+    manager?: string;
+  }>({});
 
   // 🧑‍💼 Lấy danh sách người quản lý campus (CAMPUS_ADMIN)
   useEffect(() => {
@@ -90,26 +98,51 @@ export function CampusAddDialog({
         status: "ACTIVE",
         manager: "",
       });
+      setErrors({});
     }
   }, [mode, campus, open]);
 
   const handleChange = (field: string, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    // Clear error khi user nhập
+    if (errors[field as keyof typeof errors]) {
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
+    }
   };
 
-  const validateForm = () => {
-    if (!form.name.trim() || !form.address.trim()) {
-      toast.error("Tên và địa chỉ là bắt buộc.");
+  const validateForm = (): boolean => {
+    const validationErrors = validateCampusForm({
+      name: form.name,
+      address: form.address,
+      phone: form.phone,
+      email: form.email,
+      status: form.status,
+      manager: form.manager,
+    });
+
+    if (validationErrors) {
+      // Lưu errors để hiển thị dưới mỗi field
+      setErrors({
+        name: validationErrors.name,
+        address: validationErrors.address,
+        phone: validationErrors.phone,
+        email: validationErrors.email,
+        manager: validationErrors.manager,
+      });
+      // Scroll đến field đầu tiên có lỗi
+      const firstErrorField = Object.keys(validationErrors)[0];
+      if (firstErrorField) {
+        const element = document.getElementById(firstErrorField);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth", block: "center" });
+          element.focus();
+        }
+      }
       return false;
     }
-    if (!/^\d{9,11}$/.test(form.phone)) {
-      toast.error("Số điện thoại không hợp lệ.");
-      return false;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      toast.error("Email không hợp lệ.");
-      return false;
-    }
+
+    // Clear errors nếu validation thành công
+    setErrors({});
     return true;
   };
 
@@ -136,7 +169,11 @@ export function CampusAddDialog({
       }
 
       if (res?.success) {
-        toast.success(mode === "edit" ? "Cập nhật cơ sở thành công!" : "Thêm cơ sở thành công!");
+        toast.success(
+          mode === "edit"
+            ? "Cập nhật cơ sở thành công!"
+            : "Thêm cơ sở thành công!"
+        );
         onOpenChange(false);
         onSuccess?.();
       } else {
@@ -168,88 +205,120 @@ export function CampusAddDialog({
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
           <div className="space-y-2">
-            <Label htmlFor="name">Tên cơ sở</Label>
+            <Label htmlFor="name">
+              Tên cơ sở <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="name"
               placeholder="VD: Cơ sở Phạm Văn Chiêu"
               value={form.name}
               onChange={(e) => handleChange("name", e.target.value)}
-              required
+              className={
+                errors.name ? "border-red-500 focus-visible:ring-red-500" : ""
+              }
             />
+            {errors.name && (
+              <p className="text-sm text-red-500">{errors.name}</p>
+            )}
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="address">Địa chỉ</Label>
+            <Label htmlFor="address">
+              Địa chỉ <span className="text-red-500">*</span>
+            </Label>
             <Input
               id="address"
               placeholder="VD: 12 Phạm Văn Chiêu, P4, Gò Vấp, TP.HCM"
               value={form.address}
               onChange={(e) => handleChange("address", e.target.value)}
-              required
+              className={
+                errors.address
+                  ? "border-red-500 focus-visible:ring-red-500"
+                  : ""
+              }
             />
+            {errors.address && (
+              <p className="text-sm text-red-500">{errors.address}</p>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="phone">Số điện thoại</Label>
+              <Label htmlFor="phone">
+                Số điện thoại <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="phone"
                 placeholder="VD: 0123456789"
                 value={form.phone}
                 onChange={(e) => handleChange("phone", e.target.value)}
-                required
+                className={
+                  errors.phone
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : ""
+                }
               />
+              {errors.phone && (
+                <p className="text-sm text-red-500">{errors.phone}</p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">
+                Email <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="VD: support@iuh.edu.vn"
                 value={form.email}
                 onChange={(e) => handleChange("email", e.target.value)}
-                required
+                className={
+                  errors.email
+                    ? "border-red-500 focus-visible:ring-red-500"
+                    : ""
+                }
               />
+              {errors.email && (
+                <p className="text-sm text-red-500">{errors.email}</p>
+              )}
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Trạng thái</Label>
-            <Select
-              value={form.status}
-              onValueChange={(val) => handleChange("status", val)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn trạng thái" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ACTIVE">Đang hoạt động</SelectItem>
-                <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
 
           {/* Người quản lý */}
           <div className="space-y-2">
-            <Label>Người quản lý</Label>
+            <Label>
+              Người quản lý <span className="text-red-500">*</span>
+            </Label>
             <Select
-              value={form.manager || "none"}
-              onValueChange={(val) => handleChange("manager", val === "none" ? "" : val)}
+              value={form.manager || undefined}
+              onValueChange={(val) => handleChange("manager", val)}
             >
-              <SelectTrigger>
+              <SelectTrigger
+                className={
+                  errors.manager ? "border-red-500 focus:ring-red-500" : ""
+                }
+              >
                 <SelectValue placeholder="Chọn người quản lý" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Không có người quản lý</SelectItem>
-                {managers
-                  .filter((m) => !!m._id)
-                  .map((m) => (
-                    <SelectItem key={m._id} value={m._id}>
-                      {m.fullName} — {m.email}
-                    </SelectItem>
-                  ))}
+                {managers.length === 0 ? (
+                  <div className="px-2 py-1.5 text-sm text-muted-foreground">
+                    Không có người quản lý nào
+                  </div>
+                ) : (
+                  managers
+                    .filter((m) => !!m._id)
+                    .map((m) => (
+                      <SelectItem key={m._id} value={m._id}>
+                        {m.fullName} — {m.email}
+                      </SelectItem>
+                    ))
+                )}
               </SelectContent>
             </Select>
+            {errors.manager && (
+              <p className="text-sm text-red-500">{errors.manager}</p>
+            )}
           </div>
 
           <DialogFooter className="flex justify-end gap-2 pt-2">
