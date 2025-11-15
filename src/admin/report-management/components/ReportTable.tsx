@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +19,10 @@ import { MoreHorizontal, Eye, CheckCircle, XCircle } from "lucide-react";
 import type { Report, ReportStatus } from "../types/report.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import {
+  getReportStatusBadge,
+  getReportTypeBadge,
+} from "@/config/badge.config";
 
 interface ReportTableProps {
   reports: Report[];
@@ -28,68 +31,6 @@ interface ReportTableProps {
   currentPage: number;
   itemsPerPage: number;
 }
-
-const getStatusBadge = (status: ReportStatus) => {
-  const statusMap = {
-    PENDING: {
-      label: "Chờ xử lý",
-      className:
-        "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200",
-    },
-    APPROVED: {
-      label: "Đã duyệt",
-      className:
-        "bg-green-100 text-green-700 hover:bg-green-100 border-green-200",
-    },
-    REJECTED: {
-      label: "Đã từ chối",
-      className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
-    },
-  };
-  const config = statusMap[status];
-  return (
-    <Badge variant="outline" className={config.className}>
-      {config.label}
-    </Badge>
-  );
-};
-
-const getTypeBadge = (type: string) => {
-  const typeMap: Record<string, { label: string; className: string }> = {
-    DAMAGED: {
-      label: "Hư hỏng",
-      className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
-    },
-    MAINTENANCE: {
-      label: "Bảo trì",
-      className:
-        "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200",
-    },
-    LOST: {
-      label: "Mất thiết bị",
-      className:
-        "bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200",
-    },
-    BUY_NEW: {
-      label: "Mua mới",
-      className:
-        "bg-green-100 text-green-700 hover:bg-green-100 border-green-200",
-    },
-    OTHER: {
-      label: "Khác",
-      className: "bg-gray-100 text-gray-700 hover:bg-gray-100 border-gray-200",
-    },
-  };
-  const config = typeMap[type] || {
-    label: type,
-    className: "bg-gray-100 text-gray-700 hover:bg-gray-100 border-gray-200",
-  };
-  return (
-    <Badge variant="outline" className={config.className}>
-      {config.label}
-    </Badge>
-  );
-};
 
 export function ReportTable({
   reports,
@@ -177,8 +118,8 @@ export function ReportTable({
                     )}
                   </div>
                 </TableCell>
-                <TableCell>{getTypeBadge(report.type)}</TableCell>
-                <TableCell>{getStatusBadge(report.status)}</TableCell>
+                <TableCell>{getReportTypeBadge(report.type)}</TableCell>
+                <TableCell>{getReportStatusBadge(report.status)}</TableCell>
                 <TableCell>
                   <div>
                     <p className="text-sm">

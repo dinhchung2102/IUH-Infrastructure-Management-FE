@@ -35,25 +35,14 @@ import { updateReportStatus } from "../report-management/api/report.api";
 import { ReportDetailDialog } from "../report-management/components";
 import type { Report } from "../report-management/types/report.type";
 
+import {
+  getReportStatusBadge,
+  getPriorityBadge,
+} from "@/config/badge.config";
+
 // Format number with Vietnamese locale
 const formatNumber = (num: number): string => {
   return new Intl.NumberFormat("vi-VN").format(num);
-};
-
-// Get status badge for report
-const getStatusBadge = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "pending":
-      return <Badge variant="secondary">Chờ xử lý</Badge>;
-    case "approved":
-      return <Badge variant="default">Đã duyệt</Badge>;
-    case "rejected":
-      return <Badge variant="destructive">Từ chối</Badge>;
-    case "in_progress":
-      return <Badge variant="outline">Đang xử lý</Badge>;
-    default:
-      return <Badge variant="secondary">{status}</Badge>;
-  }
 };
 
 // Format time ago in Vietnamese
@@ -224,18 +213,6 @@ export default function DashboardPage() {
     },
   ];
 
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return <Badge variant="destructive">Cao</Badge>;
-      case "medium":
-        return <Badge variant="secondary">Trung bình</Badge>;
-      case "low":
-        return <Badge variant="outline">Thấp</Badge>;
-      default:
-        return null;
-    }
-  };
 
   // Stats configuration
   const statsConfig = [
@@ -372,7 +349,9 @@ export default function DashboardPage() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      {getStatusBadge(report.status)}
+                      {getReportStatusBadge(
+                        report.status.toUpperCase() as "PENDING" | "APPROVED" | "REJECTED"
+                      )}
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon">
@@ -461,7 +440,7 @@ export default function DashboardPage() {
                           {item.type}
                         </p>
                       </div>
-                      {getPriorityBadge(item.priority)}
+                      {getPriorityBadge(item.priority.toUpperCase())}
                     </div>
                     <div className="flex items-center gap-2 mt-2">
                       <Calendar className="h-3 w-3 text-muted-foreground" />

@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { getAccountStatusBadge } from "@/config/badge.config";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Mars,
@@ -401,12 +402,7 @@ export default function AccountTable({
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={account.isActive ? "default" : "destructive"}
-                      className="text-xs"
-                    >
-                      {account.isActive ? "Hoạt động" : "Đã khóa"}
-                    </Badge>
+                    {getAccountStatusBadge(account.isActive)}
                   </TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>

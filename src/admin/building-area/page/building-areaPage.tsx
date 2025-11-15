@@ -15,11 +15,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import {
+  getActiveStatusBadge,
+  getBuildingAreaTypeBadge,
+} from "@/config/badge.config";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import {
   RefreshCcw,
-  Map,
   PlusCircle,
   BarChart3,
   Edit3,
@@ -307,18 +309,7 @@ export default function BuildingAreaPage() {
                 <TableRow key={item._id}>
                   <TableCell className="text-center">{i + 1}</TableCell>
                   <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>
-                    {item.type === "BUILDING" ? (
-                      <Badge variant="secondary">🏢 Tòa nhà</Badge>
-                    ) : (
-                      <Badge
-                        variant="outline"
-                        className="flex items-center gap-1"
-                      >
-                        <Map className="h-3 w-3" /> Khu vực
-                      </Badge>
-                    )}
-                  </TableCell>
+                  <TableCell>{getBuildingAreaTypeBadge(item.type)}</TableCell>
                   <TableCell>{item.campus?.name || "Không rõ"}</TableCell>
                   <TableCell>
                     {item.type === "BUILDING"
@@ -326,21 +317,13 @@ export default function BuildingAreaPage() {
                       : item.description || "—"}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        item.status === "ACTIVE"
-                          ? "success"
-                          : item.status === "UNDERMAINTENANCE"
-                          ? "secondary"
-                          : "destructive"
-                      }
-                    >
-                      {item.status === "ACTIVE"
-                        ? "Hoạt động"
-                        : item.status === "UNDERMAINTENANCE"
-                        ? "Bảo trì"
-                        : "Ngừng"}
-                    </Badge>
+                    {getActiveStatusBadge(
+                      item.status === "UNDERMAINTENANCE"
+                        ? "UNDERMAINTENANCE"
+                        : item.status === "ACTIVE"
+                        ? "ACTIVE"
+                        : "INACTIVE"
+                    )}
                   </TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>

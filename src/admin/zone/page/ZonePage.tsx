@@ -4,15 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { getZones, deleteZone, getZoneStats } from "../api/zone.api";
 import { getBuildings } from "../../building-area/api/building.api";
-import {
-  Plus,
-  BarChart3,
-  MoreHorizontal,
-  Pencil,
-  Trash2,
-  Wrench,
-  Cog,
-} from "lucide-react";
+import { Plus, BarChart3, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,6 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { getActiveStatusBadge } from "@/config/badge.config";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import { ZoneStatsCards } from "../components/ZoneStatsCard";
 import { ZoneStatsDialog } from "../components/ZoneStatsDialog";
@@ -51,12 +44,11 @@ import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 const zoneTypeDisplay = {
   SERVICE: {
     label: "Dịch vụ",
-    icon: Wrench,
     color: "bg-yellow-100 text-yellow-700 border border-yellow-300",
   },
   FUNCTIONAL: {
     label: "Chức năng",
-    icon: Cog,
+
     color: "bg-purple-100 text-purple-700 border border-purple-300",
   },
 };
@@ -286,7 +278,7 @@ function ZonePage() {
               filteredZones.map((z, i) => {
                 const zt =
                   zoneTypeDisplay[z.zoneType as keyof typeof zoneTypeDisplay];
-                const Icon = zt?.icon;
+
                 return (
                   <TableRow key={z._id}>
                     <TableCell className="text-center">{i + 1}</TableCell>
@@ -296,7 +288,6 @@ function ZonePage() {
                         <Badge
                           className={`flex items-center gap-1 ${zt.color}`}
                         >
-                          <Icon className="w-4 h-4" />
                           {zt.label}
                         </Badge>
                       ) : (
@@ -307,15 +298,9 @@ function ZonePage() {
                     <TableCell>{z.building?.campus?.name || "—"}</TableCell>
                     <TableCell>{z.floorLocation ?? "—"}</TableCell>
                     <TableCell>
-                      <Badge
-                        variant={
-                          z.status === "ACTIVE" ? "success" : "destructive"
-                        }
-                      >
-                        {z.status === "ACTIVE"
-                          ? "Hoạt động"
-                          : "Ngừng hoạt động"}
-                      </Badge>
+                      {getActiveStatusBadge(
+                        z.status === "ACTIVE" ? "ACTIVE" : "INACTIVE"
+                      )}
                     </TableCell>
                     <TableCell className="text-center">
                       <DropdownMenu>

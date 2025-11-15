@@ -9,6 +9,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { getAccountStatusBadge } from "@/config/badge.config";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Mars,
@@ -429,12 +430,7 @@ export default function StaffTable({
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={staffMember.isActive ? "default" : "destructive"}
-                      className="text-xs"
-                    >
-                      {staffMember.isActive ? "Hoạt động" : "Đã khóa"}
-                    </Badge>
+                    {getAccountStatusBadge(staffMember.isActive)}
                   </TableCell>
                   <TableCell>
                     <div className="flex items-start gap-1.5 text-sm">

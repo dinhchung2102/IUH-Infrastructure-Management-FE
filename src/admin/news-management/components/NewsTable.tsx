@@ -21,6 +21,7 @@ import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
 import type { News, NewsStatus } from "../types/news.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { getNewsStatusBadge } from "@/config/badge.config";
 
 interface NewsTableProps {
   news: News[];
@@ -30,22 +31,6 @@ interface NewsTableProps {
   onEdit: (news: News) => void;
   onDelete: (id: string, title: string) => void;
 }
-
-const getStatusBadge = (status: NewsStatus) => {
-  const config = {
-    PUBLISHED: {
-      label: "Đã xuất bản",
-      className: "bg-green-100 text-green-800 hover:bg-green-100",
-    },
-    DRAFT: {
-      label: "Bản nháp",
-      className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-    },
-  };
-
-  const { label, className } = config[status];
-  return <Badge className={className}>{label}</Badge>;
-};
 
 const getUserInitials = (name: string) => {
   return name
@@ -183,7 +168,7 @@ export function NewsTable({
                       </div>
                     )}
                   </TableCell>
-                  <TableCell>{getStatusBadge(item.status)}</TableCell>
+                  <TableCell>{getNewsStatusBadge(item.status)}</TableCell>
                   <TableCell className="hidden md:table-cell text-center">
                     {item.views || 0}
                   </TableCell>

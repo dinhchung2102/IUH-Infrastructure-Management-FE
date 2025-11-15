@@ -6,7 +6,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,6 +25,10 @@ import {
 import type { AuditLog, AuditStatus } from "../types/audit.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import {
+  getAuditStatusBadge,
+  getReportTypeBadge,
+} from "@/config/badge.config";
 
 interface AuditTableProps {
   auditLogs: AuditLog[];
@@ -34,72 +37,6 @@ interface AuditTableProps {
   currentPage: number;
   itemsPerPage: number;
 }
-
-const getStatusBadge = (status: AuditStatus) => {
-  const statusMap = {
-    PENDING: {
-      label: "Chờ xử lý",
-      className:
-        "bg-yellow-100 text-yellow-700 hover:bg-yellow-100 border-yellow-200",
-    },
-    IN_PROGRESS: {
-      label: "Đang xử lý",
-      className: "bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200",
-    },
-    COMPLETED: {
-      label: "Hoàn thành",
-      className:
-        "bg-green-100 text-green-700 hover:bg-green-100 border-green-200",
-    },
-    CANCELLED: {
-      label: "Đã hủy",
-      className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
-    },
-  };
-  const config = statusMap[status];
-  return (
-    <Badge variant="outline" className={config.className}>
-      {config.label}
-    </Badge>
-  );
-};
-
-const getReportTypeBadge = (type: string) => {
-  const typeMap: Record<string, { label: string; className: string }> = {
-    DAMAGED: {
-      label: "Hư hỏng",
-      className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
-    },
-    MAINTENANCE: {
-      label: "Bảo trì",
-      className:
-        "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200",
-    },
-    LOST: {
-      label: "Mất thiết bị",
-      className:
-        "bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200",
-    },
-    BUY_NEW: {
-      label: "Mua mới",
-      className:
-        "bg-green-100 text-green-700 hover:bg-green-100 border-green-200",
-    },
-    OTHER: {
-      label: "Khác",
-      className: "bg-gray-100 text-gray-700 hover:bg-gray-100 border-gray-200",
-    },
-  };
-  const config = typeMap[type] || {
-    label: type,
-    className: "bg-gray-100 text-gray-700 hover:bg-gray-100 border-gray-200",
-  };
-  return (
-    <Badge variant="outline" className={config.className}>
-      {config.label}
-    </Badge>
-  );
-};
 
 export function AuditTable({
   auditLogs,
@@ -192,7 +129,9 @@ export function AuditTable({
                     )}
                   </div>
                 </TableCell>
-                <TableCell>{getReportTypeBadge(audit.report.type)}</TableCell>
+                <TableCell>
+                  {getReportTypeBadge(audit.report.type)}
+                </TableCell>
                 <TableCell>
                   <div className="max-w-[150px]">
                     {audit.staffs.length > 0 ? (
@@ -211,7 +150,7 @@ export function AuditTable({
                     )}
                   </div>
                 </TableCell>
-                <TableCell>{getStatusBadge(audit.status)}</TableCell>
+                <TableCell>{getAuditStatusBadge(audit.status)}</TableCell>
                 <TableCell>
                   <div>
                     <p className="text-sm">

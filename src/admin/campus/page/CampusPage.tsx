@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { getActiveStatusBadge } from "@/config/badge.config";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { CampusStatsCards } from "../components/CampusStatsCards";
@@ -298,13 +298,9 @@ function CampusPage() {
                     )}
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        c.status === "ACTIVE" ? "success" : "destructive"
-                      }
-                    >
-                      {c.status === "ACTIVE" ? "Hoạt động" : "Ngừng hoạt động"}
-                    </Badge>
+                    {getActiveStatusBadge(
+                      c.status === "ACTIVE" ? "ACTIVE" : "INACTIVE"
+                    )}
                   </TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>

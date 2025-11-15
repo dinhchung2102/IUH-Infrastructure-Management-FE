@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -9,6 +8,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  getMaintenanceStatusBadge,
+  getPriorityBadge,
+} from "@/config/badge.config";
 
 export function MaintenanceList({ events }: { events: any[] }) {
   return (
@@ -35,38 +38,12 @@ export function MaintenanceList({ events }: { events: any[] }) {
 
               {/* Trạng thái */}
               <TableCell>
-                {e.status === "COMPLETED" && (
-                  <Badge variant="success">Hoàn thành</Badge>
-                )}
-                {e.status === "PENDING" && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-yellow-100 text-yellow-800 border border-yellow-300"
-                  >
-                    Chờ thực hiện
-                  </Badge>
-                )}
-                {e.status === "CANCELLED" && (
-                  <Badge variant="destructive">Đã hủy</Badge>
-                )}
+                {getMaintenanceStatusBadge(e.status)}
               </TableCell>
 
               {/* Ưu tiên */}
               <TableCell>
-                {e.priority === "HIGH" && (
-                  <Badge variant="destructive">Cao</Badge>
-                )}
-                {e.priority === "MEDIUM" && (
-                  <Badge
-                    variant="secondary"
-                    className="bg-amber-100 text-amber-800 border border-amber-300"
-                  >
-                    Trung bình
-                  </Badge>
-                )}
-                {e.priority === "LOW" && (
-                  <Badge variant="secondary">Thấp</Badge>
-                )}
+                {getPriorityBadge(e.priority)}
               </TableCell>
             </TableRow>
           ))}
