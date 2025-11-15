@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import type { AuditStatus } from "@/admin/audit-management/types/audit.type";
 import type { ReportStatus } from "@/admin/report-management/types/report.type";
 import type { NewsStatus } from "@/admin/news-management/types/news.type";
+import type { RoleName } from "@/types/role.enum";
 
 /**
  * Badge configuration for all statuses, types, and priorities in the application
@@ -360,5 +361,46 @@ export function getAccountStatusBadge(isActive: boolean) {
 export function getBuildingAreaTypeBadge(type: BuildingAreaType | string) {
   return renderBadge(
     getBadgeConfig(BUILDING_AREA_TYPE_BADGE, type as BuildingAreaType)
+  );
+}
+
+// Role Badge Config
+export const ROLE_BADGE: Record<RoleName, BadgeStyle> = {
+  ADMIN: {
+    label: "Quản trị viên",
+    className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
+    variant: "outline",
+  },
+  CAMPUS_ADMIN: {
+    label: "Quản trị cơ sở",
+    className: "bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200",
+    variant: "outline",
+  },
+  STAFF: {
+    label: "Nhân viên",
+    className: "bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200",
+    variant: "outline",
+  },
+  LECTURER: {
+    label: "Giảng viên",
+    className: "bg-green-100 text-green-700 hover:bg-green-100 border-green-200",
+    variant: "outline",
+  },
+  STUDENT: {
+    label: "Sinh viên",
+    className: "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200",
+    variant: "outline",
+  },
+  GUEST: {
+    label: "Khách",
+    className: "bg-gray-100 text-gray-700 hover:bg-gray-100 border-gray-200",
+    variant: "outline",
+  },
+};
+
+export function getRoleBadge(role: RoleName | string) {
+  return renderBadge(
+    getBadgeConfig(ROLE_BADGE, role as RoleName),
+    "text-xs"
   );
 }

@@ -8,8 +8,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { getAccountStatusBadge } from "@/config/badge.config";
+import { getAccountStatusBadge, getRoleBadge } from "@/config/badge.config";
 import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -31,6 +30,7 @@ import {
 import type { PaginationRequest } from "@/types/pagination.type";
 import type { RoleName } from "@/types/role.enum";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -180,94 +180,134 @@ export default function AccountTable({
   return (
     <div className="space-y-4">
       {/* Filter Section */}
-      <div className="flex flex-wrap gap-4">
-        <form
-          onSubmit={handleSearch}
-          className="flex-1 min-w-[250px] flex gap-2"
-        >
-          <Input
-            placeholder="Tìm kiếm theo email, tên..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="bg-white"
-          />
-          <Button type="submit" variant="default" className="cursor-pointer">
-            Tìm kiếm
-          </Button>
-        </form>
-        <Select
-          value={filters.role || "all"}
-          onValueChange={(value) =>
-            onFiltersChange({
-              role: value === "all" ? undefined : (value as RoleName),
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Vai trò" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả vai trò</SelectItem>
-            {roleOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={
-            filters.isActive === undefined
-              ? "all"
-              : filters.isActive
-              ? "active"
-              : "inactive"
-          }
-          onValueChange={(value) =>
-            onFiltersChange({
-              isActive:
-                value === "all" ? undefined : value === "active" ? true : false,
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Trạng thái" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả trạng thái</SelectItem>
-            <SelectItem value="active">Hoạt động</SelectItem>
-            <SelectItem value="inactive">Đã khóa</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          value={filters.gender || "all"}
-          onValueChange={(value) =>
-            onFiltersChange({
-              gender:
-                value === "all" ? undefined : (value as "MALE" | "FEMALE"),
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Giới tính" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả giới tính</SelectItem>
-            <SelectItem value="MALE">Nam</SelectItem>
-            <SelectItem value="FEMALE">Nữ</SelectItem>
-          </SelectContent>
-        </Select>
-        <ClearFiltersButton
-          onClick={() => {
-            setSearchInput("");
-            onFiltersChange({
-              search: "",
-              isActive: undefined,
-              gender: undefined,
-              role: undefined,
-            });
-          }}
-        />
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex-1 min-w-[250px] space-y-2">
+            <Label>Tìm kiếm</Label>
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <Input
+                placeholder="Tìm kiếm theo email, tên..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="bg-white"
+              />
+              <Button type="submit" variant="default" className="cursor-pointer">
+                Tìm kiếm
+              </Button>
+            </form>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Vai trò</Label>
+            <Select
+              value={filters.role || "all"}
+              onValueChange={(value) =>
+                onFiltersChange({
+                  role: value === "all" ? undefined : (value as RoleName),
+                })
+              }
+            >
+              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+                <SelectValue placeholder="Vai trò" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">
+                  Tất cả vai trò
+                </SelectItem>
+                {roleOptions.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="cursor-pointer"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Trạng thái</Label>
+            <Select
+              value={
+                filters.isActive === undefined
+                  ? "all"
+                  : filters.isActive
+                  ? "active"
+                  : "inactive"
+              }
+              onValueChange={(value) =>
+                onFiltersChange({
+                  isActive:
+                    value === "all"
+                      ? undefined
+                      : value === "active"
+                      ? true
+                      : false,
+                })
+              }
+            >
+              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+                <SelectValue placeholder="Trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">
+                  Tất cả trạng thái
+                </SelectItem>
+                <SelectItem value="active" className="cursor-pointer">
+                  Hoạt động
+                </SelectItem>
+                <SelectItem value="inactive" className="cursor-pointer">
+                  Đã khóa
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Giới tính</Label>
+            <Select
+              value={filters.gender || "all"}
+              onValueChange={(value) =>
+                onFiltersChange({
+                  gender:
+                    value === "all" ? undefined : (value as "MALE" | "FEMALE"),
+                })
+              }
+            >
+              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+                <SelectValue placeholder="Giới tính" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">
+                  Tất cả giới tính
+                </SelectItem>
+                <SelectItem value="MALE" className="cursor-pointer">
+                  Nam
+                </SelectItem>
+                <SelectItem value="FEMALE" className="cursor-pointer">
+                  Nữ
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="opacity-0">Thao tác</Label>
+            <ClearFiltersButton
+              onClick={() => {
+                setSearchInput("");
+                onFiltersChange({
+                  search: "",
+                  isActive: undefined,
+                  gender: undefined,
+                  role: undefined,
+                });
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Table Section */}
@@ -371,10 +411,7 @@ export default function AccountTable({
                   <TableCell>{account.email}</TableCell>
                   <TableCell>{account.fullName || ""}</TableCell>
                   <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {converRoleToDisplay(account.role.roleName) ||
-                        "Chưa xác định"}
-                    </Badge>
+                    {getRoleBadge(account.role.roleName)}
                   </TableCell>
                   <TableCell>
                     <span className="inline-flex items-center gap-2 font-medium">
