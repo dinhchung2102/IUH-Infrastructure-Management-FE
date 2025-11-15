@@ -11,7 +11,17 @@ export function useStaffStats() {
       setLoading(true);
       setError(null);
       const response = await getStaffStats();
-      setStats(response.data || null);
+      // Transform API response to component format
+      if (response?.data?.stats) {
+        setStats({
+          totalAccounts: response.data.stats.total || 0,
+          activeAccounts: response.data.stats.active || 0,
+          inactiveAccounts: response.data.stats.inactive || 0,
+          newAccountsThisMonth: response.data.stats.newThisMonth || 0,
+        });
+      } else {
+        setStats(null);
+      }
     } catch (err) {
       setError(err as Error);
       setStats(null);
