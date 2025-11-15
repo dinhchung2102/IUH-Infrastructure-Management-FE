@@ -4,10 +4,12 @@ import { useEffect, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { getZones, deleteZone, getZoneStats } from "../api/zone.api";
 import { getBuildings } from "../../building-area/api/building.api";
-import { Plus, BarChart3, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { Plus, BarChart3, Pencil, Trash2 } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
 import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -29,14 +31,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 
 /* =========================================
@@ -64,7 +58,12 @@ const zoneTypeDisplay = {
 function ZonePage() {
   const [zones, setZones] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState<any>(null);
+  const [stats, setStats] = useState<{
+    totalZones: number;
+    activeZones: number;
+    inactiveZones: number;
+    newZonesThisMonth: number;
+  } | null>(null);
   const [search, setSearch] = useState("");
   const [openStatsDialog, setOpenStatsDialog] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -73,6 +72,7 @@ function ZonePage() {
   // Bộ lọc
   const [statusFilter, setStatusFilter] = useState("all");
   const [campusFilter, setCampusFilter] = useState("all");
+  const [zoneTypeFilter, setZoneTypeFilter] = useState("all");
   const [campuses, setCampuses] = useState<any[]>([]);
 
   /* ============================
@@ -81,7 +81,25 @@ function ZonePage() {
   const fetchZone = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getZones({});
+      const query: any = {};
+      
+      if (search) {
+        query.search = search;
+      }
+      
+      if (statusFilter !== "all") {
+        query.status = statusFilter;
+      }
+      
+      if (campusFilter !== "all") {
+        query.campus = campusFilter;
+      }
+      
+      if (zoneTypeFilter !== "all") {
+        query.zoneType = zoneTypeFilter;
+      }
+      
+      const res = await getZones(query);
       setZones(res?.data?.zones || []);
     } catch (err) {
       console.error("Lỗi khi tải khu vực:", err);
@@ -89,14 +107,25 @@ function ZonePage() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [search, statusFilter, campusFilter, zoneTypeFilter]);
 
   const fetchStats = useCallback(async () => {
     try {
       const res = await getZoneStats();
-      setStats(res || null);
+      // Transform API response to component format
+      if (res?.stats) {
+        setStats({
+          totalZones: res.stats.total || 0,
+          activeZones: res.stats.active || 0,
+          inactiveZones: res.stats.inactive || 0,
+          newZonesThisMonth: res.stats.newThisMonth || 0,
+        });
+      } else {
+        setStats(null);
+      }
     } catch (err) {
       console.error("Lỗi khi tải thống kê:", err);
+      setStats(null);
     }
   }, []);
 
@@ -145,19 +174,11 @@ function ZonePage() {
     setSearch("");
     setStatusFilter("all");
     setCampusFilter("all");
+    setZoneTypeFilter("all");
   };
 
-  /* ============================
-   *  Filter logic
-   ============================ */
-  const filteredZones = zones.filter((z) => {
-    const matchSearch = z?.name?.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "all" || z.status === statusFilter;
-    const matchCampus =
-      campusFilter === "all" || z.building?.campus?._id === campusFilter;
-
-    return matchSearch && matchStatus && matchCampus;
-  });
+  // Filter đã được xử lý ở server-side qua API query params
+  const filteredZones = zones;
 
   /* ============================
    *  UI
@@ -196,45 +217,84 @@ function ZonePage() {
       <ZoneStatsCards stats={stats} loading={loading} />
 
       {/* Bộ lọc */}
-      <div className="flex flex-wrap gap-4">
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="flex-1 min-w-[250px] flex gap-2"
-        >
-          <Input
-            placeholder="Tìm kiếm khu vực..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <Button type="submit">Tìm kiếm</Button>
-        </form>
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex-1 min-w-[250px] space-y-2">
+            <Label>Tìm kiếm</Label>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="flex gap-2"
+            >
+              <Input
+                placeholder="Tìm kiếm khu vực..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="bg-white"
+              />
+              <Button type="submit">Tìm kiếm</Button>
+            </form>
+          </div>
 
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Tất cả trạng thái" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả trạng thái</SelectItem>
-            <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-            <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
-          </SelectContent>
-        </Select>
+          <div className="space-y-2">
+            <Label>Trạng thái</Label>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+                <SelectValue placeholder="Tất cả trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả trạng thái</SelectItem>
+                <SelectItem value="ACTIVE">Hoạt động</SelectItem>
+                <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
 
-        <Select value={campusFilter} onValueChange={setCampusFilter}>
-          <SelectTrigger className="w-[220px] bg-white">
-            <SelectValue placeholder="Tất cả cơ sở" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả cơ sở</SelectItem>
-            {campuses.map((c) => (
-              <SelectItem key={c._id} value={c._id}>
-                {c.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          <div className="space-y-2">
+            <Label>Cơ sở</Label>
+            <Select value={campusFilter} onValueChange={setCampusFilter}>
+              <SelectTrigger className="w-[220px] bg-white cursor-pointer">
+                <SelectValue placeholder="Tất cả cơ sở" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả cơ sở</SelectItem>
+                {campuses.map((c) => (
+                  <SelectItem key={c._id} value={c._id} className="cursor-pointer">
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-        <ClearFiltersButton onClick={handleClearFilters} />
+          <div className="space-y-2">
+            <Label>Loại khu vực</Label>
+            <Select value={zoneTypeFilter} onValueChange={setZoneTypeFilter}>
+              <SelectTrigger className="w-[200px] bg-white cursor-pointer">
+                <SelectValue placeholder="Tất cả loại" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tất cả loại</SelectItem>
+                <SelectItem value="FUNCTIONAL" className="cursor-pointer">
+                  Chức năng
+                </SelectItem>
+                <SelectItem value="TECHNICAL" className="cursor-pointer">
+                  Kỹ thuật
+                </SelectItem>
+                <SelectItem value="SERVICE" className="cursor-pointer">
+                  Dịch vụ
+                </SelectItem>
+                <SelectItem value="PUBLIC" className="cursor-pointer">
+                  Công cộng
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="opacity-0">Thao tác</Label>
+            <ClearFiltersButton onClick={handleClearFilters} />
+          </div>
+        </div>
       </div>
 
       {/* Bảng dữ liệu */}
@@ -307,35 +367,22 @@ function ZonePage() {
                       )}
                     </TableCell>
                     <TableCell className="text-center">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="h-8 w-8 p-0"
-                          >
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                          <DropdownMenuItem
-                            onClick={() => setEditZone(z)}
-                            className="cursor-pointer"
-                          >
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Chỉnh sửa
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => handleDelete(z._id)}
-                            className="text-red-600 focus:text-red-600 cursor-pointer"
-                          >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Xóa
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <TableActionMenu
+                        showLabel
+                        actions={[
+                          {
+                            label: "Chỉnh sửa",
+                            icon: Pencil,
+                            onClick: () => setEditZone(z),
+                          },
+                          {
+                            label: "Xóa",
+                            icon: Trash2,
+                            onClick: () => handleDelete(z._id),
+                            variant: "destructive",
+                          },
+                        ]}
+                      />
                     </TableCell>
                   </TableRow>
                 );

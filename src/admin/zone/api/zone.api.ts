@@ -18,9 +18,12 @@ export interface ZoneResponse {
 }
 
 export interface QueryZoneDto {
-  keyword?: string;
+  search?: string; // API uses "search" not "keyword"
   page?: number;
   limit?: number;
+  zoneType?: "FUNCTIONAL" | "TECHNICAL" | "SERVICE" | "PUBLIC";
+  status?: "ACTIVE" | "INACTIVE" | "UNDERMAINTENANCE";
+  campus?: string;
 }
 
 /** ✅ Dữ liệu thống kê zone trả về từ API */
