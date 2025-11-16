@@ -1,8 +1,5 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { toast } from "sonner";
-import { getAssets, deleteAsset, getAssetStats } from "../api/asset.api";
 import {
   ImageOff,
   Plus,
@@ -43,87 +40,41 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { useState } from "react";
+import { useAssetData, useAssetFilters } from "../hooks";
+import type { AssetListItem } from "../hooks";
 
 function AssetPage() {
-  const [assets, setAssets] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState<any>(null);
-
-  const [search, setSearch] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [typeFilter, setTypeFilter] = useState("all");
+  const { assets, loading, stats, handleDelete, refetchAll } = useAssetData();
+  const { filters, handleFiltersChange, handleClearFilters } =
+    useAssetFilters();
 
   const [openStatsDialog, setOpenStatsDialog] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
-  const [editAsset, setEditAsset] = useState<any>(null);
+  const [editAsset, setEditAsset] = useState<AssetListItem | null>(null);
 
-  /** =========================
-   * Fetch API
-   * ========================= */
-  const fetchAssets = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await getAssets();
-      const list = res?.data?.assets || [];
-      setAssets(list);
-    } catch (err) {
-      console.error("Lỗi khi tải thiết bị:", err);
-      toast.error("Không thể tải danh sách thiết bị.");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const fetchStats = useCallback(async () => {
-    try {
-      const res = await getAssetStats();
-      setStats(res?.data || null);
-    } catch (err) {
-      console.error("Lỗi khi tải thống kê thiết bị:", err);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchAssets();
-    fetchStats();
-  }, [fetchAssets, fetchStats]);
-
-  /** =========================
-   * Handlers
-   * ========================= */
-  const handleDelete = async (id: string) => {
-    if (!id) return toast.error("Không tìm thấy thiết bị.");
-    const confirmDelete = confirm("Bạn có chắc muốn xóa thiết bị này?");
-    if (!confirmDelete) return;
-
-    try {
-      await deleteAsset(id);
-      toast.success("Đã xóa thiết bị thành công!");
-      fetchAssets();
-      fetchStats();
-    } catch (err: any) {
-      console.error("Lỗi khi xóa thiết bị:", err);
-      toast.error("Không thể xóa thiết bị này.");
-    }
-  };
-
-  const handleClearFilters = () => {
-    setSearch("");
-    setStatusFilter("all");
-    setTypeFilter("all");
-  };
-
-  /** =========================
-   * Filter logic
-   * ========================= */
   const filteredAssets = assets.filter((a) => {
-    const matchSearch = a.name?.toLowerCase().includes(search.toLowerCase());
-    const matchStatus = statusFilter === "all" || a.status === statusFilter;
+    const search = filters.search.toLowerCase();
+    const matchSearch = a.name?.toLowerCase().includes(search);
+
+    const matchStatus =
+      filters.statusFilter === "all" || a.status === filters.statusFilter;
+
     const matchType =
-      typeFilter === "all" ||
-      a.assetType?.name?.toLowerCase() === typeFilter.toLowerCase();
+      filters.typeFilter === "all" ||
+      a.assetType?.name?.toLowerCase() === filters.typeFilter.toLowerCase();
+
     return matchSearch && matchStatus && matchType;
   });
+
+  const handleAddSuccess = () => {
+    refetchAll();
+  };
+
+  const handleEditSuccess = () => {
+    setEditAsset(null);
+    refetchAll();
+  };
 
   /** =========================
    * UI
@@ -169,13 +120,18 @@ function AssetPage() {
         >
           <Input
             placeholder="Tìm kiếm theo tên thiết bị..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            value={filters.search}
+            onChange={(e) => handleFiltersChange({ search: e.target.value })}
           />
           <Button type="submit">Tìm kiếm</Button>
         </form>
 
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
+        <Select
+          value={filters.statusFilter}
+          onValueChange={(value) =>
+            handleFiltersChange({ statusFilter: value })
+          }
+        >
           <SelectTrigger className="w-[180px] bg-white">
             <SelectValue placeholder="Tất cả trạng thái" />
           </SelectTrigger>
@@ -187,7 +143,10 @@ function AssetPage() {
           </SelectContent>
         </Select>
 
-        <Select value={typeFilter} onValueChange={setTypeFilter}>
+        <Select
+          value={filters.typeFilter}
+          onValueChange={(value) => handleFiltersChange({ typeFilter: value })}
+        >
           <SelectTrigger className="w-[180px] bg-white">
             <SelectValue placeholder="Tất cả loại thiết bị" />
           </SelectTrigger>
@@ -326,10 +285,7 @@ function AssetPage() {
         open={openAddDialog}
         onOpenChange={setOpenAddDialog}
         mode="add"
-        onSuccess={() => {
-          fetchAssets();
-          fetchStats();
-        }}
+        onSuccess={handleAddSuccess}
       />
 
       {editAsset && (
@@ -338,11 +294,7 @@ function AssetPage() {
           onOpenChange={(open) => !open && setEditAsset(null)}
           mode="edit"
           asset={editAsset}
-          onSuccess={() => {
-            setEditAsset(null);
-            fetchAssets();
-            fetchStats();
-          }}
+          onSuccess={handleEditSuccess}
         />
       )}
     </div>

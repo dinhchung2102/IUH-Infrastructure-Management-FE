@@ -6,7 +6,7 @@ import type { ApiResponse } from "@/types/response.type";
 // ============================
 
 export interface ZoneResponse {
-  id: string;
+  _id: string;
   name: string;
   description?: string;
   status: "ACTIVE" | "INACTIVE";
