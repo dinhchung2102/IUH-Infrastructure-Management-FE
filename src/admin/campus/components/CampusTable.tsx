@@ -11,7 +11,7 @@ import { TableActionMenu } from "@/components/TableActionMenu";
 import { getActiveStatusBadge } from "@/config/badge.config";
 import { TableSkeleton } from "@/components/TableSkeleton";
 
-interface Campus {
+export interface Campus {
   _id: string;
   name: string;
   address: string;

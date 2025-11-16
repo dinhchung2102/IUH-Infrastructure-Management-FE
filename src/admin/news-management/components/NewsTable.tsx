@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Eye, Edit, Trash2 } from "lucide-react";
 import { TableActionMenu } from "@/components/TableActionMenu";
-import type { News, NewsStatus } from "../types/news.type";
+import type { News } from "../types/news.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { getNewsStatusBadge } from "@/config/badge.config";

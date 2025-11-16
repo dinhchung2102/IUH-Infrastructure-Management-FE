@@ -48,14 +48,6 @@ export function AuditFilters({
     onFilterChange("search", searchInput);
   };
 
-  const hasActiveFilters =
-    filters.search ||
-    filters.status !== "all" ||
-    filters.campus !== "all" ||
-    filters.zone !== "all" ||
-    filters.startDate ||
-    filters.endDate;
-
   return (
     <div className="flex flex-wrap gap-4">
       {/* Search Form */}

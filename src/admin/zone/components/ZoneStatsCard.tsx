@@ -2,7 +2,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { LayoutGrid, CheckCircle2, XCircle, PlusCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface ZoneStats {
+export interface ZoneStats {
   totalZones: number;
   activeZones: number;
   inactiveZones: number;

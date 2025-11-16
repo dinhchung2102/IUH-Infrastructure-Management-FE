@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { getActiveStatusBadge } from "@/config/badge.config";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import { ZoneStatsCards } from "../components/ZoneStatsCard";
+import type { ZoneStats } from "../components/ZoneStatsCard";
 import { ZoneStatsDialog } from "../components/ZoneStatsDialog";
 import { ZoneAddDialog } from "../components/ZoneAddDialog";
 import {
@@ -58,12 +59,7 @@ const zoneTypeDisplay = {
 function ZonePage() {
   const [zones, setZones] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [stats, setStats] = useState<{
-    totalZones: number;
-    activeZones: number;
-    inactiveZones: number;
-    newZonesThisMonth: number;
-  } | null>(null);
+  const [stats, setStats] = useState<ZoneStats | undefined>(undefined);
   const [search, setSearch] = useState("");
   const [openStatsDialog, setOpenStatsDialog] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
@@ -82,23 +78,23 @@ function ZonePage() {
     try {
       setLoading(true);
       const query: any = {};
-      
+
       if (search) {
         query.search = search;
       }
-      
+
       if (statusFilter !== "all") {
         query.status = statusFilter;
       }
-      
+
       if (campusFilter !== "all") {
         query.campus = campusFilter;
       }
-      
+
       if (zoneTypeFilter !== "all") {
         query.zoneType = zoneTypeFilter;
       }
-      
+
       const res = await getZones(query);
       setZones(res?.data?.zones || []);
     } catch (err) {
@@ -121,11 +117,11 @@ function ZonePage() {
           newZonesThisMonth: res.stats.newThisMonth || 0,
         });
       } else {
-        setStats(null);
+        setStats(undefined);
       }
     } catch (err) {
       console.error("Lỗi khi tải thống kê:", err);
-      setStats(null);
+      setStats(undefined);
     }
   }, []);
 
@@ -221,10 +217,7 @@ function ZonePage() {
         <div className="flex flex-wrap gap-4 items-end">
           <div className="flex-1 min-w-[250px] space-y-2">
             <Label>Tìm kiếm</Label>
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="flex gap-2"
-            >
+            <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
               <Input
                 placeholder="Tìm kiếm khu vực..."
                 value={search}
@@ -258,7 +251,11 @@ function ZonePage() {
               <SelectContent>
                 <SelectItem value="all">Tất cả cơ sở</SelectItem>
                 {campuses.map((c) => (
-                  <SelectItem key={c._id} value={c._id} className="cursor-pointer">
+                  <SelectItem
+                    key={c._id}
+                    value={c._id}
+                    className="cursor-pointer"
+                  >
                     {c.name}
                   </SelectItem>
                 ))}

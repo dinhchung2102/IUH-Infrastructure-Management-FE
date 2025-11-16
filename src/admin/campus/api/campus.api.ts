@@ -2,12 +2,15 @@ import api from "@/lib/axios";
 import type { ApiResponse } from "@/types/response.type";
 
 export interface CampusResponse {
-  id: string;
+  _id: string;
   name: string;
   code: string;
   address: string;
   phone?: string;
   description?: string;
+  status?: "ACTIVE" | "INACTIVE";
+  email?: string;
+  manager?: unknown;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,12 +30,12 @@ export interface CampusStatistics {
   };
 }
 
-
-
 // ============================
 // API CALLS
 // ============================
-export const getCampus = async (query?: QueryCampusDto) => {
+export const getCampus = async (
+  query?: QueryCampusDto
+): Promise<ApiResponse<{ campuses: CampusResponse[] }>> => {
   const res = await api.get<ApiResponse<{ campuses: CampusResponse[] }>>(
     "/campus",
     {
@@ -72,10 +75,9 @@ export const getCampusStats = async (params?: {
   type?: "date" | "month" | "quarter" | "year" | "custom";
   startDate?: string;
   endDate?: string;
-}) => {
+}): Promise<ApiResponse<CampusStatistics>> => {
   const res = await api.get<ApiResponse<CampusStatistics>>("/campus/stats", {
     params,
   });
-  return res.data.data; // ✅ lấy trực tiếp phần { stats: {...} }
+  return res.data;
 };
-

@@ -23,10 +23,7 @@ import {
   UserX,
 } from "lucide-react";
 import { TableActionMenu } from "@/components/TableActionMenu";
-import {
-  converGenderToDisplay,
-  converRoleToDisplay,
-} from "@/utils/convertDisplay.util";
+import { converGenderToDisplay } from "@/utils/convertDisplay.util";
 import type { PaginationRequest } from "@/types/pagination.type";
 import type { RoleName } from "@/types/role.enum";
 import { Input } from "@/components/ui/input";
@@ -191,7 +188,11 @@ export default function AccountTable({
                 onChange={(e) => setSearchInput(e.target.value)}
                 className="bg-white"
               />
-              <Button type="submit" variant="default" className="cursor-pointer">
+              <Button
+                type="submit"
+                variant="default"
+                className="cursor-pointer"
+              >
                 Tìm kiếm
               </Button>
             </form>
@@ -410,9 +411,7 @@ export default function AccountTable({
                   </TableCell>
                   <TableCell>{account.email}</TableCell>
                   <TableCell>{account.fullName || ""}</TableCell>
-                  <TableCell>
-                    {getRoleBadge(account.role.roleName)}
-                  </TableCell>
+                  <TableCell>{getRoleBadge(account.role.roleName)}</TableCell>
                   <TableCell>
                     <span className="inline-flex items-center gap-2 font-medium">
                       {account.gender === "MALE" ? (
