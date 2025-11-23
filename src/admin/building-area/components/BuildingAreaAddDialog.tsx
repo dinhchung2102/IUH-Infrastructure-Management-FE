@@ -31,6 +31,7 @@ interface Props {
   mode?: "add" | "edit";
   item?: any;
   campuses: any[];
+  defaultType?: "BUILDING" | "AREA";
 }
 
 export function BuildingAreaAddDialog({
@@ -40,6 +41,7 @@ export function BuildingAreaAddDialog({
   mode = "add",
   item,
   campuses = [],
+  defaultType = "BUILDING",
 }: Props) {
   const defaultForm = {
     name: "",
@@ -48,7 +50,7 @@ export function BuildingAreaAddDialog({
     floor: "",
     campus: "",
     zoneType: "FUNCTIONAL",
-    type: "BUILDING",
+    type: defaultType,
   };
 
   const [form, setForm] = useState<any>(defaultForm);
@@ -67,9 +69,12 @@ export function BuildingAreaAddDialog({
         zoneType: item.zoneType || "FUNCTIONAL",
       });
     } else {
-      setForm(defaultForm);
+      setForm({
+        ...defaultForm,
+        type: defaultType,
+      });
     }
-  }, [open, mode, item]);
+  }, [open, mode, item, defaultType]);
 
   const handleSubmit = async () => {
     try {

@@ -29,6 +29,8 @@ import AccountPage from "./admin/account-management/page/AccountPage";
 import StaffPage from "./admin/staff-management/page/StaffPage";
 import CampusPage from "./admin/campus/page/CampusPage";
 import BuildingAreaPage from "./admin/building-area/page/building-areaPage";
+import BuildingPage from "./admin/building-area/page/BuildingPage";
+import AreaPage from "./admin/building-area/page/AreaPage";
 import ReportManagementPage from "./admin/report-management/page/ReportManagementPage";
 import AuditManagementPage from "./admin/audit-management/page/AuditManagementPage";
 import RoleManagementPage from "./admin/role-management/page/RoleManagementPage";
@@ -72,6 +74,8 @@ function AppRoutes() {
           <Route path="facilities" element={<div>Facilities Management</div>} />
           <Route path="campus" element={<CampusPage />} />
           <Route path="building-area" element={<BuildingAreaPage />} />
+          <Route path="buildings" element={<BuildingPage />} />
+          <Route path="areas" element={<AreaPage />} />
           <Route path="zone" element={<ZonePage />} />
           <Route path="account" element={<AccountPage />} />
           <Route path="staff" element={<StaffPage />} />

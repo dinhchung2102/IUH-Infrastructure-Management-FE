@@ -43,20 +43,36 @@ export interface CreateAreaDto {
 export interface UpdateAreaDto extends Partial<CreateAreaDto> {}
 
 export interface QueryAreaDto {
-  keyword?: string;
-  page?: number;
-  limit?: number;
+  search?: string;
+  status?: string;
   campus?: string;
   zoneType?: ZoneType;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 /* ============================
  *  API CALLS
  * ============================ */
 
+/** Response từ API với pagination */
+export interface AreasListResponse {
+  areas: AreaResponse[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+}
+
 /** Lấy danh sách khu vực */
-export const getAreas = async (query?: QueryAreaDto) => {
-  const res = await api.get<ApiResponse<{ areas: AreaResponse[] }>>(
+export const getAreas = async (
+  query?: QueryAreaDto
+): Promise<ApiResponse<AreasListResponse>> => {
+  const res = await api.get<ApiResponse<AreasListResponse>>(
     "/zone-area/areas",
     {
       params: query,
