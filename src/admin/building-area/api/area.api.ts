@@ -10,10 +10,10 @@ export const CommonStatus = {
 export type CommonStatus = (typeof CommonStatus)[keyof typeof CommonStatus];
 
 export const ZoneType = {
+  FUNCTIONAL: "FUNCTIONAL",
+  TECHNICAL: "TECHNICAL",
   SERVICE: "SERVICE",
-  LEARNING: "LEARNING",
-  PARKING: "PARKING",
-  OTHER: "OTHER",
+  PUBLIC: "PUBLIC",
 } as const;
 
 export type ZoneType = (typeof ZoneType)[keyof typeof ZoneType];

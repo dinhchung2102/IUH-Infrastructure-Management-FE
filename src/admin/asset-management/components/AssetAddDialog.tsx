@@ -1,6 +1,4 @@
 "use client";
-
-import { useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -20,21 +18,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-
-import { createAsset, updateAsset } from "../api/asset.api";
-import { getAssetTypes } from "../api/assetType.api";
-import { getAssetCategories } from "@/admin/asset-management/api/assetCategories.api";
-import { getAreas } from "@/admin/building-area/api/area.api";
-import { getZones } from "../../zone/api/zone.api";
+import type { AssetListItem } from "../hooks";
+import { useAssetAddForm } from "../hooks";
 
 interface AssetAddDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   mode?: "add" | "edit";
-  asset?: any;
+  asset?: AssetListItem | null;
 }
 
 export function AssetAddDialog({
@@ -44,147 +37,22 @@ export function AssetAddDialog({
   mode = "add",
   asset,
 }: AssetAddDialogProps) {
-  const [form, setForm] = useState({
-    name: "",
-    code: "",
-    status: "IN_USE",
-    description: "",
-    assetType: "",
-    assetCategory: "",
-    zone: "",
-    area: "",
-    image: "",
+  const {
+    form,
+    loading,
+    types,
+    categories,
+    zones,
+    areas,
+    handleChange,
+    handleSubmit,
+  } = useAssetAddForm({
+    open,
+    mode,
+    asset,
+    onSuccess,
+    onClose: () => onOpenChange(false),
   });
-
-  const [loading, setLoading] = useState(false);
-  const [types, setTypes] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]);
-  const [zones, setZones] = useState<any[]>([]);
-  const [areas, setAreas] = useState<any[]>([]);
-
-  // Load dữ liệu dropdown
-  useEffect(() => {
-    if (open) {
-      fetchDropdowns();
-    }
-  }, [open]);
-
-  const fetchDropdowns = async () => {
-    try {
-      const [typeRes, catRes, zoneRes, areaRes] = await Promise.all([
-        getAssetTypes(),
-        getAssetCategories(),
-        getZones(),
-        getAreas(),
-      ]);
-
-      setTypes(typeRes?.data?.assetTypes || []);
-      setCategories(catRes?.data?.categories || []);
-      setZones(zoneRes?.data?.zones || []);
-      setAreas(areaRes?.data?.areas || []);
-    } catch (err) {
-      console.error("Lỗi khi tải dữ liệu chọn:", err);
-      toast.error("Không thể tải danh sách chọn.");
-    }
-  };
-
-  // Khi edit -> nạp lại form
-  useEffect(() => {
-    if (mode === "edit" && asset) {
-      setForm({
-        name: asset.name || "",
-        code: asset.code || "",
-        status: asset.status || "IN_USE",
-        description: asset.description || "",
-        assetType: asset.assetType?._id || asset.assetType || "",
-        assetCategory: asset.assetCategory?._id || asset.assetCategory || "",
-        zone: asset.zone?._id || "",
-        area: asset.area?._id || "",
-        image: asset.image || "",
-      });
-    } else {
-      setForm({
-        name: "",
-        code: "",
-        status: "IN_USE",
-        description: "",
-        assetType: "",
-        assetCategory: "",
-        zone: "",
-        area: "",
-        image: "",
-      });
-    }
-  }, [mode, asset, open]);
-
-  const handleChange = (field: string, value: string) => {
-    setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const validateForm = () => {
-    if (!form.name.trim()) {
-      toast.error("Tên thiết bị là bắt buộc.");
-      return false;
-    }
-    if (!form.assetType) {
-      toast.error("Vui lòng chọn loại thiết bị.");
-      return false;
-    }
-    if (!form.assetCategory) {
-      toast.error("Vui lòng chọn danh mục thiết bị.");
-      return false;
-    }
-    return true;
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
-
-    try {
-      setLoading(true);
-
-      const payload: any = {
-        name: form.name.trim(),
-        code: form.code.trim(),
-        description: form.description.trim(),
-        status: form.status,
-        assetType: form.assetType,
-        assetCategory: form.assetCategory,
-        image: form.image,
-      };
-
-      // Nếu chọn khu vực hoặc area
-      if (form.zone) payload.zone = form.zone;
-      if (form.area) payload.area = form.area;
-
-      console.log("📤 Sending payload:", payload);
-
-      const res =
-        mode === "edit" && asset?._id
-          ? await updateAsset(asset._id, payload)
-          : await createAsset(payload);
-
-      if (res?.success) {
-        toast.success(
-          mode === "edit" ? "Cập nhật thiết bị thành công!" : "Thêm thiết bị thành công!"
-        );
-        onOpenChange(false);
-        onSuccess?.();
-      } else {
-        toast.error(res?.message || "Thao tác không thành công.");
-      }
-    } catch (err: any) {
-      console.error("❌ Lỗi khi lưu thiết bị:", err);
-      const msg =
-        err?.response?.data?.message ||
-        err?.message ||
-        "Có lỗi xảy ra khi lưu thiết bị.";
-      toast.error(msg);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

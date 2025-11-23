@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { useState, useEffect } from "react";
 
 interface ReportFiltersProps {
@@ -53,9 +54,6 @@ export function ReportFilters({
     e.preventDefault();
     onFilterChange("search", searchInput);
   };
-
-  const hasActiveFilters =
-    filters.search || filters.status !== "all" || filters.type !== "all";
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -107,11 +105,7 @@ export function ReportFilters({
       </Select>
 
       {/* Reset Button */}
-      {hasActiveFilters && (
-        <Button variant="outline" onClick={onReset}>
-          Xóa bộ lọc
-        </Button>
-      )}
+      <ClearFiltersButton onClick={onReset} />
     </div>
   );
 }

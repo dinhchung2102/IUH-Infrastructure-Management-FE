@@ -11,7 +11,12 @@ export function useStaffStats() {
       setLoading(true);
       setError(null);
       const response = await getStaffStats();
-      setStats(response.data || null);
+
+      if (response.success && response.data) {
+        setStats(response.data);
+      } else {
+        setStats(null);
+      }
     } catch (err) {
       setError(err as Error);
       setStats(null);

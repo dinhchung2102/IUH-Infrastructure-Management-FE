@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -8,7 +7,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import {
   NewsStatus,
   type NewsFilters as NewsFiltersType,
@@ -142,14 +142,10 @@ export function NewsFilters({ filters, onFilterChange }: NewsFiltersProps) {
           </SelectContent>
         </Select>
 
-        <Button
-          variant="outline"
+        <ClearFiltersButton
           onClick={handleReset}
-          className="gap-2 w-full sm:w-auto sm:ml-auto"
-        >
-          <X className="h-4 w-4" />
-          Xóa bộ lọc
-        </Button>
+          className="w-full sm:w-auto sm:ml-auto"
+        />
       </div>
     </div>
   );

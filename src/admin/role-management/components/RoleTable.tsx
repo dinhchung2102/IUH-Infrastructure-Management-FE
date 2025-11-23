@@ -7,16 +7,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Eye, Edit, Trash2, Lock } from "lucide-react";
+import { Eye, Edit, Trash2, Lock } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
 import type { Role } from "../types/role.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -122,35 +114,27 @@ export function RoleTable({
                 </div>
               </TableCell>
               <TableCell className="text-right">
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" size="icon">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={() => onViewDetails(role)}>
-                      <Eye className="mr-2 h-4 w-4" />
-                      Xem chi tiết
-                    </DropdownMenuItem>
-                    {/* Tạm thời cho phép edit tất cả roles để debug */}
-                    <>
-                      <DropdownMenuItem onClick={() => onEdit(role)}>
-                        <Edit className="mr-2 h-4 w-4" />
-                        Chỉnh sửa
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onDelete(role._id)}
-                        className="text-destructive"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Xóa
-                      </DropdownMenuItem>
-                    </>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <TableActionMenu
+                  showLabel
+                  actions={[
+                    {
+                      label: "Xem chi tiết",
+                      icon: Eye,
+                      onClick: () => onViewDetails(role),
+                    },
+                    {
+                      label: "Chỉnh sửa",
+                      icon: Edit,
+                      onClick: () => onEdit(role),
+                    },
+                    {
+                      label: "Xóa",
+                      icon: Trash2,
+                      onClick: () => onDelete(role._id),
+                      variant: "destructive",
+                    },
+                  ]}
+                />
               </TableCell>
             </TableRow>
           ))}

@@ -25,6 +25,7 @@ import { Loader2, Upload, X } from "lucide-react";
 import {
   createAssetCategory,
   updateAssetCategory,
+  type AssetCategoryResponse,
 } from "../api/assetCategories.api";
 
 interface Props {
@@ -32,7 +33,7 @@ interface Props {
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   mode?: "add" | "edit";
-  category?: any;
+  category?: AssetCategoryResponse | null;
 }
 
 export function AssetCategoryAddDialog({

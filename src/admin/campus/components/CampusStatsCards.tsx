@@ -2,7 +2,7 @@ import { StatsCard } from "@/components/StatsCard";
 import { Building2, CheckCircle2, XCircle, PlusCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface CampusStats {
+export interface CampusStats {
   totalCampus: number;
   activeCampus: number;
   inactiveCampus: number;

@@ -10,31 +10,16 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Newspaper, Calendar, Eye, User, FolderOpen } from "lucide-react";
-import type { News, NewsStatus } from "../types/news.type";
+import type { News } from "../types/news.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { getNewsStatusBadge } from "@/config/badge.config";
 
 interface NewsDetailDialogProps {
   news: News | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
-
-const getStatusBadge = (status: NewsStatus) => {
-  const config = {
-    PUBLISHED: {
-      label: "Đã xuất bản",
-      className: "bg-green-100 text-green-800 hover:bg-green-100",
-    },
-    DRAFT: {
-      label: "Bản nháp",
-      className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-    },
-  };
-
-  const { label, className } = config[status];
-  return <Badge className={className}>{label}</Badge>;
-};
 
 const getUserInitials = (name: string) => {
   return name
@@ -91,7 +76,7 @@ export function NewsDetailDialog({
                   <h3 className="text-2xl font-bold">{news.title}</h3>
                   <p className="text-muted-foreground">{news.description}</p>
                 </div>
-                {getStatusBadge(news.status)}
+                {getNewsStatusBadge(news.status)}
               </div>
             </div>
 

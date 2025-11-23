@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { useState, useEffect } from "react";
 
 interface AuditFiltersProps {
@@ -46,14 +47,6 @@ export function AuditFilters({
     e.preventDefault();
     onFilterChange("search", searchInput);
   };
-
-  const hasActiveFilters =
-    filters.search ||
-    filters.status !== "all" ||
-    filters.campus !== "all" ||
-    filters.zone !== "all" ||
-    filters.startDate ||
-    filters.endDate;
 
   return (
     <div className="flex flex-wrap gap-4">
@@ -106,11 +99,7 @@ export function AuditFilters({
       </div>
 
       {/* Reset Button */}
-      {hasActiveFilters && (
-        <Button variant="outline" onClick={onReset}>
-          Xóa bộ lọc
-        </Button>
-      )}
+      <ClearFiltersButton onClick={onReset} />
     </div>
   );
 }

@@ -337,7 +337,7 @@ export function AssignLocationDialog({
                   </SelectTrigger>
                   <SelectContent>
                     {campuses.map((campus) => (
-                      <SelectItem key={campus.id} value={campus.id}>
+                      <SelectItem key={campus._id} value={campus._id}>
                         {campus.name}
                       </SelectItem>
                     ))}

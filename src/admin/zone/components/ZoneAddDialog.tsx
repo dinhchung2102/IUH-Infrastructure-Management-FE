@@ -45,7 +45,7 @@ export function ZoneAddDialog({
     description: "",
     status: "ACTIVE",
     location: "",
-    zoneType: "SERVICE",
+    zoneType: "FUNCTIONAL",
     floorLocation: "",
   });
 
@@ -105,7 +105,7 @@ export function ZoneAddDialog({
           zone.building ||
           zone.area ||
           "",
-        zoneType: zone.zoneType || "SERVICE",
+        zoneType: zone.zoneType || "FUNCTIONAL",
         floorLocation:
           type === "building" && zone.floorLocation
             ? zone.floorLocation.toString()
@@ -117,7 +117,7 @@ export function ZoneAddDialog({
         description: "",
         status: "ACTIVE",
         location: "",
-        zoneType: "SERVICE",
+        zoneType: "FUNCTIONAL",
         floorLocation: "",
       });
       setSelectedType(null);
@@ -300,8 +300,10 @@ export function ZoneAddDialog({
                 <SelectValue placeholder="Chọn loại zone" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="SERVICE">Dịch vụ (SERVICE)</SelectItem>
                 <SelectItem value="FUNCTIONAL">Chức năng (FUNCTIONAL)</SelectItem>
+                <SelectItem value="TECHNICAL">Kỹ thuật (TECHNICAL)</SelectItem>
+                <SelectItem value="SERVICE">Dịch vụ (SERVICE)</SelectItem>
+                <SelectItem value="PUBLIC">Công cộng (PUBLIC)</SelectItem>
               </SelectContent>
             </Select>
           </div>

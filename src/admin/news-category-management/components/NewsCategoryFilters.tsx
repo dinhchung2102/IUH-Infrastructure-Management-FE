@@ -1,5 +1,4 @@
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -7,7 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import type { NewsCategoryFilters as NewsCategoryFiltersType } from "../types/news-category.type";
 
 interface NewsCategoryFiltersProps {
@@ -104,10 +104,7 @@ export function NewsCategoryFilters({
         </Select>
       </div>
 
-      <Button variant="outline" onClick={handleReset} className="gap-2">
-        <X className="h-4 w-4" />
-        Xóa bộ lọc
-      </Button>
+      <ClearFiltersButton onClick={handleReset} />
     </div>
   );
 }

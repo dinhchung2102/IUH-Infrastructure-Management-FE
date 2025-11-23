@@ -7,20 +7,13 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MoreHorizontal, Eye, Edit, Trash2 } from "lucide-react";
-import type { News, NewsStatus } from "../types/news.type";
+import { Eye, Edit, Trash2 } from "lucide-react";
+import { TableActionMenu } from "@/components/TableActionMenu";
+import type { News } from "../types/news.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { getNewsStatusBadge } from "@/config/badge.config";
 
 interface NewsTableProps {
   news: News[];
@@ -30,22 +23,6 @@ interface NewsTableProps {
   onEdit: (news: News) => void;
   onDelete: (id: string, title: string) => void;
 }
-
-const getStatusBadge = (status: NewsStatus) => {
-  const config = {
-    PUBLISHED: {
-      label: "Đã xuất bản",
-      className: "bg-green-100 text-green-800 hover:bg-green-100",
-    },
-    DRAFT: {
-      label: "Bản nháp",
-      className: "bg-orange-100 text-orange-800 hover:bg-orange-100",
-    },
-  };
-
-  const { label, className } = config[status];
-  return <Badge className={className}>{label}</Badge>;
-};
 
 const getUserInitials = (name: string) => {
   return name
@@ -183,7 +160,7 @@ export function NewsTable({
                       </div>
                     )}
                   </TableCell>
-                  <TableCell>{getStatusBadge(item.status)}</TableCell>
+                  <TableCell>{getNewsStatusBadge(item.status)}</TableCell>
                   <TableCell className="hidden md:table-cell text-center">
                     {item.views || 0}
                   </TableCell>
@@ -202,33 +179,27 @@ export function NewsTable({
                     </div>
                   </TableCell>
                   <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <span className="sr-only">Mở menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => onViewDetails(item)}>
-                          <Eye className="mr-2 h-4 w-4" />
-                          Xem chi tiết
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit(item)}>
-                          <Edit className="mr-2 h-4 w-4" />
-                          Chỉnh sửa
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => onDelete(item._id, item.title)}
-                          className="text-destructive"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                    <TableActionMenu
+                      showLabel
+                      actions={[
+                        {
+                          label: "Xem chi tiết",
+                          icon: Eye,
+                          onClick: () => onViewDetails(item),
+                        },
+                        {
+                          label: "Chỉnh sửa",
+                          icon: Edit,
+                          onClick: () => onEdit(item),
+                        },
+                        {
+                          label: "Xóa",
+                          icon: Trash2,
+                          onClick: () => onDelete(item._id, item.title),
+                          variant: "destructive",
+                        },
+                      ]}
+                    />
                   </TableCell>
                 </TableRow>
               ))

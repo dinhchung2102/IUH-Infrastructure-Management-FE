@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import {
   Card,
   CardContent,
@@ -7,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Building2, Users, FileText, AlertCircle } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle as AlertCircleIcon } from "lucide-react";
@@ -35,25 +35,11 @@ import { updateReportStatus } from "../report-management/api/report.api";
 import { ReportDetailDialog } from "../report-management/components";
 import type { Report } from "../report-management/types/report.type";
 
+import { getReportStatusBadge, getPriorityBadge } from "@/config/badge.config";
+
 // Format number with Vietnamese locale
 const formatNumber = (num: number): string => {
   return new Intl.NumberFormat("vi-VN").format(num);
-};
-
-// Get status badge for report
-const getStatusBadge = (status: string) => {
-  switch (status.toLowerCase()) {
-    case "pending":
-      return <Badge variant="secondary">Chờ xử lý</Badge>;
-    case "approved":
-      return <Badge variant="default">Đã duyệt</Badge>;
-    case "rejected":
-      return <Badge variant="destructive">Từ chối</Badge>;
-    case "in_progress":
-      return <Badge variant="outline">Đang xử lý</Badge>;
-    default:
-      return <Badge variant="secondary">{status}</Badge>;
-  }
 };
 
 // Format time ago in Vietnamese
@@ -224,19 +210,6 @@ export default function DashboardPage() {
     },
   ];
 
-  const getPriorityBadge = (priority: string) => {
-    switch (priority) {
-      case "high":
-        return <Badge variant="destructive">Cao</Badge>;
-      case "medium":
-        return <Badge variant="secondary">Trung bình</Badge>;
-      case "low":
-        return <Badge variant="outline">Thấp</Badge>;
-      default:
-        return null;
-    }
-  };
-
   // Stats configuration
   const statsConfig = [
     {
@@ -245,6 +218,7 @@ export default function DashboardPage() {
       icon: Building2,
       color: "text-blue-600",
       bgColor: "bg-blue-100",
+      href: "/admin/asset",
     },
     {
       title: "Người dùng hoạt động",
@@ -252,6 +226,7 @@ export default function DashboardPage() {
       icon: Users,
       color: "text-green-600",
       bgColor: "bg-green-100",
+      href: "/admin/account",
     },
     {
       title: "Báo cáo chờ xử lý",
@@ -259,13 +234,15 @@ export default function DashboardPage() {
       icon: FileText,
       color: "text-orange-600",
       bgColor: "bg-orange-100",
+      href: "/admin/reports",
     },
     {
-      title: "Kiểm tra chờ xử lý",
+      title: "Phản hồi cần xử lý",
       value: data?.stats?.pendingAudits ?? 0,
       icon: AlertCircle,
       color: "text-red-600",
       bgColor: "bg-red-100",
+      href: "/admin/audits",
     },
   ];
 
@@ -273,7 +250,7 @@ export default function DashboardPage() {
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Tổng quan</h1>
         <p className="text-muted-foreground">
           Chào mừng trở lại! Đây là tổng quan về hệ thống quản lý cơ sở vật
           chất.
@@ -303,23 +280,38 @@ export default function DashboardPage() {
                 </CardContent>
               </Card>
             ))
-          : statsConfig.map((stat) => (
-              <Card key={stat.title}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {stat.title}
-                  </CardTitle>
-                  <div className={`rounded-full p-2 ${stat.bgColor}`}>
-                    <stat.icon className={`size-4 ${stat.color}`} />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {formatNumber(stat.value)}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+          : statsConfig.map((stat) => {
+              // Map bgColor to hover class
+              const hoverClass =
+                {
+                  "bg-blue-100": "hover:bg-blue-50",
+                  "bg-green-100": "hover:bg-green-50",
+                  "bg-orange-100": "hover:bg-orange-50",
+                  "bg-red-100": "hover:bg-red-50",
+                }[stat.bgColor] || "hover:bg-muted";
+
+              return (
+                <Link key={stat.title} to={stat.href} className="block">
+                  <Card
+                    className={`transition-colors ${hoverClass} cursor-pointer`}
+                  >
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                      <CardTitle className="text-sm font-medium">
+                        {stat.title}
+                      </CardTitle>
+                      <div className={`rounded-full p-2 ${stat.bgColor}`}>
+                        <stat.icon className={`size-4 ${stat.color}`} />
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="text-2xl font-bold">
+                        {formatNumber(stat.value)}
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              );
+            })}
       </div>
 
       {/* Charts and Tables Grid */}
@@ -350,70 +342,90 @@ export default function DashboardPage() {
               </div>
             ) : data?.recentReports && data.recentReports.length > 0 ? (
               <div className="space-y-4">
-                {data.recentReports.map((report) => (
-                  <div
-                    key={report._id}
-                    className="flex items-center justify-between rounded-lg border p-3 transition-colors hover:bg-muted/50"
-                  >
-                    <div className="space-y-1 flex-1">
-                      <p className="text-sm">
-                        <span className="font-medium">
-                          {report.createdBy.fullName}
-                        </span>{" "}
-                        đã báo cáo{" "}
-                        <span className="font-medium">
-                          {report.asset.name} ({report.asset.code})
-                        </span>
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {formatTimeAgo(report.createdAt)} •{" "}
-                        {report.asset.zone.name}
-                        {report.asset.area && ` - ${report.asset.area.name}`}
-                      </p>
+                {data.recentReports.map((report) => {
+                  // Get background color based on status
+                  const statusBg =
+                    {
+                      PENDING: "bg-yellow-50",
+                      APPROVED: "bg-green-50",
+                      REJECTED: "bg-red-50",
+                    }[
+                      report.status.toUpperCase() as
+                        | "PENDING"
+                        | "APPROVED"
+                        | "REJECTED"
+                    ] || "bg-gray-50";
+
+                  return (
+                    <div
+                      key={report._id}
+                      className={`flex items-center justify-between rounded-lg border ${statusBg} p-3 transition-colors hover:opacity-80`}
+                    >
+                      <div className="space-y-1 flex-1">
+                        <p className="text-sm">
+                          <span className="font-medium">
+                            {report.createdBy.fullName}
+                          </span>{" "}
+                          đã báo cáo thông tin thiết bị{" "}
+                          <span className="font-medium">
+                            {report.asset.name} ({report.asset.code})
+                          </span>
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {formatTimeAgo(report.createdAt)} •{" "}
+                          {report.asset.zone.name}
+                          {report.asset.area && ` - ${report.asset.area.name}`}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getReportStatusBadge(
+                          report.status.toUpperCase() as
+                            | "PENDING"
+                            | "APPROVED"
+                            | "REJECTED"
+                        )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => handleViewDetails(report)}
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              Xem chi tiết
+                            </DropdownMenuItem>
+                            {report.status === "PENDING" && (
+                              <>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleUpdateStatus(report._id, "APPROVED")
+                                  }
+                                >
+                                  <CheckCircle className="mr-2 h-4 w-4" />
+                                  Duyệt báo cáo
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    handleUpdateStatus(report._id, "REJECTED")
+                                  }
+                                  className="text-destructive"
+                                >
+                                  <XCircle className="mr-2 h-4 w-4" />
+                                  Từ chối
+                                </DropdownMenuItem>
+                              </>
+                            )}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                      {getStatusBadge(report.status)}
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            onClick={() => handleViewDetails(report)}
-                          >
-                            <Eye className="mr-2 h-4 w-4" />
-                            Xem chi tiết
-                          </DropdownMenuItem>
-                          {report.status === "PENDING" && (
-                            <>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleUpdateStatus(report._id, "APPROVED")
-                                }
-                              >
-                                <CheckCircle className="mr-2 h-4 w-4" />
-                                Duyệt báo cáo
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  handleUpdateStatus(report._id, "REJECTED")
-                                }
-                                className="text-destructive"
-                              >
-                                <XCircle className="mr-2 h-4 w-4" />
-                                Từ chối
-                              </DropdownMenuItem>
-                            </>
-                          )}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground text-center py-8">
@@ -449,28 +461,40 @@ export default function DashboardPage() {
               </div>
             ) : (
               <div className="space-y-4">
-                {upcomingMaintenance.map((item) => (
-                  <div
-                    key={item.id}
-                    className="rounded-lg border p-3 transition-colors hover:bg-muted/50"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="space-y-1 flex-1">
-                        <p className="text-sm font-medium">{item.facility}</p>
+                {upcomingMaintenance.map((item) => {
+                  // Get background color based on priority
+                  const priorityBg =
+                    {
+                      HIGH: "bg-red-50",
+                      MEDIUM: "bg-amber-50",
+                      LOW: "bg-gray-50",
+                    }[
+                      item.priority.toUpperCase() as "HIGH" | "MEDIUM" | "LOW"
+                    ] || "bg-gray-50";
+
+                  return (
+                    <div
+                      key={item.id}
+                      className={`rounded-lg border ${priorityBg} p-3 transition-colors hover:opacity-80`}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="space-y-1 flex-1">
+                          <p className="text-sm font-medium">{item.facility}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {item.type}
+                          </p>
+                        </div>
+                        {getPriorityBadge(item.priority.toUpperCase())}
+                      </div>
+                      <div className="flex items-center gap-2 mt-2">
+                        <Calendar className="h-3 w-3 text-muted-foreground" />
                         <p className="text-xs text-muted-foreground">
-                          {item.type}
+                          {format(item.date, "dd/MM/yyyy", { locale: vi })}
                         </p>
                       </div>
-                      {getPriorityBadge(item.priority)}
                     </div>
-                    <div className="flex items-center gap-2 mt-2">
-                      <Calendar className="h-3 w-3 text-muted-foreground" />
-                      <p className="text-xs text-muted-foreground">
-                        {format(item.date, "dd/MM/yyyy", { locale: vi })}
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </CardContent>

@@ -47,7 +47,7 @@ export function BuildingAreaAddDialog({
     description: "",
     floor: "",
     campus: "",
-    zoneType: "SERVICE",
+    zoneType: "FUNCTIONAL",
     type: "BUILDING",
   };
 
@@ -64,7 +64,7 @@ export function BuildingAreaAddDialog({
         campus: item.campus?._id || "",
         floor: item.floor?.toString() || "",
         description: item.description || "",
-        zoneType: item.zoneType || "SERVICE",
+        zoneType: item.zoneType || "FUNCTIONAL",
       });
     } else {
       setForm(defaultForm);
@@ -94,8 +94,9 @@ export function BuildingAreaAddDialog({
           toast.error("Vui lòng nhập mô tả");
           return;
         }
-        if (!["PUBLIC", "SERVICE"].includes(form.zoneType)) {
-          toast.error("Vui lòng chọn zoneType hợp lệ");
+        const validZoneTypes = ["FUNCTIONAL", "TECHNICAL", "SERVICE", "PUBLIC"];
+        if (!validZoneTypes.includes(form.zoneType)) {
+          toast.error("Vui lòng chọn loại zone hợp lệ");
           return;
         }
       }
@@ -136,7 +137,7 @@ export function BuildingAreaAddDialog({
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             {mode === "edit" ? "Cập nhật" : "Thêm mới"}{" "}
-            {form.type === "BUILDING" ? "Tòa nhà" : "Khu vực"}
+            {form.type === "BUILDING" ? "Tòa nhà" : "Khu vực ngoài trời"}
           </DialogTitle>
           <DialogDescription className="text-gray-500 mt-1">
             Nhập thông tin chi tiết
@@ -153,7 +154,7 @@ export function BuildingAreaAddDialog({
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="BUILDING">Tòa nhà</SelectItem>
-        <SelectItem value="AREA">Khu vực</SelectItem>
+        <SelectItem value="AREA">Khu vực ngoài trời</SelectItem>
       </SelectContent>
     </Select>
   </div>
@@ -199,8 +200,10 @@ export function BuildingAreaAddDialog({
             <SelectValue placeholder="Chọn zone type" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="PUBLIC">PUBLIC</SelectItem>
-            <SelectItem value="SERVICE">SERVICE</SelectItem>
+            <SelectItem value="FUNCTIONAL">Chức năng (FUNCTIONAL)</SelectItem>
+            <SelectItem value="TECHNICAL">Kỹ thuật (TECHNICAL)</SelectItem>
+            <SelectItem value="SERVICE">Dịch vụ (SERVICE)</SelectItem>
+            <SelectItem value="PUBLIC">Công cộng (PUBLIC)</SelectItem>
           </SelectContent>
         </Select>
       </div>

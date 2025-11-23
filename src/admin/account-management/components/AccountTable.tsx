@@ -8,7 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
+import { getAccountStatusBadge, getRoleBadge } from "@/config/badge.config";
+import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Mars,
@@ -16,19 +17,17 @@ import {
   ChevronsUpDown,
   ChevronDown,
   ChevronUp,
-  MoreHorizontal,
   Eye,
   Trash2,
   UserCheck,
   UserX,
 } from "lucide-react";
-import {
-  converGenderToDisplay,
-  converRoleToDisplay,
-} from "@/utils/convertDisplay.util";
+import { TableActionMenu } from "@/components/TableActionMenu";
+import { converGenderToDisplay } from "@/utils/convertDisplay.util";
 import type { PaginationRequest } from "@/types/pagination.type";
 import type { RoleName } from "@/types/role.enum";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -37,14 +36,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import {
@@ -186,102 +177,138 @@ export default function AccountTable({
   return (
     <div className="space-y-4">
       {/* Filter Section */}
-      <div className="flex flex-wrap gap-4">
-        <form
-          onSubmit={handleSearch}
-          className="flex-1 min-w-[250px] flex gap-2"
-        >
-          <Input
-            placeholder="Tìm kiếm theo email, tên..."
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            className="bg-white"
-          />
-          <Button type="submit" variant="default" className="cursor-pointer">
-            Tìm kiếm
-          </Button>
-        </form>
-        <Select
-          value={filters.role || "all"}
-          onValueChange={(value) =>
-            onFiltersChange({
-              role: value === "all" ? undefined : (value as RoleName),
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Vai trò" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả vai trò</SelectItem>
-            {roleOptions.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select
-          value={
-            filters.isActive === undefined
-              ? "all"
-              : filters.isActive
-              ? "active"
-              : "inactive"
-          }
-          onValueChange={(value) =>
-            onFiltersChange({
-              isActive:
-                value === "all" ? undefined : value === "active" ? true : false,
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Trạng thái" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả trạng thái</SelectItem>
-            <SelectItem value="active">Hoạt động</SelectItem>
-            <SelectItem value="inactive">Đã khóa</SelectItem>
-          </SelectContent>
-        </Select>
-        <Select
-          value={filters.gender || "all"}
-          onValueChange={(value) =>
-            onFiltersChange({
-              gender:
-                value === "all" ? undefined : (value as "MALE" | "FEMALE"),
-            })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Giới tính" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả giới tính</SelectItem>
-            <SelectItem value="MALE">Nam</SelectItem>
-            <SelectItem value="FEMALE">Nữ</SelectItem>
-          </SelectContent>
-        </Select>
-        {(filters.search ||
-          filters.isActive !== undefined ||
-          filters.gender ||
-          filters.role) && (
-          <Button
-            variant="outline"
-            onClick={() => {
-              setSearchInput("");
-              onFiltersChange({
-                search: "",
-                isActive: undefined,
-                gender: undefined,
-                role: undefined,
-              });
-            }}
-          >
-            Xóa bộ lọc
-          </Button>
-        )}
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-4 items-end">
+          <div className="flex-1 min-w-[250px] space-y-2">
+            <Label>Tìm kiếm</Label>
+            <form onSubmit={handleSearch} className="flex gap-2">
+              <Input
+                placeholder="Tìm kiếm theo email, tên..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="bg-white"
+              />
+              <Button
+                type="submit"
+                variant="default"
+                className="cursor-pointer"
+              >
+                Tìm kiếm
+              </Button>
+            </form>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Vai trò</Label>
+            <Select
+              value={filters.role || "all"}
+              onValueChange={(value) =>
+                onFiltersChange({
+                  role: value === "all" ? undefined : (value as RoleName),
+                })
+              }
+            >
+              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+                <SelectValue placeholder="Vai trò" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">
+                  Tất cả vai trò
+                </SelectItem>
+                {roleOptions.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="cursor-pointer"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Trạng thái</Label>
+            <Select
+              value={
+                filters.isActive === undefined
+                  ? "all"
+                  : filters.isActive
+                  ? "active"
+                  : "inactive"
+              }
+              onValueChange={(value) =>
+                onFiltersChange({
+                  isActive:
+                    value === "all"
+                      ? undefined
+                      : value === "active"
+                      ? true
+                      : false,
+                })
+              }
+            >
+              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+                <SelectValue placeholder="Trạng thái" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">
+                  Tất cả trạng thái
+                </SelectItem>
+                <SelectItem value="active" className="cursor-pointer">
+                  Hoạt động
+                </SelectItem>
+                <SelectItem value="inactive" className="cursor-pointer">
+                  Đã khóa
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label>Giới tính</Label>
+            <Select
+              value={filters.gender || "all"}
+              onValueChange={(value) =>
+                onFiltersChange({
+                  gender:
+                    value === "all" ? undefined : (value as "MALE" | "FEMALE"),
+                })
+              }
+            >
+              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+                <SelectValue placeholder="Giới tính" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all" className="cursor-pointer">
+                  Tất cả giới tính
+                </SelectItem>
+                <SelectItem value="MALE" className="cursor-pointer">
+                  Nam
+                </SelectItem>
+                <SelectItem value="FEMALE" className="cursor-pointer">
+                  Nữ
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label className="opacity-0">Thao tác</Label>
+            <ClearFiltersButton
+              onClick={() => {
+                setSearchInput("");
+                onFiltersChange({
+                  search: "",
+                  isActive: undefined,
+                  gender: undefined,
+                  role: undefined,
+                });
+              }}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Table Section */}
@@ -384,12 +411,7 @@ export default function AccountTable({
                   </TableCell>
                   <TableCell>{account.email}</TableCell>
                   <TableCell>{account.fullName || ""}</TableCell>
-                  <TableCell>
-                    <Badge variant="outline" className="text-xs">
-                      {converRoleToDisplay(account.role.roleName) ||
-                        "Chưa xác định"}
-                    </Badge>
-                  </TableCell>
+                  <TableCell>{getRoleBadge(account.role.roleName)}</TableCell>
                   <TableCell>
                     <span className="inline-flex items-center gap-2 font-medium">
                       {account.gender === "MALE" ? (
@@ -401,64 +423,51 @@ export default function AccountTable({
                     </span>
                   </TableCell>
                   <TableCell>
-                    <Badge
-                      variant={account.isActive ? "default" : "destructive"}
-                      className="text-xs"
-                    >
-                      {account.isActive ? "Hoạt động" : "Đã khóa"}
-                    </Badge>
+                    {getAccountStatusBadge(account.isActive)}
                   </TableCell>
                   <TableCell className="text-center">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          className="h-8 w-8 p-0 cursor-pointer"
-                        >
-                          <span className="sr-only">Mở menu</span>
-                          <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleViewDetails(account._id)}
-                        >
-                          <Eye className="mr-2 h-4 w-4" />
-                          Xem chi tiết
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() =>
+                    <TableActionMenu
+                      showLabel
+                      actions={[
+                        {
+                          label: "Xem chi tiết",
+                          icon: Eye,
+                          onClick: () => handleViewDetails(account._id),
+                        },
+                        {
+                          label: account.isActive
+                            ? "Khóa tài khoản"
+                            : "Mở khóa tài khoản",
+                          icon: account.isActive ? UserX : UserCheck,
+                          onClick: () =>
                             handleToggleAccountStatus(
                               account._id,
                               account.isActive
-                            )
-                          }
-                        >
-                          {account.isActive ? (
+                            ),
+                          customContent: (
                             <>
-                              <UserX className="mr-2 h-4 w-4" />
-                              Khóa tài khoản
+                              {account.isActive ? (
+                                <>
+                                  <UserX className="h-4 w-4" />
+                                  Khóa tài khoản
+                                </>
+                              ) : (
+                                <>
+                                  <UserCheck className="h-4 w-4" />
+                                  Mở khóa tài khoản
+                                </>
+                              )}
                             </>
-                          ) : (
-                            <>
-                              <UserCheck className="mr-2 h-4 w-4" />
-                              Mở khóa tài khoản
-                            </>
-                          )}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onClick={() => handleDeleteAccount(account._id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa tài khoản
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+                          ),
+                        },
+                        {
+                          label: "Xóa tài khoản",
+                          icon: Trash2,
+                          onClick: () => handleDeleteAccount(account._id),
+                          variant: "destructive",
+                        },
+                      ]}
+                    />
                   </TableCell>
                 </TableRow>
               ))}
