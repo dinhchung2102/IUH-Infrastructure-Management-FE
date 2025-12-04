@@ -13,22 +13,7 @@ import {
   getBuildingAreaTypeBadge,
 } from "@/config/badge.config";
 import { ZoneTypeHoverCard } from "./ZoneTypeHoverCard";
-
-interface BuildingAreaItem {
-  _id: string;
-  name: string;
-  type: "BUILDING" | "AREA";
-  status: string;
-  floor?: number;
-  description?: string;
-  zoneType?: string; // For AREA
-  campus?: {
-    _id: string;
-    name: string;
-  };
-  createdAt?: string;
-  updatedAt?: string;
-}
+import type { BuildingAreaItem } from "../hooks";
 
 interface BuildingAreaTableProps {
   items: BuildingAreaItem[];
@@ -49,7 +34,7 @@ export function BuildingAreaTable({
         <TableHeader>
           <TableRow>
             <TableHead className="text-center w-12">STT</TableHead>
-            <TableHead>Tòa nhà/ Khu vực ngoài trời</TableHead>
+            <TableHead>Tòa nhà/ Khu vực</TableHead>
             <TableHead>Loại</TableHead>
             <TableHead>Cơ sở</TableHead>
             <TableHead>Số tầng</TableHead>

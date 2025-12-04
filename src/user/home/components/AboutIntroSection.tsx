@@ -12,14 +12,15 @@ export function AboutIntroSection() {
           {/* Left Content */}
           <Reveal>
             <div>
-              <h2 className="mb-6 text-3xl font-bold md:text-4xl lg:text-5xl leading-tight">
-                <span className="bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
-                  Phòng Quản Trị IUH
-                </span>
+              <h2
+                className="mb-6 text-3xl font-bold md:text-4xl lg:text-5xl uppercase"
+                style={{ color: "#204195" }}
+              >
+                Phòng Quản Trị
               </h2>
 
-              <div className="space-y-4 text-base md:text-lg text-muted-foreground leading-relaxed">
-                <p className="text-justify">
+              <div className="space-y-4 text-base md:text-base text-muted-foreground">
+                <p className="text-justify ">
                   <strong className="text-foreground">
                     Phòng Quản Trị trường Đại học Công nghiệp TP.HCM
                   </strong>{" "}
@@ -59,9 +60,6 @@ export function AboutIntroSection() {
                   className="bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-lg hover:shadow-xl transition-all"
                 >
                   <Link to="/about">Tìm hiểu thêm</Link>
-                </Button>
-                <Button asChild variant="outline" size="lg">
-                  <Link to="/contact">Liên hệ chúng tôi</Link>
                 </Button>
               </div>
             </div>

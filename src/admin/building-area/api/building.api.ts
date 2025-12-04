@@ -37,23 +37,44 @@ export interface CreateBuildingDto {
 }
 
 /** DTO khi cập nhật */
-export interface UpdateBuildingDto extends Partial<CreateBuildingDto> {}
+export interface UpdateBuildingDto {
+  name?: string;
+  floor?: number;
+  status?: CommonStatus;
+  campus?: string;
+}
 
 /** Tham số truy vấn khi lấy danh sách */
 export interface QueryBuildingDto {
-  keyword?: string;
+  search?: string;
+  status?: string;
+  campus?: string;
   page?: number;
   limit?: number;
-  campus?: string;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
 }
 
 /* ============================
  *  API CALLS
  * ============================ */
 
+/** Response từ API với pagination */
+export interface BuildingsListResponse {
+  buildings: BuildingResponse[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
+}
+
 /** Lấy danh sách tòa nhà */
-export const getBuildings = async (query?: QueryBuildingDto) => {
-  const res = await api.get<ApiResponse<{ buildings: BuildingResponse[] }>>(
+export const getBuildings = async (
+  query?: QueryBuildingDto
+): Promise<ApiResponse<BuildingsListResponse>> => {
+  const res = await api.get<ApiResponse<BuildingsListResponse>>(
     "/zone-area/buildings",
     { params: query }
   );
@@ -103,7 +124,6 @@ export const getBuildingsByCampus = async (campusId: string) => {
  *  Thống kê tòa nhà (Buildings)
  *  Endpoint: /zone-area/buildings-stats
  * ============================ */
-
 
 export interface BuildingStatsResponse {
   stats: {

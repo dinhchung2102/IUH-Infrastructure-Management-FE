@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import * as React from "react";
 import {
   Dialog,
   DialogContent,
@@ -19,18 +20,22 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-import { createZone, updateZone } from "../api/zone.api";
-import { getBuildings } from "../../building-area/api/building.api";
-import { getAreas } from "../../building-area/api/area.api";
+import { createZone, updateZone, type ZoneResponse } from "../api/zone.api";
+import {
+  getBuildings,
+  type BuildingResponse,
+} from "../../building-area/api/building.api";
+import { getAreas, type AreaResponse } from "../../building-area/api/area.api";
 
 interface ZoneAddDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess?: () => void;
   mode?: "add" | "edit";
-  zone?: any;
+  zone?: ZoneResponse;
 }
 
 export function ZoneAddDialog({
@@ -50,61 +55,93 @@ export function ZoneAddDialog({
   });
 
   const [loading, setLoading] = useState(false);
-  const [locations, setLocations] = useState<any[]>([]);
+  const [areas, setAreas] = useState<AreaResponse[]>([]);
+  const [buildings, setBuildings] = useState<BuildingResponse[]>([]);
   const [selectedType, setSelectedType] = useState<"area" | "building" | null>(
     null
   );
 
-  // 🏢 Load danh sách area + building
+  // Load areas when selectedType is "area"
   useEffect(() => {
-    if (open) fetchLocations();
-  }, [open]);
+    if (open && selectedType === "area") {
+      fetchAreas();
+    }
+  }, [open, selectedType]);
 
-  const fetchLocations = async () => {
+  // Load buildings when selectedType is "building"
+  useEffect(() => {
+    if (open && selectedType === "building") {
+      fetchBuildings();
+    }
+  }, [open, selectedType]);
+
+  // Load data when editing
+  useEffect(() => {
+    if (open && mode === "edit" && zone) {
+      const hasBuilding =
+        zone.building &&
+        (typeof zone.building === "object" ||
+          typeof zone.building === "string");
+      if (hasBuilding) {
+        fetchBuildings();
+      } else {
+        const hasArea =
+          zone.area &&
+          (typeof zone.area === "object" || typeof zone.area === "string");
+        if (hasArea) {
+          fetchAreas();
+        }
+      }
+    }
+  }, [open, mode, zone]);
+
+  const fetchAreas = async () => {
     try {
-      const [areasRes, buildingsRes] = await Promise.all([
-        getAreas({}),
-        getBuildings({}),
-      ]);
-
-      const areas = (areasRes?.data?.areas || []).map((a: any) => ({
-        _id: a._id,
-        name: a.name,
-        campus: a.campus?.name,
-        type: "area",
-      }));
-
-      const buildings = (buildingsRes?.data?.buildings || []).map((b: any) => ({
-        _id: b._id,
-        name: b.name,
-        campus: b.campus?.name,
-        area: b.area?.name,
-        type: "building",
-      }));
-
-      setLocations([...areas, ...buildings]);
+      const res = await getAreas({});
+      setAreas(res?.data?.areas || []);
     } catch (err) {
-      console.error("Lỗi khi tải danh sách khu vực / tòa nhà:", err);
-      toast.error("Không thể tải danh sách khu vực hoặc tòa nhà.");
+      console.error("Lỗi khi tải danh sách khu vực:", err);
+      toast.error("Không thể tải danh sách khu vực.");
+      setAreas([]);
+    }
+  };
+
+  const fetchBuildings = async () => {
+    try {
+      const res = await getBuildings({});
+      setBuildings(res?.data?.buildings || []);
+    } catch (err) {
+      console.error("Lỗi khi tải danh sách tòa nhà:", err);
+      toast.error("Không thể tải danh sách tòa nhà.");
+      setBuildings([]);
     }
   };
 
   // ✏️ Khi chỉnh sửa
   useEffect(() => {
     if (mode === "edit" && zone) {
-      const type = zone.building ? "building" : "area";
+      const hasBuilding =
+        zone.building &&
+        (typeof zone.building === "object" ||
+          typeof zone.building === "string");
+      const hasArea =
+        zone.area &&
+        (typeof zone.area === "object" || typeof zone.area === "string");
+      const type = hasBuilding ? "building" : hasArea ? "area" : null;
       setSelectedType(type);
+
+      const locationId =
+        (typeof zone.building === "object" && zone.building?._id) ||
+        (typeof zone.building === "string" && zone.building) ||
+        (typeof zone.area === "object" && zone.area?._id) ||
+        (typeof zone.area === "string" && zone.area) ||
+        "";
 
       setForm({
         name: zone.name || "",
         description: zone.description || "",
         status: zone.status || "ACTIVE",
-        location:
-          zone.building?._id ||
-          zone.area?._id ||
-          zone.building ||
-          zone.area ||
-          "",
+        location: locationId,
         zoneType: zone.zoneType || "FUNCTIONAL",
         floorLocation:
           type === "building" && zone.floorLocation
@@ -129,15 +166,42 @@ export function ZoneAddDialog({
   };
 
   const handleSelectLocation = (id: string) => {
-    const selected = locations.find((l) => l._id === id);
-    setSelectedType(selected?.type || null);
     setForm((prev) => ({
       ...prev,
       location: id,
       // 🧹 Reset tầng nếu chọn Area
-      floorLocation: selected?.type === "area" ? "" : prev.floorLocation,
+      floorLocation: selectedType === "area" ? "" : prev.floorLocation,
     }));
   };
+
+  const handleTypeChange = (type: "area" | "building") => {
+    setSelectedType(type);
+    setForm((prev) => ({
+      ...prev,
+      location: "", // Reset location when changing type
+      floorLocation: type === "area" ? "" : prev.floorLocation,
+    }));
+  };
+
+  // Convert areas to combobox options
+  const areaOptions = useMemo(
+    () =>
+      areas.map((area) => ({
+        value: area._id,
+        label: area.name,
+      })),
+    [areas]
+  );
+
+  // Convert buildings to combobox options
+  const buildingOptions = useMemo(
+    () =>
+      buildings.map((building) => ({
+        value: building._id,
+        label: building.name,
+      })),
+    [buildings]
+  );
 
   const validateForm = () => {
     if (!form.name.trim()) {
@@ -166,18 +230,33 @@ export function ZoneAddDialog({
     try {
       setLoading(true);
 
-      const payload: any = {
+      const payload: {
+        name: string;
+        description: string;
+        status: "ACTIVE" | "INACTIVE";
+        zoneType: "FUNCTIONAL" | "TECHNICAL" | "SERVICE" | "PUBLIC";
+        area?: string;
+        building?: string;
+        floorLocation?: number;
+      } = {
         name: form.name.trim(),
         description: form.description.trim(),
-        status: form.status,
-        zoneType: form.zoneType,
+        status: form.status as "ACTIVE" | "INACTIVE",
+        zoneType: form.zoneType as
+          | "FUNCTIONAL"
+          | "TECHNICAL"
+          | "SERVICE"
+          | "PUBLIC",
       };
 
-      if (selectedType === "area") payload.area = form.location;
+      if (selectedType === "area") {
+        payload.area = form.location;
+      }
       if (selectedType === "building") {
         payload.building = form.location;
-        if (form.floorLocation)
+        if (form.floorLocation) {
           payload.floorLocation = Number(form.floorLocation);
+        }
       }
 
       console.log("📤 Payload gửi lên:", payload);
@@ -198,11 +277,15 @@ export function ZoneAddDialog({
       } else {
         toast.error(res?.message || "Thao tác không thành công.");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("❌ Lỗi khi lưu zone:", err);
+      const error = err as {
+        response?: { data?: { message?: string } };
+        message?: string;
+      };
       const msg =
-        err?.response?.data?.message ||
-        err?.message ||
+        error?.response?.data?.message ||
+        error?.message ||
         "Có lỗi xảy ra khi lưu zone.";
       toast.error(msg);
     } finally {
@@ -248,46 +331,45 @@ export function ZoneAddDialog({
             />
           </div>
 
-          {/* Area / Building */}
+          {/* Type Selection (Area or Building) */}
           <div className="space-y-2">
-            <Label>Khu vực / Tòa nhà</Label>
+            <Label>Loại</Label>
             <Select
-              value={form.location}
-              onValueChange={(val) => handleSelectLocation(val)}
+              value={selectedType || ""}
+              onValueChange={(val) =>
+                handleTypeChange(val as "area" | "building")
+              }
             >
               <SelectTrigger>
-                <SelectValue placeholder="Chọn khu vực hoặc tòa nhà" />
+                <SelectValue placeholder="Chọn loại (Khu vực hoặc Tòa nhà)" />
               </SelectTrigger>
               <SelectContent>
-                <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                  — Khu vực —
-                </div>
-                {locations
-                  .filter((l) => l.type === "area")
-                  .map((a) => (
-                    <SelectItem key={a._id} value={a._id}>
-                      {a.name} {a.campus ? `(${a.campus})` : ""}
-                    </SelectItem>
-                  ))}
-
-                <div className="px-2 py-1 text-xs font-semibold text-muted-foreground">
-                  — Tòa nhà —
-                </div>
-                {locations
-                  .filter((l) => l.type === "building")
-                  .map((b) => (
-                    <SelectItem key={b._id} value={b._id}>
-                      {b.name}{" "}
-                      {b.area
-                        ? `(${b.area})`
-                        : b.campus
-                        ? `(${b.campus})`
-                        : ""}
-                    </SelectItem>
-                  ))}
+                <SelectItem value="area">Khu vực ngoài trời</SelectItem>
+                <SelectItem value="building">Tòa nhà</SelectItem>
               </SelectContent>
             </Select>
           </div>
+
+          {/* Area / Building Selection */}
+          {selectedType && (
+            <div className="space-y-2">
+              <Label>
+                {selectedType === "area" ? "Khu vực ngoài trời" : "Tòa nhà"}
+              </Label>
+              <Combobox
+                options={
+                  selectedType === "area" ? areaOptions : buildingOptions
+                }
+                value={form.location}
+                onValueChange={handleSelectLocation}
+                placeholder={
+                  selectedType === "area"
+                    ? "Chọn khu vực ngoài trời..."
+                    : "Chọn tòa nhà..."
+                }
+              />
+            </div>
+          )}
 
           {/* Zone Type */}
           <div className="space-y-2">
@@ -300,7 +382,9 @@ export function ZoneAddDialog({
                 <SelectValue placeholder="Chọn loại zone" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="FUNCTIONAL">Chức năng (FUNCTIONAL)</SelectItem>
+                <SelectItem value="FUNCTIONAL">
+                  Chức năng (FUNCTIONAL)
+                </SelectItem>
                 <SelectItem value="TECHNICAL">Kỹ thuật (TECHNICAL)</SelectItem>
                 <SelectItem value="SERVICE">Dịch vụ (SERVICE)</SelectItem>
                 <SelectItem value="PUBLIC">Công cộng (PUBLIC)</SelectItem>
@@ -316,9 +400,7 @@ export function ZoneAddDialog({
                 id="floorLocation"
                 placeholder="VD: 1"
                 value={form.floorLocation}
-                onChange={(e) =>
-                  handleChange("floorLocation", e.target.value)
-                }
+                onChange={(e) => handleChange("floorLocation", e.target.value)}
               />
             </div>
           )}

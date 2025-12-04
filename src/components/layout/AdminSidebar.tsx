@@ -64,8 +64,13 @@ const navigation = [
             icon: Home,
           },
           {
-            title: "Quản lý khu vực",
-            href: "/admin/building-area",
+            title: "Quản lý tòa nhà",
+            href: "/admin/buildings",
+            icon: Building2,
+          },
+          {
+            title: "Khu vực ngoài trời",
+            href: "/admin/areas",
             icon: Map,
           },
           {

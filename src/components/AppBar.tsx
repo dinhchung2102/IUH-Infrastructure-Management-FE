@@ -13,11 +13,12 @@ import {
   Info,
   Newspaper,
   FileText,
-  Mail,
   Building,
   User,
   LogOut,
   Settings,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
@@ -36,7 +37,6 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -48,7 +48,8 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import type { Account } from "@/types/response.type";
-import { getRoleDisplay, getUserInitials } from "@/utils/formatDisplay.util";
+import { getRoleDisplay } from "@/utils/formatDisplay.util";
+import { AxiosError } from "axios";
 
 type DialogType =
   | "login"
@@ -69,6 +70,7 @@ export default function AppBar() {
   const [account, setAccount] = useState<Account | null>(null);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const [showTokenExpiredAlert, setShowTokenExpiredAlert] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const { scrollY } = useScroll();
 
   useMotionValueEvent(scrollY, "change", (latest) => {
@@ -95,7 +97,6 @@ export default function AppBar() {
     { path: "/facilities", label: "Cơ sở vật chất", icon: Building },
     { path: "/news", label: "Tin tức", icon: Newspaper },
     { path: "/report", label: "Báo cáo sự cố", icon: FileText },
-    { path: "/contact", label: "Liên hệ", icon: Mail },
   ];
 
   useEffect(() => {
@@ -122,7 +123,7 @@ export default function AppBar() {
   }, []);
 
   useEffect(() => {
-    const onTokenExpired = (_e: Event) => {
+    const onTokenExpired = () => {
       // Show alert dialog when refresh token fails
       setShowTokenExpiredAlert(true);
       // Ensure any mobile sheet is closed
@@ -199,7 +200,7 @@ export default function AppBar() {
       setShowLogoutAlert(false);
       toast.success("Đăng xuất thành công!");
       navigate("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Logout error:", error);
       // Even if API fails, clear local data
       localStorage.removeItem("access_token");
@@ -209,7 +210,7 @@ export default function AppBar() {
       setShowLogoutAlert(false);
 
       // Check if it's a token expiration error
-      if (error.response?.status === 401) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
         toast.success("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
       } else {
         toast.error("Đăng xuất thất bại");
@@ -238,7 +239,7 @@ export default function AppBar() {
       >
         <div className="container flex h-18 items-center justify-between gap-4">
           {/* Logo Section - Fixed Width */}
-          <div className="flex items-center w-[200px] shrink-0">
+          <div className="flex items-center ">
             <Link
               to="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -246,7 +247,7 @@ export default function AppBar() {
               <img
                 src={logoImage}
                 alt="IUH Logo"
-                className="h-14 w-auto object-contain"
+                className="h-12 w-auto object-contain"
               />
             </Link>
           </div>
@@ -257,17 +258,17 @@ export default function AppBar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-8 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 ${
-                  isActive(item.path)
-                    ? "text-primary"
-                    : "text-foreground/70 hover:text-primary"
+                className={`relative px-8 py-2 text-sm uppercase font-semibold rounded-lg transition-colors duration-200 ${
+                  isActive(item.path) ? "" : "opacity-70 hover:opacity-100"
                 }`}
+                style={{ color: "#204195" }}
               >
                 {item.label}
                 {isActive(item.path) && (
                   <motion.span
                     layoutId="navbar-indicator"
-                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-primary rounded-full"
+                    className="absolute bottom-0 left-1/2 -translate-x-1/2 w-12 h-0.5 rounded-full"
+                    style={{ backgroundColor: "#204195" }}
                     initial={false}
                     transition={{
                       type: "spring",
@@ -283,49 +284,44 @@ export default function AppBar() {
           {/* Desktop Auth Section - Fixed Width */}
           <div className="hidden md:flex items-center gap-2 justify-end w-[200px] shrink-0">
             {account ? (
-              <Popover>
+              <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="ghost"
                     className="gap-2 bg-transparent hover:bg-transparent cursor-pointer"
-                    size="icon"
+                    style={{ color: "#204195" }}
                   >
-                    <Avatar className="size-12">
-                      <AvatarImage
-                        src={account?.avatar || undefined}
-                        alt={account?.fullName}
-                      />
-                      <AvatarFallback className="text-xs bg-primary/10 text-primary">
-                        {getUserInitials(account?.fullName)}
-                      </AvatarFallback>
-                    </Avatar>
+                    <span className="font-semibold">
+                      {account?.fullName || "User"}
+                    </span>
+                    {popoverOpen ? (
+                      <ChevronUp className="h-4 w-4" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4" />
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-56" align="end">
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-3 px-2 py-1.5">
-                      <Avatar className="size-10">
-                        <AvatarImage
-                          src={account?.avatar}
-                          alt={account?.fullName}
-                        />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {getUserInitials(account?.fullName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col gap-0.5">
-                        <p className="text-sm font-semibold">
-                          {account?.fullName || "User"}
-                        </p>
-                        <p className="text-xs text-primary/70 font-medium">
-                          {getRoleDisplay(account?.role)}
-                        </p>
-                      </div>
+                    <div className="flex flex-col gap-1 px-2 py-1.5">
+                      <p
+                        className="text-sm font-semibold"
+                        style={{ color: "#204195" }}
+                      >
+                        {account?.fullName || "User"}
+                      </p>
+                      <p
+                        className="text-xs font-medium"
+                        style={{ color: "#204195", opacity: 0.7 }}
+                      >
+                        {getRoleDisplay(account?.role)}
+                      </p>
                     </div>
                     <div className="h-px bg-border my-1" />
                     <Button
                       variant="ghost"
                       className="justify-start gap-2"
+                      style={{ color: "#204195" }}
                       asChild
                     >
                       <a href="/profile" className="cursor-pointer">
@@ -337,6 +333,7 @@ export default function AppBar() {
                       <Button
                         variant="ghost"
                         className="justify-start gap-2"
+                        style={{ color: "#204195" }}
                         asChild
                       >
                         <a href="/admin" className="cursor-pointer">
@@ -360,7 +357,8 @@ export default function AppBar() {
               <>
                 <Button
                   variant="ghost"
-                  className="hover:bg-primary/10 hover:text-primary"
+                  className="hover:bg-primary/10"
+                  style={{ color: "#204195" }}
                   onClick={() => setActiveDialog("login")}
                 >
                   Đăng nhập
@@ -385,7 +383,7 @@ export default function AppBar() {
             </SheetTrigger>
             <SheetContent side="right" className="w-[300px] sm:w-[400px]">
               <SheetHeader>
-                <SheetTitle>Menu</SheetTitle>
+                <SheetTitle style={{ color: "#204195" }}>Menu</SheetTitle>
               </SheetHeader>
               <nav className="flex flex-col gap-2 mt-6">
                 {navItems.map((item) => {
@@ -398,14 +396,16 @@ export default function AppBar() {
                       onClick={() => setOpen(false)}
                       className={`relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
                         active
-                          ? "text-primary font-semibold"
-                          : "text-foreground/70 hover:text-primary"
+                          ? "font-semibold"
+                          : "opacity-70 hover:opacity-100"
                       }`}
+                      style={{ color: "#204195" }}
                     >
                       {active && (
                         <motion.div
                           layoutId="mobile-nav-indicator"
-                          className="absolute inset-0 bg-primary/10 rounded-lg"
+                          className="absolute inset-0 rounded-lg"
+                          style={{ backgroundColor: "rgba(32, 65, 149, 0.1)" }}
                           initial={false}
                           transition={{
                             type: "spring",
@@ -415,9 +415,8 @@ export default function AppBar() {
                         />
                       )}
                       <Icon
-                        className={`h-5 w-5 relative z-10 ${
-                          active ? "text-primary" : ""
-                        }`}
+                        className="h-5 w-5 relative z-10"
+                        style={{ color: "#204195" }}
                       />
                       <span className="font-medium relative z-10">
                         {item.label}
@@ -430,28 +429,24 @@ export default function AppBar() {
               <div className="mt-6 pt-6 border-t">
                 {account ? (
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center gap-3 px-2 py-2">
-                      <Avatar className="size-10">
-                        <AvatarImage
-                          src={account?.avatar}
-                          alt={account?.fullName}
-                        />
-                        <AvatarFallback className="bg-primary/10 text-primary">
-                          {getUserInitials(account?.fullName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex flex-col gap-0.5">
-                        <p className="text-sm font-semibold">
-                          {account?.fullName || "User"}
-                        </p>
-                        <p className="text-xs text-primary/70 font-medium">
-                          {getRoleDisplay(account?.role)}
-                        </p>
-                      </div>
+                    <div className="flex flex-col gap-1 px-2 py-2">
+                      <p
+                        className="text-sm font-semibold"
+                        style={{ color: "#204195" }}
+                      >
+                        {account?.fullName || "User"}
+                      </p>
+                      <p
+                        className="text-xs font-medium"
+                        style={{ color: "#204195", opacity: 0.7 }}
+                      >
+                        {getRoleDisplay(account?.role)}
+                      </p>
                     </div>
                     <Button
                       variant="outline"
                       className="w-full justify-start gap-2"
+                      style={{ color: "#204195" }}
                       asChild
                       onClick={() => setOpen(false)}
                     >
@@ -464,6 +459,7 @@ export default function AppBar() {
                       <Button
                         variant="outline"
                         className="w-full justify-start gap-2"
+                        style={{ color: "#204195" }}
                         asChild
                         onClick={() => setOpen(false)}
                       >
@@ -489,7 +485,8 @@ export default function AppBar() {
                   <div className="flex flex-col gap-2">
                     <Button
                       variant="outline"
-                      className="w-full hover:bg-primary/10 hover:text-primary hover:border-primary"
+                      className="w-full hover:bg-primary/10 hover:border-primary"
+                      style={{ color: "#204195" }}
                       onClick={() => {
                         setOpen(false);
                         setActiveDialog("login");

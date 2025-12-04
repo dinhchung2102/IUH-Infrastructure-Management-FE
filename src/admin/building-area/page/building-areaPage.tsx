@@ -1,10 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
-import { getBuildings, deleteBuilding } from "../api/building.api";
-import { getAreas, deleteArea } from "../api/area.api";
-import { getCampus } from "../../campus/api/campus.api";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { RefreshCcw, BarChart3, Plus } from "lucide-react";
@@ -13,134 +9,79 @@ import { BuildingAreaAddDialog } from "../components/BuildingAreaAddDialog";
 import { BuildingAreaStatsDialog } from "../components/BuildingAreaStatsDialog";
 import { BuildingAreaFilters } from "../components/BuildingAreaFilters";
 import { BuildingAreaTable } from "../components/BuildingAreaTable";
+import PaginationComponent from "@/components/PaginationComponent";
+import {
+  useBuildingAreaFilters,
+  useBuildingAreaPagination,
+  useBuildingAreaData,
+  type FilterType,
+  type BuildingAreaItem,
+} from "../hooks";
 
 export default function BuildingAreaPage() {
-  const [items, setItems] = useState<any[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [campuses, setCampuses] = useState<any[]>([]);
-
-  const [search, setSearch] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
   const [openStats, setOpenStats] = useState(false);
-  const [editingItem, setEditingItem] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<BuildingAreaItem | null>(null);
+  const [filterType, setFilterType] = useState<FilterType>("BUILDING");
 
-  // Bộ lọc
-  const [filterType, setFilterType] = useState<string>("");
-  const [filterStatus, setFilterStatus] = useState<string>("");
-  const [filterCampus, setFilterCampus] = useState<string>("");
+  // Pagination
+  const {
+    paginationRequest,
+    pagination,
+    updatePagination,
+    changePage,
+    resetToFirstPage,
+  } = useBuildingAreaPagination();
 
-  /** ==========================
-   *  FETCH BUILDING + AREA
-   *  ========================== */
-  const fetchAll = async () => {
-    try {
-      setLoading(true);
-      const [buildRes, areaRes] = await Promise.all([
-        getBuildings(),
-        getAreas(),
-      ]);
+  // Get campuses first to set default campus
+  const [defaultCampusId, setDefaultCampusId] = useState<string>("");
 
-      // Handle buildings response - API returns { data: { buildings: [...] } }
-      const buildingsData = buildRes?.data?.buildings || [];
-      const buildings = Array.isArray(buildingsData)
-        ? buildingsData.map((b: any) => ({
-            ...b, // Preserve all fields including floor, status, campus, createdAt, updatedAt
-            type: "BUILDING",
-          }))
-        : [];
+  // Filters - will be initialized with default campus after campuses are loaded
+  const { filters, handleFiltersChange, handleClearFilters } =
+    useBuildingAreaFilters(defaultCampusId);
 
-      // Handle areas response - API returns { data: { areas: [...] } }
-      // AreaResponse includes: _id, name, status, description, zoneType, campus, createdAt, updatedAt
-      const areasData = areaRes?.data?.areas || [];
-      const areas = Array.isArray(areasData)
-        ? areasData.map((a: any) => ({
-            ...a, // Preserve all fields including description, zoneType, campus, createdAt, updatedAt
-            type: "AREA",
-          }))
-        : [];
-
-      setItems([...buildings, ...areas]);
-    } catch (err) {
-      console.error(err);
-      toast.error("Không thể tải danh sách tòa nhà và khu vực ngoài trời");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /** ==========================
-   *  FETCH CAMPUSES
-   *  ========================== */
-  const fetchCampuses = async () => {
-    try {
-      const res = await getCampus();
-      const list = res?.data?.campuses || [];
-      setCampuses(list);
-    } catch (err) {
-      console.error("Lỗi tải cơ sở:", err);
-    }
-  };
-
-  useEffect(() => {
-    fetchAll();
-    fetchCampuses();
-  }, []);
-
-  /** ==========================
-   *  DELETE ITEM
-   *  ========================== */
-  const handleDelete = async (item: any) => {
-    try {
-      const confirm = window.confirm(
-        `Bạn có chắc chắn muốn xóa ${
-          item.type === "BUILDING" ? "tòa nhà" : "khu vực ngoài trời"
-        } "${item.name}" không?`
-      );
-      if (!confirm) return;
-
-      if (item.type === "BUILDING") {
-        await deleteBuilding(item._id);
-      } else {
-        await deleteArea(item._id);
-      }
-
-      toast.success(
-        `Đã xóa ${
-          item.type === "BUILDING" ? "tòa nhà" : "khu vực ngoài trời"
-        } thành công`
-      );
-      fetchAll();
-    } catch (err) {
-      console.error(err);
-      toast.error("Xóa thất bại, vui lòng thử lại");
-    }
-  };
-
-  /** ==========================
-   *  FILTER
-   *  ========================== */
-  const filtered = items.filter((item) => {
-    const matchesSearch = item.name
-      ?.toLowerCase()
-      .includes(search.toLowerCase());
-    const matchesType = filterType ? item.type === filterType : true;
-    const matchesStatus = filterStatus ? item.status === filterStatus : true;
-    const matchesCampus = filterCampus
-      ? item.campus?._id === filterCampus
-      : true;
-    return matchesSearch && matchesType && matchesStatus && matchesCampus;
+  // Data fetching
+  const {
+    items,
+    loading,
+    campuses,
+    pagination: dataPagination,
+    fetchData,
+    handleDelete,
+  } = useBuildingAreaData({
+    filterType,
+    filters,
+    paginationRequest,
   });
 
-  const handleClearFilters = () => {
-    setSearch("");
-    setFilterType("");
-    setFilterStatus("");
-    setFilterCampus("");
+  // Set default campus when campuses are loaded
+  useEffect(() => {
+    if (campuses.length > 0 && !defaultCampusId) {
+      const firstCampusId = campuses[0]._id;
+      setDefaultCampusId(firstCampusId);
+      handleFiltersChange({ campus: firstCampusId });
+    }
+  }, [campuses, defaultCampusId, handleFiltersChange]);
+
+  // Update pagination when data is fetched
+  useEffect(() => {
+    if (dataPagination) {
+      updatePagination(dataPagination);
+    }
+  }, [dataPagination, updatePagination]);
+
+  // Handle filter type change - reset to first page
+  const handleFilterTypeChange = (type: FilterType) => {
+    setFilterType(type);
+    resetToFirstPage();
   };
 
-  /** ==========================
-   *  RENDER
-   *  ========================== */
+  // Handle filter changes - reset to first page
+  const handleFilterChange = (updates: Partial<typeof filters>) => {
+    handleFiltersChange(updates);
+    resetToFirstPage();
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2">
@@ -155,7 +96,7 @@ export default function BuildingAreaPage() {
           <Button
             className="flex-1 md:flex-initial cursor-pointer"
             variant="outline"
-            onClick={fetchAll}
+            onClick={fetchData}
           >
             <RefreshCcw className="h-4 w-4" />
             Làm mới
@@ -176,7 +117,7 @@ export default function BuildingAreaPage() {
             }}
           >
             <Plus className="h-4 w-4" />
-            Thêm tòa nhà / Khu vực ngoài trời
+            Thêm tòa nhà / Khu vực
           </Button>
         </div>
       </div>
@@ -186,21 +127,28 @@ export default function BuildingAreaPage() {
 
       {/* Bộ lọc */}
       <BuildingAreaFilters
-        search={search}
+        search={filters.search}
         filterType={filterType}
-        filterStatus={filterStatus}
-        filterCampus={filterCampus}
+        filterStatus={filters.status}
+        filterCampus={filters.campus}
+        filterZoneType={filters.zoneType || ""}
         campuses={campuses}
-        onSearchChange={setSearch}
-        onFilterTypeChange={setFilterType}
-        onFilterStatusChange={setFilterStatus}
-        onFilterCampusChange={setFilterCampus}
-        onClearFilters={handleClearFilters}
+        onSearchSubmit={(value) => handleFilterChange({ search: value })}
+        onFilterTypeChange={handleFilterTypeChange}
+        onFilterStatusChange={(value) => handleFilterChange({ status: value })}
+        onFilterCampusChange={(value) => handleFilterChange({ campus: value })}
+        onFilterZoneTypeChange={(value) =>
+          handleFilterChange({ zoneType: value })
+        }
+        onClearFilters={() => {
+          handleClearFilters();
+          resetToFirstPage();
+        }}
       />
 
       {/* Bảng dữ liệu */}
       <BuildingAreaTable
-        items={filtered}
+        items={items}
         loading={loading}
         onEdit={(item) => {
           setEditingItem(item);
@@ -209,11 +157,18 @@ export default function BuildingAreaPage() {
         onDelete={handleDelete}
       />
 
+      {/* Pagination */}
+      <PaginationComponent
+        pagination={pagination}
+        currentPage={paginationRequest.page}
+        onPageChange={changePage}
+      />
+
       {/* Dialog thêm/sửa */}
       <BuildingAreaAddDialog
         open={openAdd}
         onOpenChange={setOpenAdd}
-        onSuccess={fetchAll}
+        onSuccess={fetchData}
         mode={editingItem ? "edit" : "add"}
         item={editingItem}
         campuses={campuses}

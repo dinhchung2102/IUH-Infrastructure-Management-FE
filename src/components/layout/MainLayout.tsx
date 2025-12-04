@@ -4,6 +4,7 @@ import Footer from "../Footer";
 import QuickActions from "../QuickActions";
 import { ScrollProgress, PageTransition } from "../motion";
 import { Toaster } from "../ui/sonner";
+import { DisclaimerDialog } from "../DisclaimerDialog";
 
 export default function MainLayout() {
   return (
@@ -17,6 +18,7 @@ export default function MainLayout() {
       </main>
       <Footer />
       <QuickActions />
+      <DisclaimerDialog />
       <Toaster />
     </div>
   );

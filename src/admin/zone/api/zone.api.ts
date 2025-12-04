@@ -10,20 +10,60 @@ export interface ZoneResponse {
   name: string;
   description?: string;
   status: "ACTIVE" | "INACTIVE";
-  building: string;
+  building:
+    | string
+    | {
+        _id: string;
+        name?: string;
+        floor?: number;
+        campus?: {
+          _id: string;
+          name?: string;
+          address?: string;
+        };
+      }
+    | null;
+  area:
+    | string
+    | {
+        _id: string;
+        name?: string;
+        description?: string;
+        campus?: {
+          _id: string;
+          name?: string;
+          address?: string;
+        };
+      }
+    | null;
   zoneType: "FUNCTIONAL" | "TECHNICAL" | "SERVICE" | "PUBLIC";
-  floorLocation?: number;
+  floorLocation?: number | null;
   createdAt: string;
   updatedAt: string;
 }
 
 export interface QueryZoneDto {
-  search?: string; // API uses "search" not "keyword"
+  search?: string;
   page?: number;
   limit?: number;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
   zoneType?: "FUNCTIONAL" | "TECHNICAL" | "SERVICE" | "PUBLIC";
   status?: "ACTIVE" | "INACTIVE" | "UNDERMAINTENANCE";
   campus?: string;
+  building?: string;
+  area?: string;
+  floorLocation?: number;
+}
+
+export interface ZonesListResponse {
+  zones: ZoneResponse[];
+  pagination: {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    itemsPerPage: number;
+  };
 }
 
 /** ✅ Dữ liệu thống kê zone trả về từ API */
@@ -42,7 +82,7 @@ export interface ZoneStatsResponse {
 
 // Lấy tất cả zones
 export const getZones = async (query?: QueryZoneDto) => {
-  const res = await api.get<ApiResponse<{ zones: ZoneResponse[] }>>(
+  const res = await api.get<ApiResponse<ZonesListResponse>>(
     "/zone-area/zones",
     { params: query }
   );

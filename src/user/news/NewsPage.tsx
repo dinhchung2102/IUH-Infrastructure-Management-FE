@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { NewsHeroSection, NewsSidebar, NewsGrid } from "./components";
+import { NewsSidebar, NewsGrid } from "./components";
 import { getPublicNews, getPublicNewsCategories } from "./api/news.api";
 import type { PublicNews, PublicNewsCategory } from "./api/news.api";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -9,7 +9,6 @@ export default function NewsPage() {
   const [news, setNews] = useState<PublicNews[]>([]);
   const [categories, setCategories] = useState<PublicNewsCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [pagination, setPagination] = useState({
@@ -26,7 +25,7 @@ export default function NewsPage() {
   useEffect(() => {
     fetchNews();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, selectedCategory, searchQuery]);
+  }, [currentPage, selectedCategory]);
 
   const fetchCategories = async () => {
     try {
@@ -45,7 +44,6 @@ export default function NewsPage() {
       const response = await getPublicNews({
         page: currentPage,
         limit: 6,
-        search: searchQuery || undefined,
         category: selectedCategory || undefined,
         sortBy: "createdAt",
         sortOrder: "desc",
@@ -63,11 +61,6 @@ export default function NewsPage() {
     }
   };
 
-  const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    setCurrentPage(1);
-  };
-
   const handleCategoryChange = (categoryId: string) => {
     setSelectedCategory(categoryId);
     setCurrentPage(1);
@@ -75,8 +68,6 @@ export default function NewsPage() {
 
   return (
     <div className="flex flex-col">
-      <NewsHeroSection onSearch={handleSearch} />
-
       {/* Main Content */}
       <section className="container py-16">
         {loading && categories.length === 0 ? (
@@ -97,6 +88,11 @@ export default function NewsPage() {
               selectedCategory={selectedCategory}
               onCategoryChange={handleCategoryChange}
               latestNews={news.slice(0, 5)}
+              featuredNews={news.filter(
+                (item) =>
+                  new Date(item.createdAt).getTime() >
+                  Date.now() - 7 * 24 * 60 * 60 * 1000
+              )}
             />
             <NewsGrid
               news={news}

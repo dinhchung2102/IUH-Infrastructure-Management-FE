@@ -1,8 +1,10 @@
 import {
   AboutHeroSection,
-  AboutStatsSection,
-  MissionVisionSection,
+  MissionSection,
+  VisionSection,
   FunctionsSection,
+  FunctionsDetailSection,
+  ResponsibilitiesSection,
   TeamSection,
 } from "./components";
 
@@ -10,9 +12,11 @@ export default function AboutPage() {
   return (
     <div className="flex flex-col">
       <AboutHeroSection />
-      <AboutStatsSection />
-      <MissionVisionSection />
       <FunctionsSection />
+      <MissionSection />
+      <VisionSection />
+      <FunctionsDetailSection />
+      <ResponsibilitiesSection />
       <TeamSection />
     </div>
   );

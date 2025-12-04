@@ -7,7 +7,6 @@ export default function Footer() {
   const quickLinks = [
     { to: "/", label: "Trang chủ" },
     { to: "/about", label: "Giới thiệu" },
-    { to: "/contact", label: "Liên hệ" },
     { to: "/facilities", label: "Cơ sở vật chất" },
     { to: "/news", label: "Tin tức" },
     { to: "/report", label: "Báo cáo sự cố" },
@@ -56,17 +55,8 @@ export default function Footer() {
               <img
                 src={iuhLogo}
                 alt="IUH Logo"
-                className="h-auto w-40 object-contain"
+                className="h-auto w-100 object-contain"
               />
-
-              <div>
-                <span className="block text-lg font-bold text-foreground">
-                  PHÒNG QUẢN TRỊ
-                </span>
-                <span className="text-sm font-medium text-primary">
-                  TRƯỜNG ĐẠI HỌC CÔNG NGHIỆP TP.HCM
-                </span>
-              </div>
             </div>
             <p className="mb-6 text-sm leading-relaxed text-slate-600 dark:text-slate-400 text-justify">
               Hệ thống quản lý cơ sở vật chất trường Đại học Công nghiệp Thành
@@ -141,7 +131,7 @@ export default function Footer() {
 
           {/* Quick Links - Enhanced */}
           <div className="lg:col-span-3">
-            <h3 className="mb-5 text-sm font-bold uppercase tracking-wider text-foreground">
+            <h3 className="mb-5 text-lg text-[#204195] font-bold uppercase">
               Liên kết nhanh
             </h3>
             <ul className="space-y-3">
@@ -161,7 +151,7 @@ export default function Footer() {
 
           {/* Contact Info - Enhanced */}
           <div className="lg:col-span-4">
-            <h3 className="mb-5 text-sm font-bold uppercase tracking-wider text-foreground">
+            <h3 className="mb-5 text-lg text-[#204195] font-bold uppercase">
               Thông tin liên hệ
             </h3>
             <ul className="space-y-4">
