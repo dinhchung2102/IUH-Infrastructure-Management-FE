@@ -16,7 +16,6 @@ import { ScrollToTop } from "./components/ScrollToTop";
 import HomePage from "./user/home/HomePage";
 import AboutPage from "./user/about/AboutPage";
 import FacilitiesPage from "./user/facilities/FacilitiesPage";
-import ContactPage from "./user/contact/ContactPage";
 import NewsPage from "./user/news/NewsPage";
 import NewsDetailPage from "./user/news/NewsDetailPage";
 import ReportPage from "./user/report/ReportPage";
@@ -61,7 +60,6 @@ function AppRoutes() {
           <Route index element={<HomePage />} />
           <Route path="about" element={<AboutPage />} />
           <Route path="facilities" element={<FacilitiesPage />} />
-          <Route path="contact" element={<ContactPage />} />
           <Route path="news" element={<NewsPage />} />
           <Route path="news/:slug" element={<NewsDetailPage />} />
           <Route path="report" element={<ReportPage />} />

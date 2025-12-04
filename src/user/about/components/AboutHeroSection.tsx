@@ -1,59 +1,97 @@
-import { Badge } from "@/components/ui/badge";
-import { Building2, Users, Shield, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import nhaEBackground from "@/assets/background/nhaE.png";
+import csvc002 from "@/assets/about/csvc002.jpg";
+import csvc005 from "@/assets/about/csvc005.jpg";
+import csvc007 from "@/assets/about/csvc007.jpg";
+
+const images = [nhaEBackground, csvc002, csvc005, csvc007];
 
 export function AboutHeroSection() {
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  // Auto slide every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const handlePrevious = () => {
+    setCurrentIndex((prev) => (prev === 0 ? images.length - 1 : prev - 1));
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev === images.length - 1 ? 0 : prev + 1));
+  };
+
+  const goToSlide = (index: number) => {
+    setCurrentIndex(index);
+  };
+
   return (
-    <section className="relative overflow-hidden">
-      {/* Background Image */}
+    <section className="relative overflow-hidden h-[400px] md:h-[500px] lg:h-[600px]">
+      {/* Carousel Background Images */}
       <div className="absolute inset-0 z-0">
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${nhaEBackground})` }}
-        />
-        <div className="absolute inset-0 bg-black/70" />
+        {images.map((image, index) => (
+          <div
+            key={index}
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              index === currentIndex ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <div
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url(${image})` }}
+            />
+          </div>
+        ))}
       </div>
 
-      {/* Content */}
-      <div className="container relative z-10 pt-8 sm:pt-12 md:pt-16 lg:pt-18 pb-20 sm:pb-28 md:pb-32 lg:pb-40">
-        <div className="mx-auto max-w-5xl">
-          <div>
-            <h1 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl lg:text-7xl text-center sm:text-left">
-              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-teal-400 bg-clip-text text-transparent">
-                Phòng Quản Trị
-              </span>
-              <br />
-              <span className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl">
-                Trường Đại học Công nghiệp TP.HCM
-              </span>
-            </h1>
-            <p className="mb-8 text-base sm:text-lg text-gray-200 max-w-3xl leading-relaxed text-center sm:text-left">
-              Phòng Quản Trị là đơn vị trực thuộc Trường Đại học Công nghiệp
-              TP.HCM, có chức năng tham mưu và giúp Hiệu trưởng quản lý toàn bộ
-              hệ thống cơ sở vật chất, thiết bị và công tác đầu tư xây dựng của
-              Trường.
-            </p>
-            <div className="mb-10 grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl">
-              <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                <Users className="h-5 w-5 text-cyan-400 flex-shrink-0" />
-                <span className="text-sm text-white">Phục vụ cộng đồng</span>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                <Shield className="h-5 w-5 text-cyan-400 flex-shrink-0" />
-                <span className="text-sm text-white">Đảm bảo chất lượng</span>
-              </div>
-              <div className="flex items-center gap-3 p-4 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-                <CheckCircle2 className="h-5 w-5 text-cyan-400 flex-shrink-0" />
-                <span className="text-sm text-white">Phục vụ 24/7</span>
-              </div>
-            </div>
-          </div>
+      {/* Navigation Buttons */}
+      {images.length > 1 && (
+        <>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handlePrevious}
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-20 text-white hover:bg-white/20 rounded-full h-12 w-12 backdrop-blur-sm"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="h-6 w-6" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleNext}
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-20 text-white hover:bg-white/20 rounded-full h-12 w-12 backdrop-blur-sm"
+            aria-label="Next image"
+          >
+            <ChevronRight className="h-6 w-6" />
+          </Button>
+        </>
+      )}
+
+      {/* Dots Indicator */}
+      {images.length > 1 && (
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex gap-2">
+          {images.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`h-2 rounded-full transition-all duration-300 ${
+                index === currentIndex
+                  ? "w-8 bg-white"
+                  : "w-2 bg-white/50 hover:bg-white/75"
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
         </div>
-      </div>
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-full">
-        <div className="absolute top-1/4 left-1/4 h-64 w-64 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
-      </div>
+      )}
     </section>
   );
 }

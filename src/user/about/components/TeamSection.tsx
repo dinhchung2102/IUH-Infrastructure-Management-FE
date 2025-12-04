@@ -29,10 +29,13 @@ const leadership = [
 
 export function TeamSection() {
   return (
-    <section className="border-t bg-muted/30 py-16 md:py-24">
+    <section className="bg-muted/30 py-16 md:py-24">
       <div className="container">
         <div className="mb-12">
-          <h2 className="mb-3 text-2xl uppercase sm:text-3xl font-bold text-gray-900 dark:text-gray-100">
+          <h2
+            className="mb-3 text-2xl sm:text-3xl font-bold uppercase"
+            style={{ color: "#204195" }}
+          >
             Ban lãnh đạo
           </h2>
           <p className="text-muted-foreground max-w-2xl">
@@ -44,7 +47,7 @@ export function TeamSection() {
           {leadership.map((leader, index) => {
             const Icon = leader.icon;
             return (
-              <Card key={index} className="hover:shadow-md transition-shadow">
+              <Card key={index}>
                 <CardHeader>
                   <div
                     className={`mb-4 flex h-14 w-14 items-center justify-center rounded-lg ${leader.bgColor}`}

@@ -133,7 +133,10 @@ export function RecentNewsSection() {
       <div className="container relative">
         <Parallax from={-20} to={20}>
           <div className="mb-8 lg:mb-10 text-center">
-            <h2 className="text-2xl font-bold md:text-3xl lg:text-4xl bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent animate-gradient-x transition-all duration-700">
+            <h2
+              className="text-2xl font-bold md:text-3xl lg:text-4xl uppercase"
+              style={{ color: "#204195" }}
+            >
               Tin tức - Thông báo
             </h2>
           </div>
@@ -219,23 +222,20 @@ export function RecentNewsSection() {
         </Parallax>
 
         {/* View All Button */}
-        <Parallax from={-10} to={10}>
-          <Reveal delay={0.4}>
-            <div className="flex justify-center">
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="group transition-all shadow-md hover:shadow-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white border-0 hover:scale-105 focus:ring-2 focus:ring-primary/70"
-              >
-                <Link to="/news" className="flex items-center gap-2">
-                  Xem tất cả
-                  <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
-                </Link>
-              </Button>
-            </div>
-          </Reveal>
-        </Parallax>
+
+        <div className="flex justify-center">
+          <Button
+            asChild
+            size="lg"
+            variant="outline"
+            className="group transition-all text-white hover:text-white bg-gradient-to-r from-blue-600 to-cyan-600 "
+          >
+            <Link to="/news" className="flex items-center gap-2">
+              Xem tất cả
+              <ArrowRight className="h-5 w-" />
+            </Link>
+          </Button>
+        </div>
       </div>
     </section>
   );

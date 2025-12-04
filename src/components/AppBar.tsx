@@ -13,7 +13,6 @@ import {
   Info,
   Newspaper,
   FileText,
-  Mail,
   Building,
   User,
   LogOut,
@@ -98,7 +97,6 @@ export default function AppBar() {
     { path: "/facilities", label: "Cơ sở vật chất", icon: Building },
     { path: "/news", label: "Tin tức", icon: Newspaper },
     { path: "/report", label: "Báo cáo sự cố", icon: FileText },
-    { path: "/contact", label: "Liên hệ", icon: Mail },
   ];
 
   useEffect(() => {
@@ -241,7 +239,7 @@ export default function AppBar() {
       >
         <div className="container flex h-18 items-center justify-between gap-4">
           {/* Logo Section - Fixed Width */}
-          <div className="flex items-center w-[200px] shrink-0">
+          <div className="flex items-center ">
             <Link
               to="/"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
@@ -260,7 +258,7 @@ export default function AppBar() {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`relative px-8 py-2 text-sm font-semibold rounded-lg transition-colors duration-200 ${
+                className={`relative px-8 py-2 text-sm uppercase font-semibold rounded-lg transition-colors duration-200 ${
                   isActive(item.path) ? "" : "opacity-70 hover:opacity-100"
                 }`}
                 style={{ color: "#204195" }}

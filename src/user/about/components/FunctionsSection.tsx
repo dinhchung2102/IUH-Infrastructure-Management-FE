@@ -9,10 +9,8 @@ import {
   Zap,
   Droplets,
   Building,
-  BarChart3,
   Settings,
   Shield,
-  Users,
 } from "lucide-react";
 
 const functions = [
@@ -65,34 +63,39 @@ const functions = [
 
 export function FunctionsSection() {
   return (
-    <section className="container py-16 md:py-24">
-      <div className="mb-8">
-        <h2 className="text-2xl sm:text-3xl font-bold uppercase text-gray-900 dark:text-gray-100">
-          Chức năng & Nhiệm vụ
-        </h2>
-      </div>
+    <section className="bg-white py-16 md:py-24">
+      <div className="container">
+        <div className="mb-8">
+          <h2
+            className="text-2xl sm:text-3xl font-bold uppercase"
+            style={{ color: "#204195" }}
+          >
+            Chức năng & Nhiệm vụ
+          </h2>
+        </div>
 
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {functions.map((func, index) => {
-          const Icon = func.icon;
-          return (
-            <Card key={index} className="hover:shadow-md transition-shadow">
-              <CardHeader>
-                <div
-                  className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${func.bgColor}`}
-                >
-                  <Icon className={`h-6 w-6 ${func.color}`} />
-                </div>
-                <CardTitle className="text-base font-semibold mb-2">
-                  {func.title}
-                </CardTitle>
-                <CardDescription className="text-sm leading-relaxed">
-                  {func.description}
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          );
-        })}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {functions.map((func, index) => {
+            const Icon = func.icon;
+            return (
+              <Card key={index}>
+                <CardHeader>
+                  <div
+                    className={`mb-4 flex h-12 w-12 items-center justify-center rounded-lg ${func.bgColor}`}
+                  >
+                    <Icon className={`h-6 w-6 ${func.color}`} />
+                  </div>
+                  <CardTitle className="text-base font-semibold mb-2">
+                    {func.title}
+                  </CardTitle>
+                  <CardDescription className="text-sm leading-relaxed">
+                    {func.description}
+                  </CardDescription>
+                </CardHeader>
+              </Card>
+            );
+          })}
+        </div>
       </div>
     </section>
   );

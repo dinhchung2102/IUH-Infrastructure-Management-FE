@@ -924,24 +924,27 @@ export function ReportForm() {
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full hover:scale-105 transition-transform"
-              size="lg"
-              disabled={isSubmitting || isSendingOtp}
-            >
-              {isSubmitting || isSendingOtp ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
-                  {isSendingOtp ? "Đang gửi OTP..." : "Đang gửi..."}
-                </>
-              ) : (
-                <>
-                  <FileText className="h-4 w-4" />
-                  Gửi báo cáo
-                </>
-              )}
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                type="submit"
+                className="bg-[#204195] text-white hover:bg-[#204195]/90 hover:text-white/95 cursor-pointer"
+                size="lg"
+                variant={"outline"}
+                disabled={isSubmitting || isSendingOtp}
+              >
+                {isSubmitting || isSendingOtp ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white" />
+                    {isSendingOtp ? "Đang gửi OTP..." : "Đang gửi..."}
+                  </>
+                ) : (
+                  <>
+                    <FileText className="h-4 w-4" />
+                    Gửi báo cáo
+                  </>
+                )}
+              </Button>
+            </div>
           </form>
         </CardContent>
       </Card>
