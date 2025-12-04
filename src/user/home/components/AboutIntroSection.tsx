@@ -18,8 +18,8 @@ export function AboutIntroSection() {
                 </span>
               </h2>
 
-              <div className="space-y-4 text-base md:text-lg text-muted-foreground leading-relaxed">
-                <p className="text-justify">
+              <div className="space-y-4 text-base md:text-base text-muted-foreground leading-relaxed">
+                <p className="text-justify ">
                   <strong className="text-foreground">
                     Phòng Quản Trị trường Đại học Công nghiệp TP.HCM
                   </strong>{" "}

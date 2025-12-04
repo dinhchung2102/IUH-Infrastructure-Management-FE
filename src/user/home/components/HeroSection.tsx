@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { FileText, ArrowRight, CheckCircle2, Shield, Zap } from "lucide-react";
+import { CheckCircle2, Shield, Zap } from "lucide-react";
 import { Stagger, Parallax } from "@/components/motion";
 import nhaEBackground from "@/assets/background/nhaE.png";
 import { motion } from "framer-motion";
@@ -49,7 +49,7 @@ export function HeroSection() {
                 </h1>
 
                 {/* Description */}
-                <p className="mb-8 text-base sm:text-lg md:text-xl text-gray-200 max-w-3xl leading-relaxed text-center sm:text-justify">
+                <p className="mb-8 text-base sm:text-lg md:text-lg text-gray-200 max-w-3xl leading-relaxed text-center sm:text-justify">
                   Hệ thống quản lý và báo cáo sự cố cơ sở vật chất trường Đại
                   học Công nghiệp TP.HCM. Giải pháp toàn diện giúp sinh viên, Hệ
                   thống quản lý và báo cáo sự cố cơ sở vật chất trường Đại học
@@ -65,22 +65,16 @@ export function HeroSection() {
                 <div className="flex flex-col sm:flex-row items-center sm:items-start justify-center sm:justify-start gap-3">
                   <Button
                     asChild
-                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white shadow-md hover:shadow-lg hover:scale-105 transition-all border-0 text-base px-8 py-3 h-auto"
+                    className="w-full sm:w-auto bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700 text-white  hover:scale-105 transition-all border-1 border-white/30 text-base px-5 py-2 h-auto"
                   >
-                    <Link to="/report">
-                      <FileText className="h-5 w-5" />
-                      Báo cáo sự cố
-                    </Link>
+                    <Link to="/report">Báo cáo sự cố</Link>
                   </Button>
                   <Button
                     variant="outline"
                     asChild
-                    className="w-full sm:w-auto bg-white/10 hover:bg-white/20 text-white border-white/30 backdrop-blur-sm hover:scale-105 transition-all text-base px-6 py-3 h-auto"
+                    className="w-full sm:w-auto bg-white hover:bg-white/80   text-black border-white/30 backdrop-blur-sm hover:scale-105 transition-all text-base px-5 py-2 h-auto"
                   >
-                    <Link to="/about">
-                      Tìm hiểu thêm
-                      <ArrowRight className="h-5 w-5" />
-                    </Link>
+                    <Link to="/about">Tìm hiểu thêm</Link>
                   </Button>
                 </div>
               </Stagger>
