@@ -49,6 +49,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import type { Account } from "@/types/response.type";
 import { getRoleDisplay, getUserInitials } from "@/utils/formatDisplay.util";
+import { AxiosError } from "axios";
 
 type DialogType =
   | "login"
@@ -122,7 +123,7 @@ export default function AppBar() {
   }, []);
 
   useEffect(() => {
-    const onTokenExpired = (_e: Event) => {
+    const onTokenExpired = () => {
       // Show alert dialog when refresh token fails
       setShowTokenExpiredAlert(true);
       // Ensure any mobile sheet is closed
@@ -199,7 +200,7 @@ export default function AppBar() {
       setShowLogoutAlert(false);
       toast.success("Đăng xuất thành công!");
       navigate("/");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Logout error:", error);
       // Even if API fails, clear local data
       localStorage.removeItem("access_token");
@@ -209,7 +210,7 @@ export default function AppBar() {
       setShowLogoutAlert(false);
 
       // Check if it's a token expiration error
-      if (error.response?.status === 401) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
         toast.success("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
       } else {
         toast.error("Đăng xuất thất bại");
@@ -246,7 +247,7 @@ export default function AppBar() {
               <img
                 src={logoImage}
                 alt="IUH Logo"
-                className="h-14 w-auto object-contain"
+                className="h-12 w-auto object-contain"
               />
             </Link>
           </div>
