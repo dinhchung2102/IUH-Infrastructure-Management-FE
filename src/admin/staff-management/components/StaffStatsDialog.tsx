@@ -113,7 +113,7 @@ export function StaffStatsDialog({
   } satisfies ChartConfig;
 
   const roleData =
-    stats?.accountsByRole.map((item, index) => ({
+    stats?.accountsByRole?.map((item, index) => ({
       role: item.role,
       count: item.count,
       fill: `var(--chart-${(index % 5) + 1})`,
