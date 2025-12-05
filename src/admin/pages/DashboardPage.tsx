@@ -108,6 +108,7 @@ const convertDashboardReportToReport = (
     },
     type: dashboardReport.type,
     status: dashboardReport.status as "PENDING" | "APPROVED" | "REJECTED",
+    priority: dashboardReport.priority,
     description: dashboardReport.description,
     images: dashboardReport.images,
     createdBy: {
@@ -378,6 +379,8 @@ export default function DashboardPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
+                        {report.priority &&
+                          getPriorityBadge(report.priority.toUpperCase())}
                         {getReportStatusBadge(
                           report.status.toUpperCase() as
                             | "PENDING"

@@ -170,9 +170,14 @@ export const NEWS_STATUS_BADGE: Record<NewsStatus, BadgeStyle> = {
 };
 
 // Priority Badge Config
-export type Priority = "HIGH" | "MEDIUM" | "LOW";
+export type Priority = "HIGH" | "MEDIUM" | "LOW" | "CRITICAL";
 
 export const PRIORITY_BADGE: Record<Priority, BadgeStyle> = {
+  CRITICAL: {
+    label: "Khẩn cấp",
+    className: "bg-red-600 text-white hover:bg-red-600 border-red-700",
+    variant: "destructive",
+  },
   HIGH: {
     label: "Cao",
     className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
@@ -373,7 +378,8 @@ export const ROLE_BADGE: Record<RoleName, BadgeStyle> = {
   },
   CAMPUS_ADMIN: {
     label: "Quản trị cơ sở",
-    className: "bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200",
+    className:
+      "bg-purple-100 text-purple-700 hover:bg-purple-100 border-purple-200",
     variant: "outline",
   },
   STAFF: {
@@ -383,12 +389,14 @@ export const ROLE_BADGE: Record<RoleName, BadgeStyle> = {
   },
   LECTURER: {
     label: "Giảng viên",
-    className: "bg-green-100 text-green-700 hover:bg-green-100 border-green-200",
+    className:
+      "bg-green-100 text-green-700 hover:bg-green-100 border-green-200",
     variant: "outline",
   },
   STUDENT: {
     label: "Sinh viên",
-    className: "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200",
+    className:
+      "bg-amber-100 text-amber-700 hover:bg-amber-100 border-amber-200",
     variant: "outline",
   },
   GUEST: {
@@ -399,8 +407,5 @@ export const ROLE_BADGE: Record<RoleName, BadgeStyle> = {
 };
 
 export function getRoleBadge(role: RoleName | string) {
-  return renderBadge(
-    getBadgeConfig(ROLE_BADGE, role as RoleName),
-    "text-xs"
-  );
+  return renderBadge(getBadgeConfig(ROLE_BADGE, role as RoleName), "text-xs");
 }

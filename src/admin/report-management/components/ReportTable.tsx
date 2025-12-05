@@ -7,13 +7,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Eye, CheckCircle, XCircle } from "lucide-react";
-import { TableActionMenu, type TableAction } from "@/components/TableActionMenu";
+import {
+  TableActionMenu,
+  type TableAction,
+} from "@/components/TableActionMenu";
 import type { Report, ReportStatus } from "../types/report.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import {
   getReportStatusBadge,
   getReportTypeBadge,
+  getPriorityBadge,
 } from "@/config/badge.config";
 
 interface ReportTableProps {
@@ -51,6 +55,7 @@ export function ReportTable({
             <TableHead>Thiết bị</TableHead>
             <TableHead>Vị trí</TableHead>
             <TableHead>Loại</TableHead>
+            <TableHead>Độ ưu tiên</TableHead>
             <TableHead>Trạng thái</TableHead>
             <TableHead>Ngày tạo</TableHead>
             <TableHead className="text-right">Thao tác</TableHead>
@@ -111,6 +116,9 @@ export function ReportTable({
                   </div>
                 </TableCell>
                 <TableCell>{getReportTypeBadge(report.type)}</TableCell>
+                <TableCell>
+                  {report.priority ? getPriorityBadge(report.priority) : "-"}
+                </TableCell>
                 <TableCell>{getReportStatusBadge(report.status)}</TableCell>
                 <TableCell>
                   <div>

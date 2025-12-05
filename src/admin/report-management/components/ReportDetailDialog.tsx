@@ -18,6 +18,7 @@ import { useState } from "react";
 import { getAssetStatusConfig } from "@/utils/assetStatus.util";
 import { Button } from "@/components/ui/button";
 import { ApproveReportDialog } from "./ApproveReportDialog";
+import { getPriorityBadge } from "@/config/badge.config";
 
 interface ReportDetailDialogProps {
   report: Report | null;
@@ -146,6 +147,11 @@ export function ReportDetailDialog({
                 >
                   {getTypeConfig(report.type).label}
                 </Badge>
+                {report.priority && (
+                  <Badge variant="outline" className="text-xs">
+                    {getPriorityBadge(report.priority)}
+                  </Badge>
+                )}
               </div>
             </div>
           </DialogHeader>
