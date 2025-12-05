@@ -11,6 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -113,50 +114,78 @@ function AssetPage() {
       <AssetStatsCards stats={stats} loading={loading} />
 
       {/* Bộ lọc */}
-      <div className="flex flex-wrap gap-4">
-        <form
-          onSubmit={(e) => e.preventDefault()}
-          className="flex-1 min-w-[250px] flex gap-2"
-        >
-          <Input
-            placeholder="Tìm kiếm theo tên thiết bị..."
-            value={filters.search}
-            onChange={(e) => handleFiltersChange({ search: e.target.value })}
-          />
-          <Button type="submit">Tìm kiếm</Button>
-        </form>
+      <div className="flex flex-wrap gap-4 items-end">
+        <div className="flex-1 min-w-[250px] space-y-2">
+          <Label>Tìm kiếm</Label>
+          <form
+            onSubmit={(e) => e.preventDefault()}
+            className="flex gap-2"
+          >
+            <Input
+              placeholder="Tìm kiếm theo tên thiết bị..."
+              value={filters.search}
+              onChange={(e) => handleFiltersChange({ search: e.target.value })}
+              className="bg-white"
+            />
+            <Button type="submit" className="cursor-pointer">
+              Tìm kiếm
+            </Button>
+          </form>
+        </div>
 
-        <Select
-          value={filters.statusFilter}
-          onValueChange={(value) =>
-            handleFiltersChange({ statusFilter: value })
-          }
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Tất cả trạng thái" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả trạng thái</SelectItem>
-            <SelectItem value="IN_USE">Đang sử dụng</SelectItem>
-            <SelectItem value="MAINTENANCE">Bảo trì</SelectItem>
-            <SelectItem value="BROKEN">Hư hỏng</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="space-y-2">
+          <Label>Trạng thái</Label>
+          <Select
+            value={filters.statusFilter}
+            onValueChange={(value) =>
+              handleFiltersChange({ statusFilter: value })
+            }
+          >
+            <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+              <SelectValue placeholder="Tất cả trạng thái" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="cursor-pointer">
+                Tất cả trạng thái
+              </SelectItem>
+              <SelectItem value="IN_USE" className="cursor-pointer">
+                Đang sử dụng
+              </SelectItem>
+              <SelectItem value="MAINTENANCE" className="cursor-pointer">
+                Bảo trì
+              </SelectItem>
+              <SelectItem value="BROKEN" className="cursor-pointer">
+                Hư hỏng
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
-        <Select
-          value={filters.typeFilter}
-          onValueChange={(value) => handleFiltersChange({ typeFilter: value })}
-        >
-          <SelectTrigger className="w-[180px] bg-white">
-            <SelectValue placeholder="Tất cả loại thiết bị" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Tất cả loại</SelectItem>
-            <SelectItem value="máy tính">Máy tính</SelectItem>
-            <SelectItem value="máy in">Máy in</SelectItem>
-            <SelectItem value="camera">Camera</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="space-y-2">
+          <Label>Loại thiết bị</Label>
+          <Select
+            value={filters.typeFilter}
+            onValueChange={(value) => handleFiltersChange({ typeFilter: value })}
+          >
+            <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+              <SelectValue placeholder="Tất cả loại thiết bị" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all" className="cursor-pointer">
+                Tất cả loại
+              </SelectItem>
+              <SelectItem value="máy tính" className="cursor-pointer">
+                Máy tính
+              </SelectItem>
+              <SelectItem value="máy in" className="cursor-pointer">
+                Máy in
+              </SelectItem>
+              <SelectItem value="camera" className="cursor-pointer">
+                Camera
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
 
         <ClearFiltersButton onClick={handleClearFilters} />
       </div>

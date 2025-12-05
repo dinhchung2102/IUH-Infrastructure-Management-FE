@@ -13,6 +13,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import {
   DropdownMenu,
@@ -176,23 +177,27 @@ export default function AssetCategoriesPage() {
       <AssetCategoryCards stats={stats} />
 
       {/* Bộ lọc */}
-      <div className="flex flex-wrap gap-4">
-        <form
-          onSubmit={handleSearch}
-          className="flex-1 min-w-[250px] flex gap-2"
-        >
-          <Input
-            placeholder="Tìm kiếm danh mục..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="bg-white"
-          />
-          <Button type="submit" variant="default">
-            Tìm kiếm
-          </Button>
-        </form>
+      <div className="flex flex-wrap gap-4 items-end">
+        <div className="flex-1 min-w-[250px] space-y-2">
+          <Label>Tìm kiếm</Label>
+          <form onSubmit={handleSearch} className="flex gap-2">
+            <Input
+              placeholder="Tìm kiếm danh mục..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="bg-white"
+            />
+            <Button type="submit" variant="default" className="cursor-pointer">
+              Tìm kiếm
+            </Button>
+          </form>
+        </div>
         {search && (
-          <Button variant="outline" onClick={() => setSearch("")}>
+          <Button
+            variant="outline"
+            onClick={() => setSearch("")}
+            className="cursor-pointer"
+          >
             Xóa bộ lọc
           </Button>
         )}
