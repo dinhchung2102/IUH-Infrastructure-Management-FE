@@ -10,6 +10,7 @@ export interface DashboardReport {
   _id: string;
   type: string;
   status: string;
+  priority?: "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   description: string;
   images: string[];
   asset: {

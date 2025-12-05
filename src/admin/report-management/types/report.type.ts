@@ -1,5 +1,7 @@
 export type ReportStatus = "PENDING" | "APPROVED" | "REJECTED";
 
+export type ReportPriority = "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
+
 export interface Report {
   _id: string;
   asset: {
@@ -31,6 +33,7 @@ export interface Report {
   };
   type: string;
   status: ReportStatus;
+  priority?: ReportPriority;
   description: string;
   images: string[]; // Hình ảnh báo cáo (hiển thị trong detail dialog)
   createdBy: {

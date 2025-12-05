@@ -187,6 +187,7 @@ export default function ReportManagementPage() {
               { type: "text", width: "w-[150px]" },
               { type: "badge", width: "w-[100px]" },
               { type: "badge", width: "w-[100px]" },
+              { type: "badge", width: "w-[100px]" },
               { type: "text", width: "w-[120px]" },
               { type: "text", width: "w-[80px]", align: "right" },
             ]}

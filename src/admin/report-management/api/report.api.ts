@@ -1,7 +1,7 @@
 import api from "@/lib/axios";
 import type { ApiResponse } from "@/types/response.type";
 import type { BaseQueryDto } from "@/types/pagination.type";
-import type { Report } from "../types/report.type";
+import type { Report, ReportPriority } from "../types/report.type";
 
 // Response types từ API
 export interface ReportApiAsset {
@@ -43,6 +43,7 @@ export interface ReportApiResponse {
   asset: ReportApiAsset;
   type: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
+  priority?: ReportPriority;
   description: string;
   images: string[];
   createdBy: ReportApiCreatedBy | null;
@@ -170,6 +171,7 @@ export const transformReportApiToUI = (
     },
     type: apiReport.type,
     status: apiReport.status,
+    priority: apiReport.priority,
     description: apiReport.description,
     images: apiReport.images, // Giữ nguyên paths
     createdBy: {
