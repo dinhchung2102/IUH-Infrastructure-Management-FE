@@ -79,8 +79,9 @@ export const getReports = async (params?: GetReportsParams) => {
       status:
         params?.status && params.status !== "all" ? params.status : undefined,
       type: params?.type && params.type !== "all" ? params.type : undefined,
-      dateFrom: params?.dateFrom || undefined,
-      dateTo: params?.dateTo || undefined,
+      // Map dateFrom/dateTo to fromDate/toDate for BE API
+      fromDate: params?.dateFrom || undefined,
+      toDate: params?.dateTo || undefined,
     },
   });
   console.log("[API: GET REPORTS]:", response.data);

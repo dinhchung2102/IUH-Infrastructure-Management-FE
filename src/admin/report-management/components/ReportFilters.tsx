@@ -122,6 +122,27 @@ export function ReportFilters({
         </Select>
       </div>
 
+      {/* Date Range Filter */}
+      <div className="space-y-2">
+        <Label>Khoảng thời gian</Label>
+        <div className="flex gap-2">
+          <Input
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => onFilterChange("dateFrom", e.target.value)}
+            className="w-[160px] bg-white"
+            placeholder="Từ ngày"
+          />
+          <Input
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => onFilterChange("dateTo", e.target.value)}
+            className="w-[160px] bg-white"
+            placeholder="Đến ngày"
+          />
+        </div>
+      </div>
+
       {/* Reset Button */}
       <ClearFiltersButton onClick={onReset} />
     </div>
