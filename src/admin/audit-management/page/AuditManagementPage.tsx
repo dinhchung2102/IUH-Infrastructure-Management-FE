@@ -4,6 +4,7 @@ import {
   AuditFilters,
   AuditTable,
   AuditDetailDialog,
+  CreateAuditDialog,
 } from "../components";
 import type {
   AuditLog,
@@ -13,19 +14,21 @@ import type {
 import { toast } from "sonner";
 import PaginationComponent from "@/components/PaginationComponent";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 import {
   getAuditLogs,
   updateAuditStatus,
   getAuditStats,
   transformAuditLogApiToUI,
 } from "../api/audit.api";
-import { TableSkeleton } from "@/components/TableSkeleton";
 import type { PaginationResponse } from "@/types/pagination.type";
 
 export default function AuditManagementPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [selectedAudit, setSelectedAudit] = useState<AuditLog | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Pagination
@@ -151,9 +154,16 @@ export default function AuditManagementPage() {
           items={[
             { label: "Dashboard", href: "/admin" },
             { label: "Quản lý", href: "/admin/audits" },
-            { label: "Bảo trì & Sửa chữa", isCurrent: true },
+            { label: "Nhiệm vụ", isCurrent: true },
           ]}
         />
+        <Button
+          className="w-full cursor-pointer md:w-auto mt-2 md:mt-0"
+          onClick={() => setCreateDialogOpen(true)}
+        >
+          <Plus className="h-4 w-4" />
+          Tạo nhiệm vụ
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -167,46 +177,35 @@ export default function AuditManagementPage() {
       />
 
       {/* Table */}
-      <div className="space-y-4">
-        {loading ? (
-          <TableSkeleton
-            rows={5}
-            columns={[
-              { type: "number", width: "w-[60px]", align: "center" },
-              { type: "text", width: "w-[200px]" },
-              { type: "avatar", width: "w-[200px]" },
-              { type: "text", width: "w-[150px]" },
-              { type: "badge", width: "w-[100px]" },
-              { type: "text", width: "w-[150px]" },
-              { type: "badge", width: "w-[100px]" },
-              { type: "text", width: "w-[120px]" },
-              { type: "text", width: "w-[80px]", align: "right" },
-            ]}
-          />
-        ) : (
-          <AuditTable
-            auditLogs={auditLogs}
-            onViewDetails={handleViewDetails}
-            onUpdateStatus={handleUpdateStatus}
-            currentPage={currentPage}
-            itemsPerPage={pagination.itemsPerPage}
-          />
-        )}
+      <AuditTable
+        auditLogs={auditLogs}
+        onViewDetails={handleViewDetails}
+        onUpdateStatus={handleUpdateStatus}
+        currentPage={currentPage}
+        itemsPerPage={pagination.itemsPerPage}
+        loading={loading}
+      />
 
-        {pagination.totalPages > 1 && (
-          <PaginationComponent
-            pagination={pagination}
-            currentPage={currentPage}
-            onPageChange={setCurrentPage}
-          />
-        )}
-      </div>
+      {pagination.totalPages > 1 && (
+        <PaginationComponent
+          pagination={pagination}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+        />
+      )}
 
       {/* Detail Dialog */}
       <AuditDetailDialog
         audit={selectedAudit}
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
+      />
+
+      {/* Create Audit Dialog */}
+      <CreateAuditDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+        onSuccess={fetchAuditLogs}
       />
     </div>
   );

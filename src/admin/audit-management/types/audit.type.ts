@@ -2,7 +2,7 @@ export type AuditStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED" | "CANCELLED";
 
 export interface AuditLog {
   _id: string;
-  report: {
+  report?: {
     _id: string;
     asset: {
       _id: string;
@@ -40,6 +40,13 @@ export interface AuditLog {
       fullName: string;
       email: string;
     };
+  } | null;
+  asset?: {
+    _id: string;
+    name?: string;
+    code?: string;
+    status?: string;
+    image?: string;
   };
   status: AuditStatus;
   subject: string;

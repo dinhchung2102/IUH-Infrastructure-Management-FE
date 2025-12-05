@@ -96,7 +96,7 @@ const navigation = [
         icon: FileText,
       },
       {
-        title: "Bảo trì & Sửa chữa",
+        title: "Nhiệm vụ",
         href: "/admin/audits",
         icon: Wrench,
       },
@@ -232,8 +232,8 @@ function SidebarContent() {
   return (
     <div className="flex h-full w-full flex-col">
       {/* Logo */}
-      <div className="flex h-16 items-center gap-3 border-b px-6">
-        <img src={logoImage} alt="IUH Logo" className="h-14 w-auto" />
+      <div className="flex h-16 items-center gap-3 border-b px-3">
+        <img src={logoImage} alt="IUH Logo" className="w-full h-auto" />
       </div>
 
       {/* Navigation */}
@@ -369,8 +369,12 @@ function SidebarContent() {
       {/* Footer */}
       <div className="border-t p-4">
         <div className="rounded-lg bg-muted/50 p-3">
-          <p className="text-xs text-muted-foreground">Version 1.0.0</p>
-          <p className="mt-1 text-xs font-medium">© 2025 Phòng quản trị IUH</p>
+          <p className="text-xs text-muted-foreground">
+            Version {import.meta.env.VITE_APP_VERSION || "1.0.0"}
+          </p>
+          <p className="mt-1 text-xs font-medium">
+            © {new Date().getFullYear()} Phòng quản trị IUH
+          </p>
         </div>
       </div>
     </div>

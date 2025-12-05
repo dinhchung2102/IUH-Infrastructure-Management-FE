@@ -37,7 +37,7 @@ const resourceLabels: Record<string, { label: string; description: string }> = {
   ROLE: { label: "Vai trò", description: "Quản lý vai trò và phân quyền" },
   PERMISSION: { label: "Quyền hạn", description: "Quản lý quyền hạn hệ thống" },
   REPORT: { label: "Báo cáo", description: "Quản lý báo cáo sự cố" },
-  AUDIT: { label: "Bảo trì", description: "Quản lý công việc bảo trì" },
+  AUDIT: { label: "Bảo trì", description: "Quản lý Nhiệm vụ" },
   ASSET: { label: "Thiết bị", description: "Quản lý thiết bị" },
   CAMPUS: { label: "Cơ sở", description: "Quản lý cơ sở" },
   BUILDING: { label: "Tòa nhà", description: "Quản lý tòa nhà" },

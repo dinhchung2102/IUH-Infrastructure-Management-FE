@@ -7,6 +7,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
 import { ClearFiltersButton } from "@/components/ClearFiltersButton";
 import { useState, useEffect } from "react";
 
@@ -56,53 +57,91 @@ export function ReportFilters({
   };
 
   return (
-    <div className="flex flex-wrap gap-4">
+    <div className="flex flex-wrap gap-4 items-end">
       {/* Search Form */}
-      <form onSubmit={handleSearch} className="flex-1 min-w-[250px] flex gap-2">
-        <Input
-          placeholder="Tìm theo mã báo cáo, người báo cáo, thiết bị..."
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          className="bg-white"
-        />
-        <Button type="submit" variant="default" className="cursor-pointer">
-          Tìm kiếm
-        </Button>
-      </form>
+      <div className="flex-1 min-w-[250px] space-y-2">
+        <Label>Tìm kiếm</Label>
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <Input
+            placeholder="Tìm theo mã báo cáo, người báo cáo, thiết bị..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            className="bg-white"
+          />
+          <Button type="submit" variant="default" className="cursor-pointer">
+            Tìm kiếm
+          </Button>
+        </form>
+      </div>
 
       {/* Status Filter */}
-      <Select
-        value={filters.status}
-        onValueChange={(value) => onFilterChange("status", value)}
-      >
-        <SelectTrigger className="w-[180px] bg-white">
-          <SelectValue placeholder="Trạng thái" />
-        </SelectTrigger>
-        <SelectContent>
-          {statusOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="space-y-2">
+        <Label>Trạng thái</Label>
+        <Select
+          value={filters.status}
+          onValueChange={(value) => onFilterChange("status", value)}
+        >
+          <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+            <SelectValue placeholder="Trạng thái" />
+          </SelectTrigger>
+          <SelectContent>
+            {statusOptions.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="cursor-pointer"
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       {/* Type Filter */}
-      <Select
-        value={filters.type}
-        onValueChange={(value) => onFilterChange("type", value)}
-      >
-        <SelectTrigger className="w-[180px] bg-white">
-          <SelectValue placeholder="Loại báo cáo" />
-        </SelectTrigger>
-        <SelectContent>
-          {typeOptions.map((option) => (
-            <SelectItem key={option.value} value={option.value}>
-              {option.label}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+      <div className="space-y-2">
+        <Label>Loại báo cáo</Label>
+        <Select
+          value={filters.type}
+          onValueChange={(value) => onFilterChange("type", value)}
+        >
+          <SelectTrigger className="w-[180px] bg-white cursor-pointer">
+            <SelectValue placeholder="Loại báo cáo" />
+          </SelectTrigger>
+          <SelectContent>
+            {typeOptions.map((option) => (
+              <SelectItem
+                key={option.value}
+                value={option.value}
+                className="cursor-pointer"
+              >
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Date Range Filter */}
+      <div className="space-y-2">
+        <Label>Khoảng thời gian</Label>
+        <div className="flex gap-2">
+          <Input
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => onFilterChange("dateFrom", e.target.value)}
+            className="w-[160px] bg-white"
+            placeholder="Từ ngày"
+          />
+          <Input
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => onFilterChange("dateTo", e.target.value)}
+            className="w-[160px] bg-white"
+            placeholder="Đến ngày"
+          />
+        </div>
+      </div>
 
       {/* Reset Button */}
       <ClearFiltersButton onClick={onReset} />

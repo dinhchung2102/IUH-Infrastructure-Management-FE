@@ -12,7 +12,13 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 
 export function MaintenanceAddDialog({
@@ -54,7 +60,9 @@ export function MaintenanceAddDialog({
       <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
           <DialogTitle>Thêm lịch bảo trì</DialogTitle>
-          <DialogDescription>Điền thông tin chi tiết cho công việc bảo trì.</DialogDescription>
+          <DialogDescription>
+            Điền thông tin chi tiết cho Nhiệm vụ.
+          </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-3">
           <div>
@@ -99,7 +107,11 @@ export function MaintenanceAddDialog({
           </div>
 
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               Hủy
             </Button>
             <Button type="submit">Thêm</Button>
