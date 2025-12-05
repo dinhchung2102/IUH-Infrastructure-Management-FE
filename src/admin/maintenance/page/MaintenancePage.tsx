@@ -162,9 +162,7 @@ export default function MaintenancePage() {
             </SelectContent>
           </Select>
 
-          {(search ||
-            statusFilter !== "all" ||
-            priorityFilter !== "all") && (
+          {(search || statusFilter !== "all" || priorityFilter !== "all") && (
             <Button
               variant="outline"
               onClick={() => {
@@ -198,7 +196,7 @@ export default function MaintenancePage() {
             {filteredEvents.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} className="text-center py-4">
-                  Không có công việc bảo trì nào phù hợp.
+                  Không có Nhiệm vụ nào phù hợp.
                 </TableCell>
               </TableRow>
             ) : (
