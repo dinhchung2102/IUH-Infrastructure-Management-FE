@@ -1,7 +1,6 @@
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -10,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, User, Mail, FileText, CheckCircle2 } from "lucide-react";
+import { Calendar, User, Mail, CheckCircle2 } from "lucide-react";
 import type { Report } from "../types/report.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -126,182 +125,96 @@ export function ReportDetailDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[95vw] sm:max-w-5xl max-h-[90vh]">
-          <DialogHeader>
-            <DialogTitle className="text-xl flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Chi tiết báo cáo
-            </DialogTitle>
-            <DialogDescription>
-              Thông tin chi tiết về báo cáo sự cố
-            </DialogDescription>
-          </DialogHeader>
-
-          <ScrollArea className="max-h-[calc(90vh-120px)]">
-            <div className="space-y-6 pr-4">
-              {/* Status & Type */}
-              <div className="flex items-center gap-2">
+        <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[88vh]">
+          <DialogHeader className="space-y-2 pb-2">
+            <div className="flex items-center">
+              <DialogTitle className="text-lg flex items-center gap-2">
+                Chi tiết báo cáo
+              </DialogTitle>
+              <div className="flex items-center gap-1.5 pl-4">
                 <Badge
                   variant="outline"
-                  className={getStatusConfig(report.status).className}
+                  className={`text-xs ${
+                    getStatusConfig(report.status).className
+                  }`}
                 >
                   {getStatusConfig(report.status).label}
                 </Badge>
                 <Badge
                   variant="outline"
-                  className={getTypeConfig(report.type).className}
+                  className={`text-xs ${getTypeConfig(report.type).className}`}
                 >
                   {getTypeConfig(report.type).label}
                 </Badge>
               </div>
+            </div>
+          </DialogHeader>
 
-              <Separator />
-
-              {/* Reporter Info */}
-              <div>
-                <h3 className="text-sm font-semibold mb-3">Người báo cáo</h3>
-                <div className="flex items-start gap-4 bg-muted/30 rounded-lg p-4">
-                  <Avatar className="h-14 w-14 flex-shrink-0">
-                    <AvatarFallback className="text-base">
-                      {getUserInitials(report.createdBy.fullName)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="min-w-0 flex-1 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <User className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      <p className="font-semibold text-base truncate">
-                        {report.createdBy.fullName}
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-                      <p className="text-sm text-muted-foreground truncate">
-                        {report.createdBy.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Asset Info */}
-              <div>
-                <h3 className="text-sm font-semibold mb-3">
-                  Thông tin thiết bị
-                </h3>
-                <div className="flex items-start gap-4 bg-muted/30 rounded-lg p-4">
-                  {report.asset.image ? (
-                    <img
-                      src={`${import.meta.env.VITE_URL_UPLOADS}${
-                        report.asset.image
-                      }`}
-                      alt={report.asset.name}
-                      className="h-20 w-20 rounded-lg object-cover border-2 flex-shrink-0"
-                    />
-                  ) : (
-                    <div className="h-20 w-20 rounded-lg bg-gray-100 flex items-center justify-center border-2 flex-shrink-0">
-                      <span className="text-sm text-gray-400">N/A</span>
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Tên thiết bị
-                      </p>
-                      <p className="font-semibold truncate">
-                        {report.asset.name}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Mã thiết bị
-                      </p>
-                      <p className="font-semibold text-primary">
-                        {report.asset.code}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground mb-1">
-                        Trạng thái
-                      </p>
-                      <Badge
-                        variant="outline"
-                        className={
-                          getAssetStatusConfig(report.asset.status).className
-                        }
-                      >
-                        {getAssetStatusConfig(report.asset.status).label}
-                      </Badge>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Separator />
-
-              {/* Location Info & Timeline - 2 Columns */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Location Info */}
-                <div>
-                  <h3 className="text-sm font-semibold mb-3">Vị trí báo cáo</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Cơ sở</p>
-                      <p className="font-medium">{report.location?.campus}</p>
-                    </div>
-                    {report.location?.building && (
-                      <div>
-                        <p className="text-xs text-muted-foreground">Tòa nhà</p>
-                        <p className="font-medium">
-                          {report.location.building}
+          <ScrollArea className="max-h-[calc(88vh-140px)]">
+            <div className="space-y-3 pr-3">
+              {/* Reporter Info & Timeline - 2 Columns */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Reporter Info */}
+                <div className="space-y-1.5">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                    Người báo cáo
+                  </h3>
+                  <div className="flex items-center gap-2.5 bg-muted/30 rounded-md p-2.5">
+                    <Avatar className="h-9 w-9 flex-shrink-0">
+                      <AvatarFallback className="text-xs">
+                        {getUserInitials(report.createdBy.fullName)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                        <p className="font-medium text-xs truncate">
+                          {report.createdBy.fullName}
                         </p>
                       </div>
-                    )}
-                    {report.location?.zone && (
-                      <div>
-                        <p className="text-xs text-muted-foreground">Khu vực</p>
-                        <p className="font-medium">{report.location.zone}</p>
+                      <div className="flex items-center gap-1.5">
+                        <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                        <p className="text-[11px] text-muted-foreground truncate">
+                          {report.createdBy.email}
+                        </p>
                       </div>
-                    )}
+                    </div>
                   </div>
                 </div>
 
                 {/* Timeline */}
-                <div>
-                  <h3 className="text-sm font-semibold mb-3">Thời gian</h3>
-                  <div className="space-y-2">
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">
+                <div className="space-y-1.5">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                    Thời gian
+                  </h3>
+                  <div className="bg-muted/30 rounded-md p-2.5 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-[11px] text-muted-foreground">
                           Ngày tạo
                         </span>
                       </div>
-                      <p className="font-medium text-sm">
+                      <p className="font-medium text-xs">
                         {format(
                           new Date(report.createdAt),
                           "dd/MM/yyyy HH:mm",
-                          {
-                            locale: vi,
-                          }
+                          { locale: vi }
                         )}
                       </p>
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2 mb-1">
-                        <Calendar className="h-4 w-4 text-muted-foreground" />
-                        <span className="text-xs text-muted-foreground">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Calendar className="h-3 w-3 text-muted-foreground" />
+                        <span className="text-[11px] text-muted-foreground">
                           Cập nhật
                         </span>
                       </div>
-                      <p className="font-medium text-sm">
+                      <p className="font-medium text-xs">
                         {format(
                           new Date(report.updatedAt),
                           "dd/MM/yyyy HH:mm",
-                          {
-                            locale: vi,
-                          }
+                          { locale: vi }
                         )}
                       </p>
                     </div>
@@ -311,29 +224,125 @@ export function ReportDetailDialog({
 
               <Separator />
 
-              {/* Description & Images - 2 Columns */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Description */}
-                <div>
-                  <h3 className="text-sm font-semibold mb-3">Mô tả sự cố</h3>
-                  <div className="bg-muted/50 rounded-lg p-4 h-full min-h-[200px]">
-                    <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                      {report.description}
-                    </p>
+              {/* Asset Info & Location - 2 Columns */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                {/* Asset Info */}
+                <div className="space-y-1.5">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                    Thông tin thiết bị
+                  </h3>
+                  <div className="bg-muted/30 rounded-md p-2.5 h-full">
+                    <div className="flex items-start gap-3">
+                      {report.asset.image ? (
+                        <img
+                          src={`${import.meta.env.VITE_URL_UPLOADS}${
+                            report.asset.image
+                          }`}
+                          alt={report.asset.name}
+                          className="h-25 w-25 rounded-md object-cover border flex-shrink-0"
+                        />
+                      ) : (
+                        <div className="h-20 w-20 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
+                          <span className="text-[10px] text-muted-foreground">
+                            N/A
+                          </span>
+                        </div>
+                      )}
+                      <div className="min-w-0 flex-1 space-y-2">
+                        <div>
+                          <p className="text-[11px] text-muted-foreground mb-0.5">
+                            Tên thiết bị
+                          </p>
+                          <p className="font-medium text-sm truncate">
+                            {report.asset.name}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-[11px] text-muted-foreground mb-0.5">
+                            Trạng thái
+                          </p>
+                          <Badge
+                            variant="outline"
+                            className={`text-xs ${
+                              getAssetStatusConfig(report.asset.status)
+                                .className
+                            }`}
+                          >
+                            {getAssetStatusConfig(report.asset.status).label}
+                          </Badge>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* Images */}
-                <div>
-                  <h3 className="text-sm font-semibold mb-3">
-                    Hình ảnh đính kèm ({report.images.length})
+                {/* Location Info */}
+                <div className="space-y-1.5 ">
+                  <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                    Vị trí báo cáo
                   </h3>
-                  {report.images.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-muted/30 rounded-md p-2.5 h-full flex flex-col">
+                    <div className="space-y-2 ">
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <p className="text-[11px] text-muted-foreground mb-0.5">
+                            Cơ sở
+                          </p>
+                          <p className="font-medium text-xs">
+                            {report.location?.campus}
+                          </p>
+                        </div>
+                        {report.location?.building && (
+                          <div>
+                            <p className="text-[11px] text-muted-foreground mb-0.5">
+                              Tòa nhà
+                            </p>
+                            <p className="font-medium text-xs">
+                              {report.location.building}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      {report.location?.zone && (
+                        <div>
+                          <p className="text-[11px] text-muted-foreground mb-0.5">
+                            Khu vực
+                          </p>
+                          <p className="font-medium text-xs">
+                            {report.location.zone}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-1.5 pt-6">
+                <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                  Mô tả sự cố
+                </h3>
+                <div className="bg-muted/30 rounded-md p-2.5">
+                  <p className="text-xs leading-relaxed whitespace-pre-wrap">
+                    {report.description}
+                  </p>
+                </div>
+              </div>
+
+              {/* Images */}
+              {report.images.length > 0 && (
+                <>
+                  <Separator />
+                  <div className="space-y-1.5">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                      Hình ảnh đính kèm ({report.images.length})
+                    </h3>
+                    <div className="grid grid-cols-4 gap-2">
                       {report.images.map((image, index) => (
                         <div
                           key={index}
-                          className="rounded-lg border overflow-hidden group relative aspect-video cursor-pointer"
+                          className="rounded-md border overflow-hidden group relative aspect-video cursor-pointer hover:border-primary transition-colors"
                           onClick={() => handleImageClick(index)}
                         >
                           <img
@@ -342,32 +351,26 @@ export function ReportDetailDialog({
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
                           />
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
-                          <div className="absolute bottom-2 right-2 bg-black/60 text-white text-xs px-2 py-1 rounded">
+                          <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
                             {index + 1}/{report.images.length}
                           </div>
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <div className="bg-muted/30 rounded-lg p-8 text-center min-h-[200px] flex items-center justify-center">
-                      <p className="text-sm text-muted-foreground">
-                        Không có hình ảnh đính kèm
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
+                  </div>
+                </>
+              )}
             </div>
           </ScrollArea>
 
           {/* Dialog Footer with Action Buttons */}
           {report.status === "PENDING" && (
-            <DialogFooter className="border-t pt-4">
+            <DialogFooter className="border-t pt-2.5">
               <Button
                 onClick={handleApproveClick}
-                className="bg-green-600 hover:bg-green-700"
+                className="bg-green-600 hover:bg-green-700 text-sm h-9 cursor-pointer"
               >
-                <CheckCircle2 className="h-4 w-4 mr-2" />
+                <CheckCircle2 className="h-3.5 w-3.5" />
                 Phê duyệt báo cáo
               </Button>
             </DialogFooter>

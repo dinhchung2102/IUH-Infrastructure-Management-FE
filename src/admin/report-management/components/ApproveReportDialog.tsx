@@ -91,7 +91,7 @@ export function ApproveReportDialog({
     }
 
     if (!subject.trim()) {
-      toast.error("Vui lòng nhập tiêu đề công việc");
+      toast.error("Vui lòng nhập Nội dung nhiệm vụ");
       return;
     }
 
@@ -126,14 +126,14 @@ export function ApproveReportDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] sm:max-w-3xl max-h-[90vh]">
+      <DialogContent className="max-w-[95vw] sm:max-w-xl max-h-[90vh]">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <CheckCircle2 className="h-5 w-5 text-green-600" />
             Phê duyệt báo cáo
           </DialogTitle>
           <DialogDescription>
-            Chọn nhân viên và nhập tiêu đề công việc để phê duyệt báo cáo này
+            Chọn nhân viên và nhập Nội dung nhiệm vụ để phê duyệt báo cáo này
           </DialogDescription>
         </DialogHeader>
 
@@ -141,7 +141,7 @@ export function ApproveReportDialog({
           {/* Subject Input */}
           <div className="space-y-2">
             <Label htmlFor="subject">
-              Tiêu đề công việc <span className="text-red-500">*</span>
+              Nội dung nhiệm vụ <span className="text-red-500">*</span>
             </Label>
             <Input
               id="subject"
@@ -260,6 +260,7 @@ export function ApproveReportDialog({
             variant="outline"
             onClick={() => onOpenChange(false)}
             disabled={submitting}
+            className="cursor-pointer text-red-600 hover:text-red-700"
           >
             Hủy
           </Button>
@@ -268,16 +269,16 @@ export function ApproveReportDialog({
             disabled={
               submitting || selectedStaffIds.length === 0 || !subject.trim()
             }
-            className="bg-green-600 hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 cursor-pointer"
           >
             {submitting ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                <Loader2 className="h-4 w-4 animate-spin" />
                 Đang phê duyệt...
               </>
             ) : (
               <>
-                <CheckCircle2 className="h-4 w-4 mr-2" />
+                <CheckCircle2 className="h-4 w-4" />
                 Phê duyệt
               </>
             )}
