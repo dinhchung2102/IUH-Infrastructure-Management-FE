@@ -151,7 +151,7 @@ export default function AuditManagementPage() {
           items={[
             { label: "Dashboard", href: "/admin" },
             { label: "Quản lý", href: "/admin/audits" },
-            { label: "Bảo trì & Sửa chữa", isCurrent: true },
+            { label: "Nhiệm vụ", isCurrent: true },
           ]}
         />
       </div>

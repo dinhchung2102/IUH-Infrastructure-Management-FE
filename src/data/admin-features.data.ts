@@ -110,7 +110,7 @@ export const adminFeatures: AdminFeature[] = [
   },
   {
     id: "audits",
-    title: "Bảo trì & Sửa chữa",
+    title: "Nhiệm vụ",
     description: "Quản lý kiểm tra và bảo trì",
     href: "/admin/audits",
     icon: Wrench,
