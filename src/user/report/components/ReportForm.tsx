@@ -49,6 +49,10 @@ import {
   getAssetsByAreaId,
   type Asset,
 } from "../api/asset.api";
+import { classifyReport, searchSimilarReports } from "@/chatbot/api/chatbot.api";
+import { Badge } from "@/components/ui/badge";
+import { Sparkles, AlertTriangle } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const areaTypes = [
   { value: "outdoor", label: "Khu vực ngoài trời" },
@@ -83,6 +87,15 @@ export function ReportForm() {
     { url: string; type: string; name: string }[]
   >([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // AI Classification states
+  const [isClassifying, setIsClassifying] = useState(false);
+  const [aiSuggestion, setAiSuggestion] = useState<{
+    priority?: string;
+    reasoning?: string;
+    confidence?: number;
+  } | null>(null);
+  const [similarReports, setSimilarReports] = useState<any[]>([]);
 
   // Data from API
   const [reportTypes, setReportTypes] = useState<ReportType[]>([]);
@@ -270,6 +283,48 @@ export function ReportForm() {
       previewImages.forEach((preview) => URL.revokeObjectURL(preview.url));
     };
   }, [previewImages]);
+
+  // AI Classify description when user stops typing (debounced)
+  useEffect(() => {
+    if (description.trim().length < 10) {
+      setAiSuggestion(null);
+      setSimilarReports([]);
+      return;
+    }
+
+    const timeoutId = setTimeout(async () => {
+      setIsClassifying(true);
+      try {
+        // Get location info for better classification
+        const location = selectedAssetObj
+          ? `${selectedAssetObj.name}`
+          : areaType === "outdoor"
+          ? selectedOutdoorArea
+          : selectedIndoorZone;
+
+        // Call AI classify API
+        const [classifyResult, similarResult] = await Promise.all([
+          classifyReport({ description: description.trim(), location }),
+          searchSimilarReports(description.trim()).catch(() => ({ data: { sources: [] } })),
+        ]);
+
+        setAiSuggestion({
+          priority: classifyResult.data.priority,
+          reasoning: classifyResult.data.reasoning,
+          confidence: classifyResult.data.confidence,
+        });
+
+        setSimilarReports(similarResult.data.sources || []);
+      } catch (error) {
+        console.error("Error classifying report:", error);
+        // Silent fail - AI is optional feature
+      } finally {
+        setIsClassifying(false);
+      }
+    }, 1000); // Wait 1 second after user stops typing
+
+    return () => clearTimeout(timeoutId);
+  }, [description, selectedAssetObj, areaType, selectedOutdoorArea, selectedIndoorZone]);
 
   // Create report with FormData
   const submitReport = async (otpCode?: string) => {
@@ -525,7 +580,12 @@ export function ReportForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="description">Mô tả *</Label>
+                <Label htmlFor="description" className="flex items-center gap-2">
+                  Mô tả *
+                  {isClassifying && (
+                    <Sparkles className="h-4 w-4 text-blue-500 animate-pulse" />
+                  )}
+                </Label>
                 <Textarea
                   id="description"
                   placeholder="Mô tả chi tiết về vấn đề cần báo cáo... (10-1000 ký tự)"
@@ -537,6 +597,82 @@ export function ReportForm() {
                 <p className="text-xs text-muted-foreground">
                   {description.length}/1000 ký tự
                 </p>
+
+                {/* AI Suggestion */}
+                {aiSuggestion && aiSuggestion.priority && (
+                  <Alert className="border-blue-200 bg-blue-50">
+                    <Sparkles className="h-4 w-4 text-blue-600" />
+                    <AlertTitle className="text-blue-900">
+                      Đề xuất từ AI
+                    </AlertTitle>
+                    <AlertDescription className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-blue-800">
+                          Độ ưu tiên:
+                        </span>
+                        <Badge
+                          variant={
+                            aiSuggestion.priority === "CRITICAL"
+                              ? "destructive"
+                              : aiSuggestion.priority === "HIGH"
+                              ? "destructive"
+                              : "secondary"
+                          }
+                        >
+                          {aiSuggestion.priority === "CRITICAL"
+                            ? "Khẩn cấp"
+                            : aiSuggestion.priority === "HIGH"
+                            ? "Cao"
+                            : aiSuggestion.priority === "MEDIUM"
+                            ? "Trung bình"
+                            : "Thấp"}
+                        </Badge>
+                        <span className="text-xs text-blue-600">
+                          ({Math.round((aiSuggestion.confidence || 0) * 100)}%
+                          tin cậy)
+                        </span>
+                      </div>
+                      {aiSuggestion.reasoning && (
+                        <p className="text-sm text-blue-800">
+                          {aiSuggestion.reasoning}
+                        </p>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {/* Similar Reports Warning */}
+                {similarReports.length > 0 && (
+                  <Alert className="border-yellow-200 bg-yellow-50">
+                    <AlertTriangle className="h-4 w-4 text-yellow-600" />
+                    <AlertTitle className="text-yellow-900">
+                      Tìm thấy {similarReports.length} báo cáo tương tự
+                    </AlertTitle>
+                    <AlertDescription className="space-y-2">
+                      <p className="text-sm text-yellow-800">
+                        Có thể vấn đề này đã được báo cáo:
+                      </p>
+                      <div className="space-y-1">
+                        {similarReports.slice(0, 2).map((report, idx) => (
+                          <div
+                            key={idx}
+                            className="text-xs text-yellow-700 bg-yellow-100 p-2 rounded"
+                          >
+                            <div className="flex items-center gap-2 mb-1">
+                              <Badge variant="outline" className="text-xs">
+                                {report.metadata.category || "N/A"}
+                              </Badge>
+                              <span className="text-xs">
+                                📍 {report.metadata.location || "N/A"}
+                              </span>
+                            </div>
+                            <p className="line-clamp-2">{report.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </AlertDescription>
+                  </Alert>
+                )}
               </div>
 
               {/* Row 1: Campus + Area Type */}

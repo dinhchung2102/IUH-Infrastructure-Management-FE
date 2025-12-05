@@ -8,10 +8,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
+import { ChatbotDialog } from "@/chatbot/components";
 
 export default function QuickActions() {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [lastScrollY, setLastScrollY] = useState(0);
+  const [chatbotOpen, setChatbotOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -46,8 +48,7 @@ export default function QuickActions() {
   };
 
   const handleChatClick = () => {
-    // TODO: Implement chat functionality
-    console.log("Chat clicked");
+    setChatbotOpen(true);
   };
 
   return (
@@ -185,6 +186,9 @@ export default function QuickActions() {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Chatbot Dialog */}
+      <ChatbotDialog open={chatbotOpen} onOpenChange={setChatbotOpen} />
     </TooltipProvider>
   );
 }
