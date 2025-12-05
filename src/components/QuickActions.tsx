@@ -8,7 +8,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "./ui/tooltip";
-import { ChatbotDialog } from "@/chatbot/components";
+import { ChatbotWidget } from "@/chatbot/components";
 
 export default function QuickActions() {
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -187,8 +187,8 @@ export default function QuickActions() {
         </AnimatePresence>
       </div>
 
-      {/* Chatbot Dialog */}
-      <ChatbotDialog open={chatbotOpen} onOpenChange={setChatbotOpen} />
+      {/* Chatbot Widget */}
+      <ChatbotWidget open={chatbotOpen} onOpenChange={setChatbotOpen} />
     </TooltipProvider>
   );
 }

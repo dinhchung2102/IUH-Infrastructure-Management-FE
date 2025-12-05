@@ -1,4 +1,4 @@
-import { useState, useRef, KeyboardEvent } from "react";
+import { useState, useRef, type KeyboardEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from "lucide-react";
@@ -43,7 +43,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="flex items-end gap-2 p-4 border-t bg-white">
+    <div className="flex items-end gap-2 p-3 border-t bg-white">
       <Textarea
         ref={textareaRef}
         value={input}
@@ -51,22 +51,21 @@ export function ChatInput({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         disabled={isLoading}
-        className="min-h-[44px] max-h-[120px] resize-none"
+        className="min-h-[38px] max-h-[100px] resize-none text-sm"
         rows={1}
       />
       <Button
         onClick={handleSend}
         disabled={!input.trim() || isLoading}
         size="icon"
-        className="h-[44px] w-[44px] flex-shrink-0"
+        className="h-[38px] w-[38px] flex-shrink-0 bg-blue-500 hover:bg-blue-600"
       >
         {isLoading ? (
-          <Loader2 className="h-4 w-4 animate-spin" />
+          <Loader2 className="h-3.5 w-3.5 animate-spin" />
         ) : (
-          <Send className="h-4 w-4" />
+          <Send className="h-3.5 w-3.5" />
         )}
       </Button>
     </div>
   );
 }
-
