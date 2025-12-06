@@ -126,9 +126,16 @@ export interface AssetMaintenanceWarrantyStats {
  * Endpoint: GET /assets/statistics/dashboard
  */
 export const getAssetStatsDashboard = async () => {
-  const res = await api.get<ApiResponse<AssetDashboardStats>>(
+  const res = await api.get<ApiResponse<{ data: AssetDashboardStats }>>(
     "/assets/statistics/dashboard"
   );
+  // Transform nested response to match expected format
+  if (res.data.success && res.data.data?.data) {
+    return {
+      ...res.data,
+      data: res.data.data.data,
+    };
+  }
   return res.data;
 };
 
