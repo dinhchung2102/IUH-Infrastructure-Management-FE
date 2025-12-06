@@ -10,8 +10,10 @@ export interface AssetResponse {
   name: string;
   code: string;
   description?: string;
-  status: "ACTIVE" | "INACTIVE" | "DAMAGED";
+  status: "IN_USE" | "MAINTENANCE" | "RETIRED" | "DISPOSED";
   assetType?: string;
+  assetCategory?: string;
+  image?: string;
   zone?: {
     _id: string;
     name: string;
@@ -61,16 +63,29 @@ export const getAssetById = async (id: string) => {
 /**
  * Tạo tài sản mới
  */
-export const createAsset = async (data: Partial<AssetResponse>) => {
-  const res = await api.post<ApiResponse<AssetResponse>>("/assets", data);
+export const createAsset = async (data: Partial<AssetResponse> | FormData) => {
+  const res = await api.post<ApiResponse<AssetResponse>>("/assets", data, {
+    headers:
+      data instanceof FormData
+        ? { "Content-Type": "multipart/form-data" }
+        : undefined,
+  });
   return res.data;
 };
 
 /**
  * Cập nhật thông tin tài sản
  */
-export const updateAsset = async (id: string, data: Partial<AssetResponse>) => {
-  const res = await api.patch<ApiResponse<AssetResponse>>(`/assets/${id}`, data);
+export const updateAsset = async (
+  id: string,
+  data: Partial<AssetResponse> | FormData
+) => {
+  const res = await api.patch<ApiResponse<AssetResponse>>(`/assets/${id}`, data, {
+    headers:
+      data instanceof FormData
+        ? { "Content-Type": "multipart/form-data" }
+        : undefined,
+  });
   return res.data;
 };
 
