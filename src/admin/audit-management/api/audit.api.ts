@@ -113,20 +113,68 @@ export const updateAuditStatus = async (
   return response.data;
 };
 
+// API Response type for stats
+export interface AuditStatsApiResponse {
+  totalAudits: number;
+  auditsByStatus: {
+    PENDING?: number;
+    IN_PROGRESS?: number;
+    COMPLETED?: number;
+    CANCELLED?: number;
+  };
+  recentAudits: unknown[];
+  auditsThisMonth: number;
+  auditsLastMonth: number;
+  averageCompletionTime: number;
+}
+
+// UI Stats type for Audit Management Page
+export interface AuditStatsUI {
+  total: number;
+  pending: number;
+  inProgress: number;
+  completed: number;
+  cancelled: number;
+  todayAudits: number;
+}
+
 // Lấy thống kê audit logs
 export const getAuditStats = async () => {
-  const response = await api.get<
-    ApiResponse<{
-      total: number;
-      pending: number;
-      inProgress: number;
-      completed: number;
-      cancelled: number;
-      todayAudits: number;
-    }>
-  >("/audit/stats");
+  const response = await api.get<ApiResponse<{ data: AuditStatsApiResponse }>>(
+    "/audit/stats"
+  );
   console.log("[API: GET AUDIT STATS]:", response.data);
-  return response.data;
+
+  // Transform API response to UI format
+  if (response.data.success && response.data.data?.data) {
+    const apiData = response.data.data.data;
+    const transformedStats: AuditStatsUI = {
+      total: apiData.totalAudits || 0,
+      pending: apiData.auditsByStatus?.PENDING || 0,
+      inProgress: apiData.auditsByStatus?.IN_PROGRESS || 0,
+      completed: apiData.auditsByStatus?.COMPLETED || 0,
+      cancelled: apiData.auditsByStatus?.CANCELLED || 0,
+      todayAudits: apiData.auditsThisMonth || 0,
+    };
+
+    return {
+      ...response.data,
+      data: transformedStats,
+    };
+  }
+
+  // Return default values if no data
+  return {
+    ...response.data,
+    data: {
+      total: 0,
+      pending: 0,
+      inProgress: 0,
+      completed: 0,
+      cancelled: 0,
+      todayAudits: 0,
+    },
+  };
 };
 
 // Create audit DTO

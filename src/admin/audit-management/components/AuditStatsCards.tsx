@@ -19,36 +19,44 @@ export function AuditStatsCards({ stats }: AuditStatsCardsProps) {
         title="Chờ xử lý"
         value={stats.pending}
         icon={Clock}
-        description={`${((stats.pending / stats.total) * 100 || 0).toFixed(
-          0
-        )}% tổng số`}
+        description={`${
+          stats.total > 0
+            ? ((stats.pending / stats.total) * 100).toFixed(0)
+            : 0
+        }% tổng số`}
         variant="warning"
       />
       <StatsCard
         title="Đang xử lý"
         value={stats.inProgress}
         icon={PlayCircle}
-        description={`${((stats.inProgress / stats.total) * 100 || 0).toFixed(
-          0
-        )}% tổng số`}
+        description={`${
+          stats.total > 0
+            ? ((stats.inProgress / stats.total) * 100).toFixed(0)
+            : 0
+        }% tổng số`}
         variant="info"
       />
       <StatsCard
         title="Hoàn thành"
         value={stats.completed}
         icon={CheckCircle2}
-        description={`${((stats.completed / stats.total) * 100 || 0).toFixed(
-          0
-        )}% tổng số`}
+        description={`${
+          stats.total > 0
+            ? ((stats.completed / stats.total) * 100).toFixed(0)
+            : 0
+        }% tổng số`}
         variant="success"
       />
       <StatsCard
         title="Đã hủy"
         value={stats.cancelled}
         icon={XCircle}
-        description={`${((stats.cancelled / stats.total) * 100 || 0).toFixed(
-          0
-        )}% tổng số`}
+        description={`${
+          stats.total > 0
+            ? ((stats.cancelled / stats.total) * 100).toFixed(0)
+            : 0
+        }% tổng số`}
         variant="danger"
       />
     </div>

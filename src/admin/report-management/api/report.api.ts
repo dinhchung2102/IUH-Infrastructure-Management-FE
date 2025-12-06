@@ -101,19 +101,79 @@ export const updateReportStatus = async (
   return response.data;
 };
 
+// API Response type for stats
+export interface ReportStatsApiResponse {
+  totalReports: number;
+  reportsByStatus: {
+    OPEN?: number;
+    IN_PROGRESS?: number;
+    RESOLVED?: number;
+    CLOSED?: number;
+    APPROVED?: number;
+    PENDING?: number;
+    REJECTED?: number;
+  };
+  reportsByType: Record<string, number>;
+  reportsByPriority: Record<string, number>;
+  recentReports: unknown[];
+  reportsThisMonth: number;
+  reportsLastMonth: number;
+  averageResolutionTime: number;
+}
+
+// UI Stats type for Report Management Page
+export interface ReportStatsUI {
+  total: number;
+  pending: number;
+  approved: number;
+  rejected: number;
+  todayReports: number;
+  reportsThisMonth: number;
+  reportsLastMonth: number;
+  averageResolutionTime: number;
+}
+
 // Lấy thống kê báo cáo
 export const getReportStats = async () => {
-  const response = await api.get<
-    ApiResponse<{
-      total: number;
-      pending: number;
-      approved: number;
-      rejected: number;
-      todayReports: number;
-    }>
-  >("/report/stats");
+  const response = await api.get<ApiResponse<{ data: ReportStatsApiResponse }>>(
+    "/report/stats"
+  );
   console.log("[API: GET REPORT STATS]:", response.data);
-  return response.data;
+
+  // Transform API response to UI format
+  if (response.data.success && response.data.data?.data) {
+    const apiData = response.data.data.data;
+    const transformedStats: ReportStatsUI = {
+      total: apiData.totalReports || 0,
+      pending: apiData.reportsByStatus?.PENDING || 0,
+      approved: apiData.reportsByStatus?.APPROVED || 0,
+      rejected: apiData.reportsByStatus?.REJECTED || 0,
+      todayReports: apiData.reportsThisMonth || 0,
+      reportsThisMonth: apiData.reportsThisMonth || 0,
+      reportsLastMonth: apiData.reportsLastMonth || 0,
+      averageResolutionTime: apiData.averageResolutionTime || 0,
+    };
+
+    return {
+      ...response.data,
+      data: transformedStats,
+    };
+  }
+
+  // Return default values if no data
+  return {
+    ...response.data,
+    data: {
+      total: 0,
+      pending: 0,
+      approved: 0,
+      rejected: 0,
+      todayReports: 0,
+      reportsThisMonth: 0,
+      reportsLastMonth: 0,
+      averageResolutionTime: 0,
+    },
+  };
 };
 
 // Phê duyệt báo cáo

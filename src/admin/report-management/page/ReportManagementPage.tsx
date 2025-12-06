@@ -57,6 +57,9 @@ export default function ReportManagementPage() {
     approved: 0,
     rejected: 0,
     todayReports: 0,
+    reportsThisMonth: 0,
+    reportsLastMonth: 0,
+    averageResolutionTime: 0,
   });
 
   // Fetch reports từ API
