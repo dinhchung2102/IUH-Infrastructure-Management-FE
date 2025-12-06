@@ -116,7 +116,9 @@ export function NewsTable({
                   <TableCell className="hidden lg:table-cell">
                     {item.category ? (
                       typeof item.category === "string" ? (
-                        <p className="text-sm">{item.category}</p>
+                        <span className="text-xs text-muted-foreground italic">
+                          Chưa phân loại
+                        </span>
                       ) : (
                         <Badge variant="outline" className="font-normal">
                           {item.category.name}
