@@ -117,10 +117,7 @@ function AssetPage() {
       <div className="flex flex-wrap gap-4 items-end">
         <div className="flex-1 min-w-[250px] space-y-2">
           <Label>Tìm kiếm</Label>
-          <form
-            onSubmit={(e) => e.preventDefault()}
-            className="flex gap-2"
-          >
+          <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
             <Input
               placeholder="Tìm kiếm theo tên thiết bị..."
               value={filters.search}
@@ -165,7 +162,9 @@ function AssetPage() {
           <Label>Loại thiết bị</Label>
           <Select
             value={filters.typeFilter}
-            onValueChange={(value) => handleFiltersChange({ typeFilter: value })}
+            onValueChange={(value) =>
+              handleFiltersChange({ typeFilter: value })
+            }
           >
             <SelectTrigger className="w-[180px] bg-white cursor-pointer">
               <SelectValue placeholder="Tất cả loại thiết bị" />
@@ -236,7 +235,7 @@ function AssetPage() {
                   <TableCell>
                     {a.image ? (
                       <img
-                        src={a.image}
+                        src={`${process.env.VITE_URL_UPLOADS}${a.image}`}
                         alt={a.name}
                         className="size-12 rounded-md object-cover border"
                       />
