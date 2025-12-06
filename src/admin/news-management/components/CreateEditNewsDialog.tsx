@@ -56,6 +56,8 @@ export function CreateEditNewsDialog({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [thumbnail, setThumbnail] = useState("");
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState("");
   const [content, setContent] = useState("");
   const [status, setStatus] = useState<NewsStatus>("DRAFT" as NewsStatus);
   const [category, setCategory] = useState<string>("");
@@ -93,6 +95,8 @@ export function CreateEditNewsDialog({
       setTitle(news.title);
       setDescription(news.description);
       setThumbnail(news.thumbnail);
+      setThumbnailFile(null);
+      setThumbnailPreview(news.thumbnail);
       const contentStr =
         typeof news.content === "string"
           ? news.content
@@ -104,11 +108,45 @@ export function CreateEditNewsDialog({
       setTitle("");
       setDescription("");
       setThumbnail("");
+      setThumbnailFile(null);
+      setThumbnailPreview("");
       setContent("");
       setStatus("DRAFT" as NewsStatus);
       setCategory("");
     }
   }, [news, open]);
+
+  // Handle thumbnail file selection
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        toast.error("Vui lòng chọn file ảnh");
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Kích thước ảnh không được vượt quá 5MB");
+        return;
+      }
+      setThumbnailFile(file);
+      // Create preview URL
+      if (thumbnailPreview && !thumbnailPreview.startsWith("http")) {
+        URL.revokeObjectURL(thumbnailPreview);
+      }
+      setThumbnailPreview(URL.createObjectURL(file));
+    }
+  };
+
+  // Cleanup preview URL on unmount
+  useEffect(() => {
+    return () => {
+      if (thumbnailPreview && !thumbnailPreview.startsWith("http")) {
+        URL.revokeObjectURL(thumbnailPreview);
+      }
+    };
+  }, [thumbnailPreview]);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -121,8 +159,8 @@ export function CreateEditNewsDialog({
       return;
     }
 
-    if (!thumbnail.trim()) {
-      toast.error("Vui lòng nhập đường dẫn thumbnail");
+    if (!thumbnailFile && !thumbnail.trim()) {
+      toast.error("Vui lòng chọn ảnh thumbnail");
       return;
     }
 
@@ -140,23 +178,30 @@ export function CreateEditNewsDialog({
     try {
       setSubmitting(true);
 
-      const payload = {
-        title: title.trim(),
-        description: description.trim(),
-        thumbnail: thumbnail.trim(),
-        content: content, // Already in HTML format from RichTextEditor
-        status,
-        category: category || undefined,
-      };
+      const formData = new FormData();
+      formData.append("title", title.trim());
+      formData.append("description", description.trim());
+      formData.append("content", content);
+      formData.append("status", status);
+
+      if (category) {
+        formData.append("category", category);
+      }
+
+      // If new file is selected, upload it
+      if (thumbnailFile) {
+        formData.append("thumbnail", thumbnailFile);
+      } else if (thumbnail.trim()) {
+        // Keep existing thumbnail URL for edit mode
+        formData.append("thumbnail", thumbnail.trim());
+      }
 
       if (isEditMode) {
-        await updateNews(news._id, payload);
+        await updateNews(news._id, formData);
         toast.success("Cập nhật tin tức thành công!");
       } else {
-        await createNews({
-          ...payload,
-          author: userId!,
-        });
+        formData.append("author", userId!);
+        await createNews(formData);
         toast.success("Tạo tin tức thành công!");
       }
 
@@ -240,22 +285,29 @@ export function CreateEditNewsDialog({
             {/* Thumbnail */}
             <div className="space-y-2">
               <Label htmlFor="thumbnail">
-                Đường dẫn Thumbnail <span className="text-red-500">*</span>
+                Ảnh Thumbnail <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="thumbnail"
-                placeholder="/uploads/image.jpg hoặc https://..."
-                value={thumbnail}
-                onChange={(e) => setThumbnail(e.target.value)}
-                className="bg-white"
+                type="file"
+                accept="image/*"
+                onChange={handleThumbnailChange}
+                className="bg-white cursor-pointer"
               />
-              {thumbnail && (
+              <p className="text-xs text-muted-foreground">
+                Chọn ảnh thumbnail (tối đa 5MB, định dạng JPG, PNG, WebP)
+              </p>
+              {thumbnailPreview && (
                 <div className="mt-2">
                   <img
                     src={
-                      thumbnail.startsWith("http")
-                        ? thumbnail
-                        : `${import.meta.env.VITE_URL_UPLOADS}${thumbnail}`
+                      thumbnailPreview.startsWith("blob:")
+                        ? thumbnailPreview
+                        : thumbnailPreview.startsWith("http")
+                        ? thumbnailPreview
+                        : `${
+                            import.meta.env.VITE_URL_UPLOADS
+                          }${thumbnailPreview}`
                     }
                     alt="Preview"
                     className="w-full h-40 object-cover rounded border"
