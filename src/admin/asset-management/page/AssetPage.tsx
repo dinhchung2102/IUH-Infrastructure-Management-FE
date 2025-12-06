@@ -235,7 +235,7 @@ function AssetPage() {
                   <TableCell>
                     {a.image ? (
                       <img
-                        src={`${process.env.VITE_URL_UPLOADS}${a.image}`}
+                        src={`${import.meta.env.VITE_URL_UPLOADS}${a.image}`}
                         alt={a.name}
                         className="size-12 rounded-md object-cover border"
                       />
