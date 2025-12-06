@@ -125,7 +125,9 @@ export interface AssetMaintenanceWarrantyStats {
  * 1️⃣ Lấy thống kê tổng quan Dashboard
  * Endpoint: GET /assets/statistics/dashboard
  */
-export const getAssetStatsDashboard = async () => {
+export const getAssetStatsDashboard = async (): Promise<
+  ApiResponse<AssetDashboardStats>
+> => {
   const res = await api.get<ApiResponse<{ data: AssetDashboardStats }>>(
     "/assets/statistics/dashboard"
   );
@@ -134,9 +136,13 @@ export const getAssetStatsDashboard = async () => {
     return {
       ...res.data,
       data: res.data.data.data,
-    };
+    } as ApiResponse<AssetDashboardStats>;
   }
-  return res.data;
+  // Fallback: return original response if structure is different
+  return {
+    ...res.data,
+    data: res.data.data as unknown as AssetDashboardStats,
+  } as ApiResponse<AssetDashboardStats>;
 };
 
 /**
