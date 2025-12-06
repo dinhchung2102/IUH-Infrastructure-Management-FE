@@ -90,7 +90,7 @@ export function useAssetAddForm({
         toast.error(areaRes.message || "Không thể tải danh sách area.");
       }
 
-      setTypes(typeRes.data?.assetTypes || []);
+      setTypes(typeRes.data?.types || []);
       setCategories(catRes.data?.categories || []);
       setZones(zoneRes.data?.zones || []);
       setAreas(areaRes.data?.areas || []);

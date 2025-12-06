@@ -8,11 +8,17 @@ import type { ApiResponse } from "@/types/response.type";
 export interface AssetTypeResponse {
   _id: string;
   name: string;
-  code: string;
+  code?: string;
   description?: string;
-  status: "ACTIVE" | "INACTIVE";
+  status?: "ACTIVE" | "INACTIVE";
+  assetCategory?: {
+    _id: string;
+    name: string;
+  };
+  properties?: Record<string, string>;
   createdAt: string;
   updatedAt: string;
+  __v?: number;
 }
 
 export interface QueryAssetTypeDto {
@@ -32,10 +38,17 @@ export interface QueryAssetTypeDto {
  * Lấy danh sách loại tài sản (Asset Type)
  */
 export const getAssetTypes = async (query?: QueryAssetTypeDto) => {
-  const res = await api.get<ApiResponse<{ assetTypes: AssetTypeResponse[] }>>(
-    "/assets/types",
-    { params: query }
-  );
+  const res = await api.get<
+    ApiResponse<{
+      types: AssetTypeResponse[];
+      pagination?: {
+        currentPage: number;
+        totalPages: number;
+        totalItems: number;
+        itemsPerPage: number;
+      };
+    }>
+  >("/assets/types", { params: query });
   return res.data;
 };
 
