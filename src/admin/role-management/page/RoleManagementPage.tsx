@@ -13,6 +13,7 @@ import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { Plus, UserCog, Code } from "lucide-react";
 import { getRoles, deleteRole, getRoleStats } from "../api/role.api";
+import { isSystemRole } from "../utils/role.utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -69,16 +70,8 @@ export default function RoleManagementPage() {
       if (response.success && response.data) {
         setRoles(response.data.roles);
         // Update stats based on fetched data
-        const systemRoles = [
-          "ADMIN",
-          "STAFF",
-          "CAMPUS_ADMIN",
-          "GUEST",
-          "STUDENT",
-          "LECTURER",
-        ];
         const sysCount = response.data.roles.filter((r) =>
-          systemRoles.includes(r.roleName)
+          isSystemRole(r.roleName)
         ).length;
         setStats((prev) => ({
           ...prev,
@@ -119,11 +112,17 @@ export default function RoleManagementPage() {
   };
 
   const handleEdit = (role: Role) => {
+    // Prevent editing system roles
+    if (isSystemRole(role.roleName)) {
+      toast.error("Không thể chỉnh sửa vai trò hệ thống mặc định");
+      return;
+    }
+
     // Convert Role to RoleWithPermissions for editing
     const editRole: RoleWithPermissions = {
       ...role,
       permissions: role.permissions as unknown as [], // Use current permissions
-      isSystem: false, // Tạm thời set false để cho phép edit
+      isSystem: false,
     };
     setEditingRole(editRole);
     setCreateEditDialogOpen(true);
@@ -135,7 +134,13 @@ export default function RoleManagementPage() {
   };
 
   const handleDelete = (roleId: string) => {
-    // Tạm thời disable check system role để debug
+    // Find the role to check if it's a system role
+    const role = roles.find((r) => r._id === roleId);
+    if (role && isSystemRole(role.roleName)) {
+      toast.error("Không thể xóa vai trò hệ thống mặc định");
+      return;
+    }
+
     setRoleToDelete(roleId);
     setDeleteConfirmOpen(true);
   };
@@ -179,8 +184,8 @@ export default function RoleManagementPage() {
               variant="destructive"
               className="cursor-pointer"
             >
-              <Code className="h-4 w-4 mr-2" />
-              🛠️ Debug Permissions
+              <Code className="h-4 w-4" />
+              Debug Permissions
             </Button>
           )}
           <Button
@@ -188,11 +193,11 @@ export default function RoleManagementPage() {
             variant="outline"
             className="cursor-pointer"
           >
-            <UserCog className="h-4 w-4 mr-2" />
+            <UserCog className="h-4 w-4" />
             Gán vai trò
           </Button>
           <Button onClick={handleCreateNew} className="cursor-pointer">
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4" />
             Tạo vai trò mới
           </Button>
         </div>

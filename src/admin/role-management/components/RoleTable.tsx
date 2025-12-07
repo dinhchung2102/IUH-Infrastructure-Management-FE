@@ -12,6 +12,7 @@ import { TableActionMenu } from "@/components/TableActionMenu";
 import type { Role } from "../types/role.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import { isSystemRole } from "../utils/role.utils";
 
 interface RoleTableProps {
   roles: Role[];
@@ -21,22 +22,13 @@ interface RoleTableProps {
 }
 
 const getRoleNameBadge = (roleName: string, isActive: boolean) => {
-  // System roles (không thể xóa)
-  const systemRoles = [
-    "ADMIN",
-    "STAFF",
-    "CAMPUS_ADMIN",
-    "GUEST",
-    "STUDENT",
-    "LECTURER",
-  ];
-  const isSystem = systemRoles.includes(roleName);
+  const isSystem = isSystemRole(roleName);
 
   return (
     <div className="flex items-center gap-2">
       <Badge
         variant={isSystem ? "default" : "outline"}
-        className={isSystem ? "bg-purple-600" : ""}
+        className={isSystem ? "bg-blue-800 text-white" : ""}
       >
         {roleName}
       </Badge>
@@ -126,12 +118,14 @@ export function RoleTable({
                       label: "Chỉnh sửa",
                       icon: Edit,
                       onClick: () => onEdit(role),
+                      disabled: isSystemRole(role.roleName),
                     },
                     {
                       label: "Xóa",
                       icon: Trash2,
                       onClick: () => onDelete(role._id),
                       variant: "destructive",
+                      disabled: isSystemRole(role.roleName),
                     },
                   ]}
                 />
