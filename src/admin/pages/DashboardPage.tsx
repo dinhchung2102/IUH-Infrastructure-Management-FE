@@ -11,7 +11,7 @@ import { Building2, Users, FileText, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle as AlertCircleIcon } from "lucide-react";
-import { formatDistanceToNow, format, addDays } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,6 +34,8 @@ import { toast } from "sonner";
 import { updateReportStatus } from "../report-management/api/report.api";
 import { ReportDetailDialog } from "../report-management/components";
 import type { Report } from "../report-management/types/report.type";
+import { getMaintenances } from "../maintenance/api/maintenance.api";
+import type { Maintenance } from "../maintenance/types/maintenance.type";
 
 import { getReportStatusBadge, getPriorityBadge } from "@/config/badge.config";
 
@@ -127,6 +129,10 @@ export default function DashboardPage() {
   const [error, setError] = useState<string | null>(null);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [upcomingMaintenances, setUpcomingMaintenances] = useState<
+    Maintenance[]
+  >([]);
+  const [loadingMaintenances, setLoadingMaintenances] = useState(false);
 
   const fetchDashboardData = async () => {
     try {
@@ -146,8 +152,50 @@ export default function DashboardPage() {
     }
   };
 
+  // Helper function to extract nested data
+  const extractData = <T,>(responseData: T | { data: T }): T => {
+    if (
+      responseData &&
+      typeof responseData === "object" &&
+      "data" in responseData
+    ) {
+      return (responseData as { data: T }).data;
+    }
+    return responseData;
+  };
+
   useEffect(() => {
+    const fetchUpcomingMaintenances = async () => {
+      try {
+        setLoadingMaintenances(true);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        const oneMonthLater = new Date(today);
+        oneMonthLater.setMonth(oneMonthLater.getMonth() + 1);
+
+        const response = await getMaintenances({
+          startDate: today.toISOString(),
+          endDate: oneMonthLater.toISOString(),
+          limit: 10,
+          page: 1,
+          sortBy: "scheduledDate",
+          sortOrder: "asc",
+        });
+
+        if (response.success && response.data) {
+          const data = extractData(response.data);
+          setUpcomingMaintenances(data.maintenances || []);
+        }
+      } catch (err) {
+        console.error("Error fetching upcoming maintenances:", err);
+        // Don't show error toast for maintenance, just log it
+      } finally {
+        setLoadingMaintenances(false);
+      }
+    };
+
     fetchDashboardData();
+    fetchUpcomingMaintenances();
   }, []);
 
   const handleViewDetails = (report: DashboardReport) => {
@@ -178,38 +226,6 @@ export default function DashboardPage() {
   const handleApproveSuccess = () => {
     fetchDashboardData();
   };
-
-  // Fake maintenance schedule data (within 1 month)
-  const upcomingMaintenance = [
-    {
-      id: 1,
-      facility: "Phòng A101",
-      type: "Bảo trì định kỳ",
-      date: addDays(new Date(), 5),
-      priority: "high",
-    },
-    {
-      id: 2,
-      facility: "Hệ thống điện B",
-      type: "Kiểm tra an toàn",
-      date: addDays(new Date(), 12),
-      priority: "medium",
-    },
-    {
-      id: 3,
-      facility: "Phòng máy C301",
-      type: "Nâng cấp thiết bị",
-      date: addDays(new Date(), 20),
-      priority: "low",
-    },
-    {
-      id: 4,
-      facility: "Hệ thống điều hòa D",
-      type: "Vệ sinh và bảo dưỡng",
-      date: addDays(new Date(), 28),
-      priority: "medium",
-    },
-  ];
 
   // Stats configuration
   const statsConfig = [
@@ -449,7 +465,7 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {isLoading ? (
+            {isLoading || loadingMaintenances ? (
               <div className="space-y-4">
                 {Array.from({ length: 3 }).map((_, i) => (
                   <div key={i} className="rounded-lg border p-3">
@@ -464,43 +480,57 @@ export default function DashboardPage() {
                   </div>
                 ))}
               </div>
-            ) : (
+            ) : upcomingMaintenances.length > 0 ? (
               <div className="space-y-4">
-                {upcomingMaintenance.map((item) => {
+                {upcomingMaintenances.map((maintenance) => {
                   // Get background color based on priority
                   const priorityBg =
                     {
+                      CRITICAL: "bg-red-100",
                       HIGH: "bg-red-50",
                       MEDIUM: "bg-amber-50",
                       LOW: "bg-gray-50",
-                    }[
-                      item.priority.toUpperCase() as "HIGH" | "MEDIUM" | "LOW"
-                    ] || "bg-gray-50";
+                    }[maintenance.priority] || "bg-gray-50";
 
                   return (
-                    <div
-                      key={item.id}
-                      className={`rounded-lg border ${priorityBg} p-3 transition-colors hover:opacity-80`}
+                    <Link
+                      key={maintenance._id}
+                      to="/admin/maintenance"
+                      className="block"
                     >
-                      <div className="flex items-start justify-between">
-                        <div className="space-y-1 flex-1">
-                          <p className="text-sm font-medium">{item.facility}</p>
+                      <div
+                        className={`rounded-lg border ${priorityBg} p-3 transition-colors hover:opacity-80 cursor-pointer`}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="space-y-1 flex-1">
+                            <p className="text-sm font-medium">
+                              {maintenance.asset.name}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {maintenance.title}
+                            </p>
+                          </div>
+                          {getPriorityBadge(maintenance.priority)}
+                        </div>
+                        <div className="flex items-center gap-2 mt-2">
+                          <Calendar className="h-3 w-3 text-muted-foreground" />
                           <p className="text-xs text-muted-foreground">
-                            {item.type}
+                            {format(
+                              new Date(maintenance.scheduledDate),
+                              "dd/MM/yyyy",
+                              { locale: vi }
+                            )}
                           </p>
                         </div>
-                        {getPriorityBadge(item.priority.toUpperCase())}
                       </div>
-                      <div className="flex items-center gap-2 mt-2">
-                        <Calendar className="h-3 w-3 text-muted-foreground" />
-                        <p className="text-xs text-muted-foreground">
-                          {format(item.date, "dd/MM/yyyy", { locale: vi })}
-                        </p>
-                      </div>
-                    </div>
+                    </Link>
                   );
                 })}
               </div>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                Không có lịch bảo trì sắp tới
+              </p>
             )}
           </CardContent>
         </Card>

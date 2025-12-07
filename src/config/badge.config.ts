@@ -201,7 +201,8 @@ export type MaintenanceStatus =
   | "PENDING"
   | "IN_PROGRESS"
   | "COMPLETED"
-  | "CANCELLED";
+  | "CANCELLED"
+  | "OVERDUE";
 
 export const MAINTENANCE_STATUS_BADGE: Record<MaintenanceStatus, BadgeStyle> = {
   PENDING: {
@@ -224,6 +225,11 @@ export const MAINTENANCE_STATUS_BADGE: Record<MaintenanceStatus, BadgeStyle> = {
   CANCELLED: {
     label: "Đã hủy",
     className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
+    variant: "destructive",
+  },
+  OVERDUE: {
+    label: "Quá hạn",
+    className: "bg-red-600 text-white hover:bg-red-600 border-red-700",
     variant: "destructive",
   },
 };
