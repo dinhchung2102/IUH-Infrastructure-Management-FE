@@ -73,7 +73,6 @@ export default function MaintenancePage() {
     handleFiltersChange,
     handlePageChange,
     clearFilters,
-    hasActiveFilters,
     refetch,
   } = useMaintenanceManagement();
 

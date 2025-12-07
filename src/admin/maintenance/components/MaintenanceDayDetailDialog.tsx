@@ -8,15 +8,23 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getMaintenanceById } from "../api/maintenance.api";
-import { getMaintenanceStatusBadge, getPriorityBadge } from "@/config/badge.config";
+import {
+  getMaintenanceStatusBadge,
+  getPriorityBadge,
+} from "@/config/badge.config";
 import type { Maintenance } from "../types/maintenance.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-import { Calendar, Clock, User, Package, FileText, Image as ImageIcon } from "lucide-react";
+import {
+  Calendar,
+  User,
+  Package,
+  FileText,
+  Image as ImageIcon,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CalendarEvent {
@@ -53,7 +61,9 @@ export function MaintenanceDayDetailDialog({
       if (response.success && response.data) {
         // Handle nested data structure
         const data =
-          response.data && typeof response.data === "object" && "data" in response.data
+          response.data &&
+          typeof response.data === "object" &&
+          "data" in response.data
             ? (response.data as { data: Maintenance }).data
             : (response.data as Maintenance);
         setSelectedMaintenance(data);
@@ -199,16 +209,28 @@ export function MaintenanceDayDetailDialog({
                     </h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Tên thiết bị:</span>
-                        <p className="font-medium">{selectedMaintenance.asset.name}</p>
+                        <span className="text-muted-foreground">
+                          Tên thiết bị:
+                        </span>
+                        <p className="font-medium">
+                          {selectedMaintenance.asset.name}
+                        </p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Mã thiết bị:</span>
-                        <p className="font-medium">{selectedMaintenance.asset.code}</p>
+                        <span className="text-muted-foreground">
+                          Mã thiết bị:
+                        </span>
+                        <p className="font-medium">
+                          {selectedMaintenance.asset.code}
+                        </p>
                       </div>
                       <div>
-                        <span className="text-muted-foreground">Trạng thái:</span>
-                        <p className="font-medium">{selectedMaintenance.asset.status}</p>
+                        <span className="text-muted-foreground">
+                          Trạng thái:
+                        </span>
+                        <p className="font-medium">
+                          {selectedMaintenance.asset.status}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -234,7 +256,9 @@ export function MaintenanceDayDetailDialog({
                     </h4>
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       <div>
-                        <span className="text-muted-foreground">Ngày dự kiến:</span>
+                        <span className="text-muted-foreground">
+                          Ngày dự kiến:
+                        </span>
                         <p className="font-medium">
                           {format(
                             new Date(selectedMaintenance.scheduledDate),
@@ -245,7 +269,9 @@ export function MaintenanceDayDetailDialog({
                       </div>
                       {selectedMaintenance.completedDate && (
                         <div>
-                          <span className="text-muted-foreground">Ngày hoàn thành:</span>
+                          <span className="text-muted-foreground">
+                            Ngày hoàn thành:
+                          </span>
                           <p className="font-medium">
                             {format(
                               new Date(selectedMaintenance.completedDate),
@@ -265,7 +291,8 @@ export function MaintenanceDayDetailDialog({
                       <div className="space-y-3">
                         <h4 className="font-medium flex items-center gap-2">
                           <User className="h-4 w-4" />
-                          Người được gán ({selectedMaintenance.assignedTo.length})
+                          Người được gán (
+                          {selectedMaintenance.assignedTo.length})
                         </h4>
                         <div className="space-y-2">
                           {selectedMaintenance.assignedTo.map((staff) => (
@@ -274,7 +301,9 @@ export function MaintenanceDayDetailDialog({
                               className="flex items-center gap-2 p-2 rounded border bg-muted/30"
                             >
                               <div className="flex-1">
-                                <p className="text-sm font-medium">{staff.fullName}</p>
+                                <p className="text-sm font-medium">
+                                  {staff.fullName}
+                                </p>
                                 <p className="text-xs text-muted-foreground">
                                   {staff.email}
                                 </p>
@@ -303,34 +332,38 @@ export function MaintenanceDayDetailDialog({
                   )}
 
                   {/* Images */}
-                  {selectedMaintenance.images && selectedMaintenance.images.length > 0 && (
-                    <>
-                      <Separator />
-                      <div className="space-y-3">
-                        <h4 className="font-medium flex items-center gap-2">
-                          <ImageIcon className="h-4 w-4" />
-                          Hình ảnh ({selectedMaintenance.images.length})
-                        </h4>
-                        <div className="grid grid-cols-3 gap-2">
-                          {selectedMaintenance.images.map((image, idx) => (
-                            <div
-                              key={idx}
-                              className="relative aspect-video rounded border overflow-hidden bg-muted"
-                            >
-                              <img
-                                src={`${import.meta.env.VITE_URL_UPLOADS || ""}${image}`}
-                                alt={`Image ${idx + 1}`}
-                                className="w-full h-full object-cover"
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).src = "/placeholder-image.png";
-                                }}
-                              />
-                            </div>
-                          ))}
+                  {selectedMaintenance.images &&
+                    selectedMaintenance.images.length > 0 && (
+                      <>
+                        <Separator />
+                        <div className="space-y-3">
+                          <h4 className="font-medium flex items-center gap-2">
+                            <ImageIcon className="h-4 w-4" />
+                            Hình ảnh ({selectedMaintenance.images.length})
+                          </h4>
+                          <div className="grid grid-cols-3 gap-2">
+                            {selectedMaintenance.images.map((image, idx) => (
+                              <div
+                                key={idx}
+                                className="relative aspect-video rounded border overflow-hidden bg-muted"
+                              >
+                                <img
+                                  src={`${
+                                    import.meta.env.VITE_URL_UPLOADS || ""
+                                  }${image}`}
+                                  alt={`Image ${idx + 1}`}
+                                  className="w-full h-full object-cover"
+                                  onError={(e) => {
+                                    (e.target as HTMLImageElement).src =
+                                      "/placeholder-image.png";
+                                  }}
+                                />
+                              </div>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    </>
-                  )}
+                      </>
+                    )}
 
                   {/* Created By */}
                   <Separator />
@@ -366,4 +399,3 @@ export function MaintenanceDayDetailDialog({
     </Dialog>
   );
 }
-
