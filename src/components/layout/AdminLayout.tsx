@@ -7,7 +7,7 @@ export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-screen bg-white/97">
       {/* Sidebar - Desktop (Fixed) */}
       <AdminSidebar className="hidden lg:flex lg:fixed lg:left-0 lg:top-0 lg:z-30 lg:h-screen" />
 

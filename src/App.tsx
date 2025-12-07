@@ -39,7 +39,7 @@ import ZonePage from "./admin/zone/page/ZonePage";
 import AssetCategoriesPage from "./admin/asset-management/page/AssetCategoriesPage";
 import Assetpage from "./admin/asset-management/page/AssetPage";
 import MaintenancePage from "./admin/maintenance/page/MaintenancePage";
-import AnalyticsPage from "./admin/pages/AnalyticsPage";
+import AnalyticsPage from "./admin/statistics/AnalyticsPage";
 import SettingsPage from "./admin/pages/SettingsPage";
 
 function AppRoutes() {
