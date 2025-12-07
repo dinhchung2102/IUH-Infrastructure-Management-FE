@@ -50,7 +50,7 @@ export type CreateStaffDto = {
   email: string;
   password: string;
   fullName: string;
-  role: "ADMIN" | "STAFF" | "CAMPUS_ADMIN";
+  role: RoleName;
   phoneNumber?: string;
   address?: string;
   gender?: "MALE" | "FEMALE";

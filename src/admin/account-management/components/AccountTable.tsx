@@ -29,6 +29,7 @@ import type { RoleName } from "@/types/role.enum";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
+import { RoleSelect } from "@/components/RoleSelect";
 import {
   Select,
   SelectContent,
@@ -165,15 +166,6 @@ export default function AccountTable({
     }
   };
 
-  const roleOptions = [
-    { value: "ADMIN", label: "Quản trị viên" },
-    { value: "CAMPUS_ADMIN", label: "Quản trị cơ sở" },
-    { value: "STAFF", label: "Nhân viên" },
-    { value: "LECTURER", label: "Giảng viên" },
-    { value: "STUDENT", label: "Sinh viên" },
-    { value: "GUEST", label: "Khách" },
-  ];
-
   return (
     <div className="space-y-4">
       {/* Filter Section */}
@@ -200,32 +192,19 @@ export default function AccountTable({
 
           <div className="space-y-2">
             <Label>Vai trò</Label>
-            <Select
+            <RoleSelect
               value={filters.role || "all"}
               onValueChange={(value) =>
                 onFiltersChange({
                   role: value === "all" ? undefined : (value as RoleName),
                 })
               }
-            >
-              <SelectTrigger className="w-[180px] bg-white cursor-pointer">
-                <SelectValue placeholder="Vai trò" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all" className="cursor-pointer">
-                  Tất cả vai trò
-                </SelectItem>
-                {roleOptions.map((option) => (
-                  <SelectItem
-                    key={option.value}
-                    value={option.value}
-                    className="cursor-pointer"
-                  >
-                    {option.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder="Vai trò"
+              className="w-[180px] bg-white cursor-pointer"
+              includeAllOption={true}
+              allOptionLabel="Tất cả vai trò"
+              showLabel={false}
+            />
           </div>
 
           <div className="space-y-2">

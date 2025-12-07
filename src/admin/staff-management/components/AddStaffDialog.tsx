@@ -10,13 +10,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { RoleSelect } from "@/components/RoleSelect";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
 import { Loader2, Copy, RefreshCw, Upload, X } from "lucide-react";
@@ -175,12 +169,7 @@ export function AddStaffDialog({
 
     // Role validation
     if (!form.role) {
-      toast.error("Role không được để trống");
-      return false;
-    }
-    const validRoles = ["ADMIN", "STAFF", "CAMPUS_ADMIN"];
-    if (!validRoles.includes(form.role)) {
-      toast.error("Role phải là ADMIN, STAFF hoặc CAMPUS_ADMIN");
+      toast.error("Vai trò không được để trống");
       return false;
     }
 
@@ -324,24 +313,14 @@ export function AddStaffDialog({
 
           {/* Role & Gender on same row */}
           <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label>
-                Vai trò <span className="text-red-500">*</span>
-              </Label>
-              <Select
-                value={form.role}
-                onValueChange={(val) => handleChange("role", val)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn vai trò" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ADMIN">Quản trị viên</SelectItem>
-                  <SelectItem value="CAMPUS_ADMIN">Quản trị cơ sở</SelectItem>
-                  <SelectItem value="STAFF">Nhân viên</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <RoleSelect
+              value={form.role}
+              onValueChange={(val) => handleChange("role", val)}
+              label="Vai trò"
+              showLabel={true}
+              required={true}
+              placeholder="Chọn vai trò"
+            />
 
             <div className="space-y-3">
               <Label>Giới tính</Label>
