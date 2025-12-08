@@ -59,6 +59,7 @@ export interface AuditLogApiResponse {
   images: string[];
   createdAt: string;
   updatedAt: string;
+  expiresAt?: string;
   __v?: number;
 }
 
@@ -186,6 +187,7 @@ export interface CreateAuditDto {
   description?: string;
   staffs: string[]; // Array of staff IDs
   images?: string[]; // Array of image URLs or files
+  expiresAt?: string; // Expiration date (ISO string)
 }
 
 // Tạo audit mới
@@ -278,6 +280,7 @@ export const transformAuditLogApiToUI = (
     images: apiAuditLog.images, // Giữ nguyên paths
     createdAt: apiAuditLog.createdAt,
     updatedAt: apiAuditLog.updatedAt,
+    expiresAt: apiAuditLog.expiresAt,
     location: buildLocation(),
   };
 };

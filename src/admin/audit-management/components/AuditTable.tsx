@@ -46,7 +46,7 @@ export function AuditTable({
             <TableHead>Loại báo cáo</TableHead>
             <TableHead>Nhân viên</TableHead>
             <TableHead>Trạng thái</TableHead>
-            <TableHead>Ngày tạo</TableHead>
+            <TableHead>Ngày hết hạn</TableHead>
             <TableHead className="text-right">Thao tác</TableHead>
           </TableRow>
         </TableHeader>
@@ -171,16 +171,20 @@ export function AuditTable({
                   </TableCell>
                   <TableCell>{getAuditStatusBadge(audit.status)}</TableCell>
                   <TableCell>
-                    <div>
-                      <p className="text-sm">
-                        {format(new Date(audit.createdAt), "dd/MM/yyyy")}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {format(new Date(audit.createdAt), "HH:mm", {
-                          locale: vi,
-                        })}
-                      </p>
-                    </div>
+                    {audit.expiresAt ? (
+                      <div>
+                        <p className="text-sm">
+                          {format(new Date(audit.expiresAt), "dd/MM/yyyy")}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {format(new Date(audit.expiresAt), "HH:mm", {
+                            locale: vi,
+                          })}
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">Chưa có</p>
+                    )}
                   </TableCell>
                   <TableCell className="text-right">
                     <TableActionMenu

@@ -58,6 +58,7 @@ export interface AuditLog {
   images: string[];
   createdAt: string;
   updatedAt: string;
+  expiresAt?: string;
   // Helper field for display
   location?: {
     campus: string;

@@ -75,6 +75,7 @@ export function CreateAuditDialog({
   const [loadingStaff, setLoadingStaff] = useState(false);
   const [staffList, setStaffList] = useState<StaffResponse[]>([]);
   const [searchStaff, setSearchStaff] = useState("");
+  const [expirationDays, setExpirationDays] = useState<string>("");
 
   // Asset selection states
   const [campuses, setCampuses] = useState<Campus[]>([]);
@@ -302,9 +303,24 @@ export function CreateAuditDialog({
       return;
     }
 
+    if (!expirationDays || isNaN(Number(expirationDays)) || Number(expirationDays) <= 0) {
+      toast.error("Vui lòng nhập số ngày hết hạn hợp lệ");
+      return;
+    }
+
     try {
       setLoading(true);
-      await createAudit(formData);
+      
+      // Calculate expiresAt: current date + number of days
+      const currentDate = new Date();
+      const daysToAdd = Number(expirationDays);
+      const expiresAt = new Date(currentDate);
+      expiresAt.setDate(expiresAt.getDate() + daysToAdd);
+      
+      await createAudit({
+        ...formData,
+        expiresAt: expiresAt.toISOString(),
+      });
       toast.success("Tạo nhiệm vụ thành công!");
       onSuccess?.();
       handleClose();
@@ -332,6 +348,9 @@ export function CreateAuditDialog({
 
     // Reset staff search
     setSearchStaff("");
+
+    // Reset expiration days
+    setExpirationDays("");
 
     // Reset asset selection
     setSelectedCampus("");
@@ -414,6 +433,25 @@ export function CreateAuditDialog({
               />
               <p className="text-xs text-muted-foreground">
                 {formData.description?.length || 0}/1000 ký tự
+              </p>
+            </div>
+
+            {/* Expiration Days Input */}
+            <div className="space-y-2">
+              <Label htmlFor="expirationDays">
+                Số ngày hết hạn <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="expirationDays"
+                type="number"
+                min="1"
+                placeholder="Nhập số ngày (ví dụ: 7)"
+                value={expirationDays}
+                onChange={(e) => setExpirationDays(e.target.value)}
+                className="bg-white"
+              />
+              <p className="text-xs text-muted-foreground">
+                Nhiệm vụ sẽ hết hạn sau số ngày được nhập tính từ ngày hiện tại
               </p>
             </div>
 
@@ -822,7 +860,16 @@ export function CreateAuditDialog({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={
+              loading ||
+              !formData.subject ||
+              formData.subject.length < 5 ||
+              formData.staffs.length === 0 ||
+              (!reportId && !selectedAsset) ||
+              !expirationDays ||
+              isNaN(Number(expirationDays)) ||
+              Number(expirationDays) <= 0
+            }
             className="cursor-pointer"
           >
             {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

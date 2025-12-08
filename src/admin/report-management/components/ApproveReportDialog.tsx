@@ -45,6 +45,7 @@ export function ApproveReportDialog({
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
   const [subject, setSubject] = useState("");
   const [searchStaff, setSearchStaff] = useState("");
+  const [expirationDays, setExpirationDays] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
@@ -95,14 +96,27 @@ export function ApproveReportDialog({
       return;
     }
 
+    if (!expirationDays || isNaN(Number(expirationDays)) || Number(expirationDays) <= 0) {
+      toast.error("Vui lòng nhập số ngày hết hạn hợp lệ");
+      return;
+    }
+
     if (!report) return;
 
     try {
       setSubmitting(true);
+      
+      // Calculate expiresAt: current date + number of days
+      const currentDate = new Date();
+      const daysToAdd = Number(expirationDays);
+      const expiresAt = new Date(currentDate);
+      expiresAt.setDate(expiresAt.getDate() + daysToAdd);
+      
       await approveReport({
         reportId: report._id,
         staffIds: selectedStaffIds,
         subject: subject.trim(),
+        expiresAt: expiresAt.toISOString(),
       });
       toast.success("Phê duyệt báo cáo thành công!");
       onSuccess();
@@ -110,6 +124,7 @@ export function ApproveReportDialog({
       // Reset form
       setSelectedStaffIds([]);
       setSubject("");
+      setExpirationDays("");
     } catch (error) {
       console.error("Error approving report:", error);
       toast.error("Không thể phê duyệt báo cáo");
@@ -179,24 +194,46 @@ export function ApproveReportDialog({
             </div>
           )}
 
-          {/* Staff Search */}
-          <div className="space-y-2">
-            <Label htmlFor="search-staff">Tìm và chọn nhân viên</Label>
-            <Input
-              id="search-staff"
-              placeholder="Tìm theo tên nhân viên..."
-              value={searchStaff}
-              onChange={(e) => {
-                setSearchStaff(e.target.value);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  fetchStaff();
-                }
-              }}
-              className="bg-white"
-            />
+          {/* Staff Search and Expiration Days - Same Row */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Staff Search */}
+            <div className="space-y-2">
+              <Label htmlFor="search-staff">Tìm và chọn nhân viên</Label>
+              <Input
+                id="search-staff"
+                placeholder="Tìm theo tên nhân viên..."
+                value={searchStaff}
+                onChange={(e) => {
+                  setSearchStaff(e.target.value);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    fetchStaff();
+                  }
+                }}
+                className="bg-white"
+              />
+            </div>
+
+            {/* Expiration Days Input */}
+            <div className="space-y-2">
+              <Label htmlFor="expirationDays">
+                Số ngày hết hạn <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="expirationDays"
+                type="number"
+                min="1"
+                placeholder="Nhập số ngày (ví dụ: 7)"
+                value={expirationDays}
+                onChange={(e) => setExpirationDays(e.target.value)}
+                className="bg-white"
+              />
+            </div>
           </div>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Nhiệm vụ sẽ hết hạn sau số ngày được nhập tính từ ngày hiện tại
+          </p>
 
           {/* Staff List */}
           <div className="space-y-2">
@@ -267,7 +304,12 @@ export function ApproveReportDialog({
           <Button
             onClick={handleApprove}
             disabled={
-              submitting || selectedStaffIds.length === 0 || !subject.trim()
+              submitting ||
+              selectedStaffIds.length === 0 ||
+              !subject.trim() ||
+              !expirationDays ||
+              isNaN(Number(expirationDays)) ||
+              Number(expirationDays) <= 0
             }
             className="bg-green-600 hover:bg-green-700 cursor-pointer"
           >

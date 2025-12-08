@@ -169,6 +169,21 @@ export function AuditDetailDialog({
                     })}
                   </p>
                 </div>
+                {audit.expiresAt && (
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Calendar className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-[11px] text-muted-foreground">
+                        Hết hạn
+                      </span>
+                    </div>
+                    <p className="font-medium text-xs">
+                      {format(new Date(audit.expiresAt), "dd/MM/yyyy HH:mm", {
+                        locale: vi,
+                      })}
+                    </p>
+                  </div>
+                )}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <Calendar className="h-3 w-3 text-muted-foreground" />

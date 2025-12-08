@@ -181,6 +181,7 @@ export interface ApproveReportDto {
   reportId: string;
   staffIds: string[];
   subject: string;
+  expiresAt?: string; // Expiration date (ISO string)
 }
 
 export const approveReport = async (data: ApproveReportDto) => {
