@@ -236,6 +236,7 @@ export default function DashboardPage() {
       color: "text-blue-600",
       bgColor: "bg-blue-100",
       href: "/admin/asset",
+      description: "Tổng số thiết bị trong hệ thống",
     },
     {
       title: "Người dùng hoạt động",
@@ -244,6 +245,7 @@ export default function DashboardPage() {
       color: "text-green-600",
       bgColor: "bg-green-100",
       href: "/admin/account",
+      description: "Số lượng người dùng đang hoạt động",
     },
     {
       title: "Báo cáo chờ xử lý",
@@ -252,6 +254,7 @@ export default function DashboardPage() {
       color: "text-orange-600",
       bgColor: "bg-orange-100",
       href: "/admin/reports",
+      description: "Báo cáo đang chờ được xử lý",
     },
     {
       title: "Phản hồi cần xử lý",
@@ -260,6 +263,7 @@ export default function DashboardPage() {
       color: "text-red-600",
       bgColor: "bg-red-100",
       href: "/admin/audits",
+      description: "Phản hồi cần được xử lý",
     },
   ];
 
@@ -326,6 +330,11 @@ export default function DashboardPage() {
                       <div className="text-2xl font-bold">
                         {formatNumber(stat.value)}
                       </div>
+                      {stat.description && (
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {stat.description}
+                        </p>
+                      )}
                     </CardContent>
                   </Card>
                 </Link>
