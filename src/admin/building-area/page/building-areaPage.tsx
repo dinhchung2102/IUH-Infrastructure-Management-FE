@@ -94,7 +94,7 @@ export default function BuildingAreaPage() {
         />
         <div className="flex gap-2 mt-2 md:mt-0">
           <Button
-            className="flex-1 md:flex-initial cursor-pointer"
+            className="flex-1 md:flex-initial cursor-pointer hidden"
             variant="outline"
             onClick={fetchData}
           >

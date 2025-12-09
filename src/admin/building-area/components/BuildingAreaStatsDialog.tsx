@@ -113,7 +113,8 @@ export function BuildingAreaStatsDialog({
 
   const statusData = [
     { status: "Hoạt động", count: activeStats.stats.active ?? 0 },
-{ status: "Không hoạt động", count: activeStats.stats.inactive ?? 0 },
+    { status: "Không hoạt động", count: activeStats.stats.inactive ?? 0 },
+    { status: "Đang bảo trì", count: activeStats.stats.underMaintenance ?? 0 },
   ];
 
   /* ============================

@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { RefreshCcw, BarChart3, Plus } from "lucide-react";
-import { BuildingAreaCards } from "../components/BuildingAreaCards";
+import { AreaStatsCards } from "../components/AreaStatsCards";
 import { BuildingAreaAddDialog } from "../components/BuildingAreaAddDialog";
-import { BuildingAreaStatsDialog } from "../components/BuildingAreaStatsDialog";
+import { AreaStatsByCampusDialog } from "../components/AreaStatsByCampusDialog";
 import { BuildingAreaFilters } from "../components/BuildingAreaFilters";
 import { BuildingAreaTable } from "../components/BuildingAreaTable";
 import PaginationComponent from "@/components/PaginationComponent";
@@ -16,11 +16,17 @@ import {
   useBuildingAreaData,
   type BuildingAreaItem,
 } from "../hooks";
+import { getAreaStats } from "../api/area.api";
+import type { AreaStatsResponse } from "../api/area.api";
 
 export default function AreaPage() {
   const [openAdd, setOpenAdd] = useState(false);
   const [openStats, setOpenStats] = useState(false);
   const [editingItem, setEditingItem] = useState<BuildingAreaItem | null>(null);
+  const [areaStats, setAreaStats] = useState<AreaStatsResponse | undefined>(
+    undefined
+  );
+  const [statsLoading, setStatsLoading] = useState(true);
   const filterType = "AREA" as const;
 
   // Pagination
@@ -69,6 +75,23 @@ export default function AreaPage() {
     }
   }, [dataPagination, updatePagination]);
 
+  // Fetch area stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await getAreaStats();
+        setAreaStats(stats);
+      } catch (error) {
+        console.error("Error fetching area stats:", error);
+        setAreaStats(undefined);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   // Handle filter changes - reset to first page
   const handleFilterChange = (updates: Partial<typeof filters>) => {
     handleFiltersChange(updates);
@@ -87,7 +110,7 @@ export default function AreaPage() {
         />
         <div className="flex gap-2 mt-2 md:mt-0">
           <Button
-            className="flex-1 md:flex-initial cursor-pointer"
+            className="flex-1 md:flex-initial cursor-pointer hidden"
             variant="outline"
             onClick={fetchData}
           >
@@ -116,7 +139,7 @@ export default function AreaPage() {
       </div>
 
       {/* Cards thống kê */}
-      <BuildingAreaCards stats={undefined} loading={false} />
+      <AreaStatsCards stats={areaStats} loading={statsLoading} />
 
       {/* Bộ lọc */}
       <BuildingAreaFilters
@@ -170,8 +193,11 @@ export default function AreaPage() {
       />
 
       {/* Dialog thống kê */}
-      <BuildingAreaStatsDialog open={openStats} onOpenChange={setOpenStats} />
+      <AreaStatsByCampusDialog
+        open={openStats}
+        onOpenChange={setOpenStats}
+        campuses={campuses}
+      />
     </div>
   );
 }
-

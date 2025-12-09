@@ -18,13 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 import { Loader2 } from "lucide-react";
 import type { ReportsByLocationData } from "../api/statistics.api";
 
@@ -69,9 +63,9 @@ export function LocationsTab({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="zone">Khu vực (Zone)</SelectItem>
-              <SelectItem value="area">Vùng (Area)</SelectItem>
-              <SelectItem value="building">Tòa nhà (Building)</SelectItem>
+              <SelectItem value="zone">Khu vực</SelectItem>
+              <SelectItem value="area">Khu vực ngoài trời</SelectItem>
+              <SelectItem value="building">Tòa nhà</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -104,4 +98,3 @@ export function LocationsTab({
     </Card>
   );
 }
-

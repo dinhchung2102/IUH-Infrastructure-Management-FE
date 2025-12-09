@@ -8,7 +8,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -22,7 +21,15 @@ import {
 } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { createZone, updateZone, type ZoneResponse } from "../api/zone.api";
 import {
   getBuildings,
@@ -152,7 +159,7 @@ export function ZoneAddDialog({
       setForm({
         name: "",
         description: "",
-        status: "ACTIVE",
+        status: "ACTIVE", // Mặc định là ACTIVE
         location: "",
         zoneType: "FUNCTIONAL",
         floorLocation: "",
@@ -203,9 +210,36 @@ export function ZoneAddDialog({
     [buildings]
   );
 
+  const zoneTypeDescriptions = {
+    FUNCTIONAL: {
+      title: "Khu vực Chức năng",
+      description:
+        "Khu vực được sử dụng cho các hoạt động chức năng chính của cơ sở, như phòng học, phòng làm việc, phòng họp, thư viện, v.v.",
+      color: "bg-purple-100 text-purple-700 border-purple-300",
+    },
+    TECHNICAL: {
+      title: "Khu vực Kỹ thuật",
+      description:
+        "Khu vực dành cho các thiết bị kỹ thuật, hệ thống cơ sở hạ tầng như phòng máy chủ, phòng điện, phòng nước, hệ thống điều hòa, v.v.",
+      color: "bg-blue-100 text-blue-700 border-blue-300",
+    },
+    SERVICE: {
+      title: "Khu vực Dịch vụ",
+      description:
+        "Khu vực cung cấp các dịch vụ hỗ trợ như nhà vệ sinh, phòng y tế, căn tin, khu vực đỗ xe, v.v.",
+      color: "bg-yellow-100 text-yellow-700 border-yellow-300",
+    },
+    PUBLIC: {
+      title: "Khu vực Công cộng",
+      description:
+        "Khu vực mở cho công chúng sử dụng như sân vận động, công viên, khu vực giải trí, không gian công cộng, v.v.",
+      color: "bg-green-100 text-green-700 border-green-300",
+    },
+  };
+
   const validateForm = () => {
     if (!form.name.trim()) {
-      toast.error("Tên zone là bắt buộc.");
+      toast.error("Tên phòng - khu vực là bắt buộc.");
       return false;
     }
     if (!form.location.trim()) {
@@ -269,8 +303,8 @@ export function ZoneAddDialog({
       if (res?.success) {
         toast.success(
           mode === "edit"
-            ? "Cập nhật zone thành công!"
-            : "Thêm zone thành công!"
+            ? "Cập nhật phòng - khu vực thành công!"
+            : "Thêm phòng - khu vực thành công!"
         );
         onOpenChange(false);
         onSuccess?.();
@@ -278,7 +312,7 @@ export function ZoneAddDialog({
         toast.error(res?.message || "Thao tác không thành công.");
       }
     } catch (err: unknown) {
-      console.error("❌ Lỗi khi lưu zone:", err);
+      console.error("❌ Lỗi khi lưu phòng - khu vực:", err);
       const error = err as {
         response?: { data?: { message?: string } };
         message?: string;
@@ -286,7 +320,7 @@ export function ZoneAddDialog({
       const msg =
         error?.response?.data?.message ||
         error?.message ||
-        "Có lỗi xảy ra khi lưu zone.";
+        "Có lỗi xảy ra khi lưu phòng - khu vực.";
       toast.error(msg);
     } finally {
       setLoading(false);
@@ -295,146 +329,180 @@ export function ZoneAddDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[520px]">
+      <DialogContent className="max-w-[calc(100%-2rem)] sm:max-w-[1100px]">
         <DialogHeader>
           <DialogTitle>
-            {mode === "edit" ? "Chỉnh sửa Zone" : "Thêm Zone mới"}
+            {mode === "edit"
+              ? "Chỉnh sửa Phòng - Khu vực"
+              : "Thêm Phòng - Khu vực mới"}
           </DialogTitle>
           <DialogDescription>
             {mode === "edit"
-              ? "Cập nhật thông tin khu vực trong hệ thống."
-              : "Điền đầy đủ thông tin để tạo zone mới."}
+              ? "Cập nhật thông tin phòng - khu vực trong hệ thống."
+              : "Điền đầy đủ thông tin để tạo phòng - khu vực mới."}
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          {/* Tên zone */}
-          <div className="space-y-2">
-            <Label htmlFor="name">Tên Zone</Label>
-            <Input
-              id="name"
-              placeholder="VD: Nhà vệ sinh H1 hoặc Phòng kỹ thuật"
-              value={form.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              required
-            />
-          </div>
+        <form onSubmit={handleSubmit} className="mt-2">
+          <div className="grid grid-cols-2 gap-6">
+            {/* Cột trái: Form */}
+            <div className="space-y-4">
+              {/* Tên */}
+              <div className="space-y-2">
+                <Label htmlFor="name">Tên</Label>
+                <Input
+                  id="name"
+                  placeholder="VD: Nhà vệ sinh H1 hoặc Phòng kỹ thuật"
+                  value={form.name}
+                  onChange={(e) => handleChange("name", e.target.value)}
+                  required
+                />
+              </div>
 
-          {/* Mô tả */}
-          <div className="space-y-2">
-            <Label htmlFor="description">Mô tả</Label>
-            <Input
-              id="description"
-              placeholder="VD: Khu vực dịch vụ hoặc chức năng"
-              value={form.description}
-              onChange={(e) => handleChange("description", e.target.value)}
-            />
-          </div>
+              {/* Mô tả */}
+              <div className="space-y-2">
+                <Label htmlFor="description">Mô tả</Label>
+                <Input
+                  id="description"
+                  placeholder="VD: Khu vực dịch vụ hoặc chức năng"
+                  value={form.description}
+                  onChange={(e) => handleChange("description", e.target.value)}
+                />
+              </div>
 
-          {/* Type Selection (Area or Building) */}
-          <div className="space-y-2">
-            <Label>Loại</Label>
-            <Select
-              value={selectedType || ""}
-              onValueChange={(val) =>
-                handleTypeChange(val as "area" | "building")
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn loại (Khu vực hoặc Tòa nhà)" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="area">Khu vực ngoài trời</SelectItem>
-                <SelectItem value="building">Tòa nhà</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+              {/* Loại và Loại khu vực trên cùng 1 hàng */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label>Tòa nhà / Khu vực ngoài trời</Label>
+                  <Select
+                    value={selectedType || ""}
+                    onValueChange={(val) =>
+                      handleTypeChange(val as "area" | "building")
+                    }
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn loại" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="area">Khu vực ngoài trời</SelectItem>
+                      <SelectItem value="building">Tòa nhà</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-          {/* Area / Building Selection */}
-          {selectedType && (
-            <div className="space-y-2">
-              <Label>
-                {selectedType === "area" ? "Khu vực ngoài trời" : "Tòa nhà"}
-              </Label>
-              <Combobox
-                options={
-                  selectedType === "area" ? areaOptions : buildingOptions
-                }
-                value={form.location}
-                onValueChange={handleSelectLocation}
-                placeholder={
-                  selectedType === "area"
-                    ? "Chọn khu vực ngoài trời..."
-                    : "Chọn tòa nhà..."
-                }
-              />
+                <div className="space-y-2">
+                  <Label>Loại phòng - khu vực</Label>
+                  <Select
+                    value={form.zoneType}
+                    onValueChange={(val) => handleChange("zoneType", val)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn loại khu vực" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="FUNCTIONAL">Chức năng</SelectItem>
+                      <SelectItem value="TECHNICAL">Kỹ thuật</SelectItem>
+                      <SelectItem value="SERVICE">Dịch vụ</SelectItem>
+                      <SelectItem value="PUBLIC">Công cộng</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Area Selection */}
+              {selectedType === "area" && (
+                <div className="space-y-2">
+                  <Label>Khu vực ngoài trời</Label>
+                  <Combobox
+                    options={areaOptions}
+                    value={form.location}
+                    onValueChange={handleSelectLocation}
+                    placeholder="Chọn khu vực ngoài trời..."
+                  />
+                </div>
+              )}
+
+              {/* Building và Tầng trên cùng 1 hàng */}
+              {selectedType === "building" && (
+                <div className="grid grid-cols-4 gap-4">
+                  <div className="col-span-3 space-y-2">
+                    <Label>Tòa nhà</Label>
+                    <Combobox
+                      options={buildingOptions}
+                      value={form.location}
+                      onValueChange={handleSelectLocation}
+                      placeholder="Chọn tòa nhà..."
+                    />
+                  </div>
+                  <div className="col-span-1 space-y-2">
+                    <Label htmlFor="floorLocation">Tầng</Label>
+                    <Input
+                      id="floorLocation"
+                      placeholder="VD: 1"
+                      value={form.floorLocation}
+                      onChange={(e) =>
+                        handleChange("floorLocation", e.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Button */}
+              <div className="flex justify-end gap-2 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => onOpenChange(false)}
+                >
+                  Hủy
+                </Button>
+                <Button type="submit" disabled={loading}>
+                  {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  {mode === "edit" ? "Cập nhật" : "Thêm mới"}
+                </Button>
+              </div>
             </div>
-          )}
 
-          {/* Zone Type */}
-          <div className="space-y-2">
-            <Label>Loại Zone</Label>
-            <Select
-              value={form.zoneType}
-              onValueChange={(val) => handleChange("zoneType", val)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn loại zone" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="FUNCTIONAL">
-                  Chức năng (FUNCTIONAL)
-                </SelectItem>
-                <SelectItem value="TECHNICAL">Kỹ thuật (TECHNICAL)</SelectItem>
-                <SelectItem value="SERVICE">Dịch vụ (SERVICE)</SelectItem>
-                <SelectItem value="PUBLIC">Công cộng (PUBLIC)</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          {/* Floor (chỉ hiển thị nếu là building) */}
-          {selectedType === "building" && (
-            <div className="space-y-2">
-              <Label htmlFor="floorLocation">Tầng</Label>
-              <Input
-                id="floorLocation"
-                placeholder="VD: 1"
-                value={form.floorLocation}
-                onChange={(e) => handleChange("floorLocation", e.target.value)}
-              />
+            {/* Cột phải: Hướng dẫn ZoneType */}
+            <div>
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Hướng dẫn về Loại khu vực
+                  </CardTitle>
+                  <CardDescription>
+                    Chọn loại khu vực phù hợp với mục đích sử dụng
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {Object.entries(zoneTypeDescriptions).map(([key, info]) => (
+                    <div
+                      key={key}
+                      className={`p-3 rounded-lg border ${
+                        form.zoneType === key
+                          ? "ring-2 ring-primary"
+                          : "bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge
+                          className={`${info.color} border`}
+                          variant="outline"
+                        >
+                          {info.title}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {info.description}
+                      </p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
             </div>
-          )}
-
-          {/* Status */}
-          <div className="space-y-2">
-            <Label>Trạng thái</Label>
-            <Select
-              value={form.status}
-              onValueChange={(val) => handleChange("status", val)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn trạng thái" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="ACTIVE">Đang hoạt động</SelectItem>
-                <SelectItem value="INACTIVE">Ngừng hoạt động</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
-
-          <DialogFooter className="flex justify-end gap-2 pt-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-            >
-              Hủy
-            </Button>
-            <Button type="submit" disabled={loading}>
-              {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {mode === "edit" ? "Cập nhật" : "Thêm Zone"}
-            </Button>
-          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>

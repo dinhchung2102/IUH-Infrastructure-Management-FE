@@ -46,6 +46,7 @@ export interface ReportApiResponse {
   priority?: ReportPriority;
   description: string;
   images: string[];
+  suggestedProcessingDays?: number; // AI suggested processing days
   createdBy: ReportApiCreatedBy | null;
   createdAt: string;
   updatedAt: string;
@@ -235,6 +236,7 @@ export const transformReportApiToUI = (
     priority: apiReport.priority,
     description: apiReport.description,
     images: apiReport.images, // Giữ nguyên paths
+    suggestedProcessingDays: apiReport.suggestedProcessingDays,
     createdBy: {
       _id: apiReport.createdBy._id,
       fullName: apiReport.createdBy.fullName,

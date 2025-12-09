@@ -56,7 +56,7 @@ export function ZoneStatsCards({ stats, loading }: ZoneStatsCardsProps) {
         variant="danger"
       />
       <StatsCard
-        title="Zone mới trong tháng"
+        title="Khu vực mới trong tháng"
         value={stats?.newZonesThisMonth || 0}
         icon={PlusCircle}
         description="Khu vực mới trong tháng"

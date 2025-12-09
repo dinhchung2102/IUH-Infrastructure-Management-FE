@@ -74,7 +74,7 @@ const navigation = [
             icon: Map,
           },
           {
-            title: "Quản lý phòng",
+            title: "Phòng & Khu vực",
             href: "/admin/zone",
             icon: Map,
           },

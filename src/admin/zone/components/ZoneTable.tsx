@@ -11,6 +11,7 @@ import { getActiveStatusBadge } from "@/config/badge.config";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import { TableActionMenu } from "@/components/TableActionMenu";
 import { Pencil, Trash2 } from "lucide-react";
+import { ZoneTypeHoverCard } from "@/admin/building-area/components/ZoneTypeHoverCard";
 
 /* =========================================
    Icon & màu cho loại zone
@@ -103,9 +104,11 @@ export function ZoneTable({
                   <TableCell className="font-medium">{z.name}</TableCell>
                   <TableCell>
                     {zt ? (
-                      <Badge className={`flex items-center gap-1 ${zt.color}`}>
-                        {zt.label}
-                      </Badge>
+                      <ZoneTypeHoverCard zoneType={z.zoneType}>
+                        <Badge className={`flex items-center gap-1 ${zt.color}`}>
+                          {zt.label}
+                        </Badge>
+                      </ZoneTypeHoverCard>
                     ) : (
                       "—"
                     )}

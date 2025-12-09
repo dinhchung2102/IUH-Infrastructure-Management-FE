@@ -4,9 +4,9 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { RefreshCcw, BarChart3, Plus } from "lucide-react";
-import { BuildingAreaCards } from "../components/BuildingAreaCards";
+import { BuildingStatsCards } from "../components/BuildingStatsCards";
 import { BuildingAreaAddDialog } from "../components/BuildingAreaAddDialog";
-import { BuildingAreaStatsDialog } from "../components/BuildingAreaStatsDialog";
+import { BuildingStatsByCampusDialog } from "../components/BuildingStatsByCampusDialog";
 import { BuildingAreaFilters } from "../components/BuildingAreaFilters";
 import { BuildingAreaTable } from "../components/BuildingAreaTable";
 import PaginationComponent from "@/components/PaginationComponent";
@@ -16,11 +16,17 @@ import {
   useBuildingAreaData,
   type BuildingAreaItem,
 } from "../hooks";
+import { getBuildingStats } from "../api/building.api";
+import type { BuildingStatsResponse } from "../api/building.api";
 
 export default function BuildingPage() {
   const [openAdd, setOpenAdd] = useState(false);
   const [openStats, setOpenStats] = useState(false);
   const [editingItem, setEditingItem] = useState<BuildingAreaItem | null>(null);
+  const [buildingStats, setBuildingStats] = useState<
+    BuildingStatsResponse | undefined
+  >(undefined);
+  const [statsLoading, setStatsLoading] = useState(true);
   const filterType = "BUILDING" as const;
 
   // Pagination
@@ -69,6 +75,23 @@ export default function BuildingPage() {
     }
   }, [dataPagination, updatePagination]);
 
+  // Fetch building stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        setStatsLoading(true);
+        const stats = await getBuildingStats();
+        setBuildingStats(stats);
+      } catch (error) {
+        console.error("Error fetching building stats:", error);
+        setBuildingStats(undefined);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
   // Handle filter changes - reset to first page
   const handleFilterChange = (updates: Partial<typeof filters>) => {
     handleFiltersChange(updates);
@@ -87,7 +110,7 @@ export default function BuildingPage() {
         />
         <div className="flex gap-2 mt-2 md:mt-0">
           <Button
-            className="flex-1 md:flex-initial cursor-pointer"
+            className="flex-1 md:flex-initial cursor-pointer hidden"
             variant="outline"
             onClick={fetchData}
           >
@@ -116,7 +139,7 @@ export default function BuildingPage() {
       </div>
 
       {/* Cards thống kê */}
-      <BuildingAreaCards stats={undefined} loading={false} />
+      <BuildingStatsCards stats={buildingStats} loading={statsLoading} />
 
       {/* Bộ lọc */}
       <BuildingAreaFilters
@@ -170,7 +193,11 @@ export default function BuildingPage() {
       />
 
       {/* Dialog thống kê */}
-      <BuildingAreaStatsDialog open={openStats} onOpenChange={setOpenStats} />
+      <BuildingStatsByCampusDialog
+        open={openStats}
+        onOpenChange={setOpenStats}
+        campuses={campuses}
+      />
     </div>
   );
 }

@@ -121,18 +121,54 @@ export const getAreasByCampus = async (campusId: string) => {
   return res.data;
 };
 
-export interface AreaStatsResponse {
-  stats: {
-    total: number;
-    active: number;
-    inactive: number;
-    newThisMonth: number;
-  };
+export interface AreaStatsData {
+  total: number;
+  active: number;
+  inactive: number;
+  underMaintenance: number;
 }
 
-export const getAreaStats = async () => {
-  const res = await api.get<ApiResponse<AreaStatsResponse>>(
+export interface AreaStatsResponse {
+  total: number;
+  active: number;
+  inactive: number;
+  underMaintenance: number;
+}
+
+export const getAreaStats = async (): Promise<AreaStatsResponse> => {
+  const res = await api.get<ApiResponse<{ data: AreaStatsData }>>(
     "/zone-area/areas-stats"
   );
-  return res.data.data;
+  const data = res.data.data?.data || res.data.data;
+  if (data && "total" in data) {
+    return data as AreaStatsResponse;
+  }
+  return { total: 0, active: 0, inactive: 0, underMaintenance: 0 };
+};
+
+/** ============================
+ *  Thống kê khu vực theo Campus (Tất cả campus)
+ *  Endpoint: /zone-area/areas-stats-by-campus
+ * ============================ */
+
+export interface AreaStatsByCampusItem {
+  campusId: string;
+  campusName: string;
+  total: number;
+  active: number;
+  inactive: number;
+  underMaintenance: number;
+}
+
+export type AreaStatsByCampusResponse = AreaStatsByCampusItem[];
+
+export const getAreaStatsByCampus = async (): Promise<AreaStatsByCampusResponse> => {
+  const res = await api.get<ApiResponse<{ data: AreaStatsByCampusItem[] }>>(
+    "/zone-area/areas-stats-by-campus"
+  );
+  const data = res.data.data?.data || res.data.data;
+  if (Array.isArray(data)) {
+    return data;
+  }
+  return [];
 };

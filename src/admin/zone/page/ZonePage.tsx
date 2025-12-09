@@ -53,7 +53,7 @@ function ZonePage() {
             variant="outline"
             onClick={() => setOpenStatsDialog(true)}
           >
-            <BarChart3 className="mr-2 h-4 w-4" />
+            <BarChart3 className=" h-4 w-4" />
             Xem thống kê
           </Button>
           <Button
@@ -61,7 +61,7 @@ function ZonePage() {
             variant="default"
             onClick={() => setOpenAddDialog(true)}
           >
-            <Plus className="mr-2 h-4 w-4" />
+            <Plus className=" h-4 w-4" />
             Thêm khu vực
           </Button>
         </div>

@@ -36,6 +36,7 @@ export interface Report {
   priority?: ReportPriority;
   description: string;
   images: string[]; // Hình ảnh báo cáo (hiển thị trong detail dialog)
+  suggestedProcessingDays?: number; // Gợi ý số ngày xử lý từ AI
   createdBy: {
     _id: string;
     fullName: string;

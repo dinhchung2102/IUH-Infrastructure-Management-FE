@@ -53,8 +53,14 @@ export function ApproveReportDialog({
   useEffect(() => {
     if (open) {
       fetchStaff();
+      // Set suggestedProcessingDays as default value if available
+      if (report?.suggestedProcessingDays) {
+        setExpirationDays(String(report.suggestedProcessingDays));
+      } else {
+        setExpirationDays("");
+      }
     }
-  }, [open]);
+  }, [open, report]);
 
   const fetchStaff = async () => {
     try {
@@ -124,7 +130,12 @@ export function ApproveReportDialog({
       // Reset form
       setSelectedStaffIds([]);
       setSubject("");
-      setExpirationDays("");
+      // Reset to suggestedProcessingDays if available, otherwise empty
+      if (report?.suggestedProcessingDays) {
+        setExpirationDays(String(report.suggestedProcessingDays));
+      } else {
+        setExpirationDays("");
+      }
     } catch (error) {
       console.error("Error approving report:", error);
       toast.error("Không thể phê duyệt báo cáo");

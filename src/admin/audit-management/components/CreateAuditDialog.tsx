@@ -48,6 +48,7 @@ interface CreateAuditDialogProps {
   onSuccess?: () => void;
   reportId?: string; // Optional - if creating from report
   assetId?: string; // Optional - if creating from asset
+  suggestedProcessingDays?: number; // Optional - AI suggested processing days from report (only available when creating from report)
 }
 
 const getUserInitials = (name: string) => {
@@ -70,12 +71,15 @@ export function CreateAuditDialog({
   onSuccess,
   reportId,
   assetId,
+  suggestedProcessingDays,
 }: CreateAuditDialogProps) {
   const [loading, setLoading] = useState(false);
   const [loadingStaff, setLoadingStaff] = useState(false);
   const [staffList, setStaffList] = useState<StaffResponse[]>([]);
   const [searchStaff, setSearchStaff] = useState("");
-  const [expirationDays, setExpirationDays] = useState<string>("");
+  const [expirationDays, setExpirationDays] = useState<string>(
+    suggestedProcessingDays ? String(suggestedProcessingDays) : ""
+  );
 
   // Asset selection states
   const [campuses, setCampuses] = useState<Campus[]>([]);
@@ -127,9 +131,16 @@ export function CreateAuditDialog({
     if (open) {
       fetchStaff();
       fetchCampuses();
+      // Set suggestedProcessingDays as default value if available (only when creating from report)
+      // Note: suggestedProcessingDays is a field from report, not from audit log
+      if (suggestedProcessingDays) {
+        setExpirationDays(String(suggestedProcessingDays));
+      } else {
+        setExpirationDays("");
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
+  }, [open, suggestedProcessingDays]);
 
   // Fetch campuses
   const fetchCampuses = async () => {
@@ -303,20 +314,24 @@ export function CreateAuditDialog({
       return;
     }
 
-    if (!expirationDays || isNaN(Number(expirationDays)) || Number(expirationDays) <= 0) {
+    if (
+      !expirationDays ||
+      isNaN(Number(expirationDays)) ||
+      Number(expirationDays) <= 0
+    ) {
       toast.error("Vui lòng nhập số ngày hết hạn hợp lệ");
       return;
     }
 
     try {
       setLoading(true);
-      
+
       // Calculate expiresAt: current date + number of days
       const currentDate = new Date();
       const daysToAdd = Number(expirationDays);
       const expiresAt = new Date(currentDate);
       expiresAt.setDate(expiresAt.getDate() + daysToAdd);
-      
+
       await createAudit({
         ...formData,
         expiresAt: expiresAt.toISOString(),
@@ -349,8 +364,13 @@ export function CreateAuditDialog({
     // Reset staff search
     setSearchStaff("");
 
-    // Reset expiration days
-    setExpirationDays("");
+    // Reset expiration days to suggestedProcessingDays if available (only when creating from report)
+    // Note: suggestedProcessingDays is a field from report, not from audit log
+    if (suggestedProcessingDays) {
+      setExpirationDays(String(suggestedProcessingDays));
+    } else {
+      setExpirationDays("");
+    }
 
     // Reset asset selection
     setSelectedCampus("");

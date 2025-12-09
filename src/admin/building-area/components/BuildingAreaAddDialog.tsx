@@ -6,7 +6,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -20,9 +19,17 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { Loader2, Info } from "lucide-react";
 import { createBuilding, updateBuilding } from "../api/building.api";
 import { createArea, updateArea } from "../api/area.api";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 
 interface Props {
   open: boolean;
@@ -67,11 +74,13 @@ export function BuildingAreaAddDialog({
         floor: item.floor?.toString() || "",
         description: item.description || "",
         zoneType: item.zoneType || "FUNCTIONAL",
+        type: item.type || defaultType,
       });
     } else {
       setForm({
         ...defaultForm,
         type: defaultType,
+        status: "ACTIVE", // Mặc định là ACTIVE
       });
     }
   }, [open, mode, item, defaultType]);
@@ -125,140 +134,252 @@ export function BuildingAreaAddDialog({
         else await createArea(payload);
       }
 
-      toast.success(mode === "edit" ? "Cập nhật thành công" : "Thêm mới thành công");
+      toast.success(
+        mode === "edit" ? "Cập nhật thành công" : "Thêm mới thành công"
+      );
       onSuccess?.();
       onOpenChange(false);
     } catch (err: any) {
       console.error(err);
-      toast.error(err.response?.data?.message || "Lỗi khi lưu dữ liệu. Vui lòng thử lại.");
+      toast.error(
+        err.response?.data?.message || "Lỗi khi lưu dữ liệu. Vui lòng thử lại."
+      );
     } finally {
       setLoading(false);
     }
   };
 
+  const zoneTypeDescriptions = {
+    FUNCTIONAL: {
+      title: "Khu vực Chức năng",
+      description:
+        "Khu vực được sử dụng cho các hoạt động chức năng chính của cơ sở, như phòng học, phòng làm việc, phòng họp, thư viện, v.v.",
+      color: "bg-purple-100 text-purple-700 border-purple-300",
+    },
+    TECHNICAL: {
+      title: "Khu vực Kỹ thuật",
+      description:
+        "Khu vực dành cho các thiết bị kỹ thuật, hệ thống cơ sở hạ tầng như phòng máy chủ, phòng điện, phòng nước, hệ thống điều hòa, v.v.",
+      color: "bg-blue-100 text-blue-700 border-blue-300",
+    },
+    SERVICE: {
+      title: "Khu vực Dịch vụ",
+      description:
+        "Khu vực cung cấp các dịch vụ hỗ trợ như nhà vệ sinh, phòng y tế, căn tin, khu vực đỗ xe, v.v.",
+      color: "bg-yellow-100 text-yellow-700 border-yellow-300",
+    },
+    PUBLIC: {
+      title: "Khu vực Công cộng",
+      description:
+        "Khu vực mở cho công chúng sử dụng như sân vận động, công viên, khu vực giải trí, không gian công cộng, v.v.",
+      color: "bg-green-100 text-green-700 border-green-300",
+    },
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[550px] rounded-xl p-6">
+      <DialogContent
+        className={`rounded-xl p-6 ${
+          form.type === "AREA"
+            ? "max-w-[calc(100%-2rem)] sm:max-w-[1100px]"
+            : "max-w-[calc(100%-2rem)] sm:max-w-[550px]"
+        }`}
+      >
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">
             {mode === "edit" ? "Cập nhật" : "Thêm mới"}{" "}
             {form.type === "BUILDING" ? "Tòa nhà" : "Khu vực ngoài trời"}
           </DialogTitle>
-          <DialogDescription className="text-gray-500 mt-1">
-            Nhập thông tin chi tiết
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="grid grid-cols-1 gap-4 mt-4">
-  {/* Loại */}
-  <div>
-    <Label>Loại</Label>
-    <Select value={form.type} onValueChange={(v) => setForm({ ...form, type: v })}>
-      <SelectTrigger className="w-full mt-1">
-        <SelectValue placeholder="Chọn loại" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="BUILDING">Tòa nhà</SelectItem>
-        <SelectItem value="AREA">Khu vực ngoài trời</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
+        {form.type === "AREA" ? (
+          <div className="grid grid-cols-2 gap-6">
+            {/* Cột trái: Form */}
+            <div className="space-y-4">
+              <div>
+                <Label>Cơ sở</Label>
+                <Select
+                  value={form.campus}
+                  onValueChange={(v) => setForm({ ...form, campus: v })}
+                >
+                  <SelectTrigger className="w-full mt-1">
+                    <SelectValue placeholder="Chọn cơ sở" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {campuses.length > 0 ? (
+                      campuses.map((c) => (
+                        <SelectItem key={c._id} value={c._id}>
+                          {c.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <SelectItem value="" disabled>
+                        Không có dữ liệu
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </Select>
+              </div>
 
-  {/* Tên */}
-  <div>
-    <Label>Tên</Label>
-    <Input
-      value={form.name}
-      onChange={(e) => setForm({ ...form, name: e.target.value })}
-      placeholder="Nhập tên"
-      className="mt-1"
-    />
-  </div>
+              {/* Tên và Loại khu vực trên cùng 1 hàng */}
+              <div className="grid grid-cols-4 gap-4">
+                <div className="col-span-3">
+                  <Label>Tên</Label>
+                  <Input
+                    value={form.name}
+                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                    placeholder="Nhập tên"
+                    className="mt-1"
+                  />
+                </div>
+                <div className="col-span-1">
+                  <Label>Loại khu vực</Label>
+                  <Select
+                    value={form.zoneType}
+                    onValueChange={(v) => setForm({ ...form, zoneType: v })}
+                  >
+                    <SelectTrigger className="w-full mt-1">
+                      <SelectValue placeholder="Chọn loại khu vực" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="FUNCTIONAL">Chức năng</SelectItem>
+                      <SelectItem value="TECHNICAL">Kỹ thuật</SelectItem>
+                      <SelectItem value="SERVICE">Dịch vụ</SelectItem>
+                      <SelectItem value="PUBLIC">Công cộng</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-  {/* Số tầng / Mô tả */}
-  {form.type === "BUILDING" ? (
-    <div>
-      <Label>Số tầng</Label>
-      <Input
-        type="number"
-        value={form.floor}
-        onChange={(e) => setForm({ ...form, floor: e.target.value })}
-        placeholder="Nhập số tầng"
-        className="mt-1"
-      />
-    </div>
-  ) : (
-    <>
-      <div>
-        <Label>Mô tả</Label>
-        <Input
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-          placeholder="Nhập mô tả"
-          className="mt-1"
-        />
-      </div>
-      <div>
-        <Label>Zone Type</Label>
-        <Select value={form.zoneType} onValueChange={(v) => setForm({ ...form, zoneType: v })}>
-          <SelectTrigger className="w-full mt-1">
-            <SelectValue placeholder="Chọn zone type" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="FUNCTIONAL">Chức năng (FUNCTIONAL)</SelectItem>
-            <SelectItem value="TECHNICAL">Kỹ thuật (TECHNICAL)</SelectItem>
-            <SelectItem value="SERVICE">Dịch vụ (SERVICE)</SelectItem>
-            <SelectItem value="PUBLIC">Công cộng (PUBLIC)</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-    </>
-  )}
+              <div>
+                <Label>Mô tả</Label>
+                <Input
+                  value={form.description}
+                  onChange={(e) =>
+                    setForm({ ...form, description: e.target.value })
+                  }
+                  placeholder="Nhập mô tả"
+                  className="mt-1"
+                />
+              </div>
 
-  {/* Cơ sở */}
-  <div>
-    <Label>Cơ sở</Label>
-    <Select value={form.campus} onValueChange={(v) => setForm({ ...form, campus: v })}>
-      <SelectTrigger className="w-full mt-1">
-        <SelectValue placeholder="Chọn cơ sở" />
-      </SelectTrigger>
-      <SelectContent>
-        {campuses.length > 0 ? (
-          campuses.map((c) => <SelectItem key={c._id} value={c._id}>{c.name}</SelectItem>)
+              {/* Button thêm mới */}
+              <div className="pt-2">
+                <Button
+                  onClick={handleSubmit}
+                  disabled={loading}
+                  className="w-full flex justify-center items-center gap-2"
+                >
+                  {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+                  {mode === "edit" ? "Lưu thay đổi" : "Thêm mới"}
+                </Button>
+              </div>
+            </div>
+
+            {/* Cột phải: Hướng dẫn ZoneType */}
+            <div>
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Hướng dẫn về Loại khu vực
+                  </CardTitle>
+                  <CardDescription>
+                    Chọn loại khu vực phù hợp với mục đích sử dụng
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {Object.entries(zoneTypeDescriptions).map(([key, info]) => (
+                    <div
+                      key={key}
+                      className={`p-3 rounded-lg border ${
+                        form.zoneType === key
+                          ? "ring-2 ring-primary"
+                          : "bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge
+                          className={`${info.color} border`}
+                          variant="outline"
+                        >
+                          {info.title}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {info.description}
+                      </p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         ) : (
-          <SelectItem value="" disabled>Không có dữ liệu</SelectItem>
+          <div className="grid grid-cols-1 gap-4">
+            {/* Cơ sở */}
+            <div>
+              <Label>Cơ sở</Label>
+              <Select
+                value={form.campus}
+                onValueChange={(v) => setForm({ ...form, campus: v })}
+              >
+                <SelectTrigger className="w-full mt-1">
+                  <SelectValue placeholder="Chọn cơ sở" />
+                </SelectTrigger>
+                <SelectContent>
+                  {campuses.length > 0 ? (
+                    campuses.map((c) => (
+                      <SelectItem key={c._id} value={c._id}>
+                        {c.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <SelectItem value="" disabled>
+                      Không có dữ liệu
+                    </SelectItem>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Tên và Số tầng trên cùng 1 hàng */}
+            <div className="grid grid-cols-4 gap-4">
+              <div className="col-span-3">
+                <Label>Tên</Label>
+                <Input
+                  value={form.name}
+                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  placeholder="Nhập tên"
+                  className="mt-1"
+                />
+              </div>
+              <div className="col-span-1">
+                <Label>Số tầng</Label>
+                <Input
+                  type="number"
+                  value={form.floor}
+                  onChange={(e) => setForm({ ...form, floor: e.target.value })}
+                  placeholder="Nhập số"
+                  className="mt-1"
+                />
+              </div>
+            </div>
+          </div>
         )}
-      </SelectContent>
-    </Select>
-  </div>
 
-  {/* Trạng thái */}
-  <div>
-    <Label>Trạng thái</Label>
-    <Select value={form.status} onValueChange={(v) => setForm({ ...form, status: v })}>
-      <SelectTrigger className="w-full mt-1">
-        <SelectValue placeholder="Chọn trạng thái" />
-      </SelectTrigger>
-      <SelectContent>
-        <SelectItem value="ACTIVE">Hoạt động</SelectItem>
-        <SelectItem value="INACTIVE">Ngừng</SelectItem>
-        <SelectItem value="UNDERMAINTENANCE">Bảo trì</SelectItem>
-      </SelectContent>
-    </Select>
-  </div>
-</div>
-
-
-        <DialogFooter className="mt-6">
-          <Button
-            onClick={handleSubmit}
-            disabled={loading}
-            className="w-full flex justify-center items-center gap-2"
-          >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {mode === "edit" ? "Lưu thay đổi" : "Thêm mới"}
-          </Button>
-        </DialogFooter>
+        {form.type === "BUILDING" && (
+          <DialogFooter className="mt-6">
+            <Button
+              onClick={handleSubmit}
+              disabled={loading}
+              className="w-full flex justify-center items-center gap-2"
+            >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {mode === "edit" ? "Lưu thay đổi" : "Thêm mới"}
+            </Button>
+          </DialogFooter>
+        )}
       </DialogContent>
     </Dialog>
   );

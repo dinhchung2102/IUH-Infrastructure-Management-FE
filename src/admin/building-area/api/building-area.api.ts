@@ -52,8 +52,24 @@ export const getBuildingAreaList = async () => {
  * 📊 LẤY THỐNG KÊ GỘP: TÒA NHÀ + KHU VỰC
  * ======================================================== */
 export interface BuildingAreaStats {
-  buildings: BuildingStatsResponse;
-  areas: AreaStatsResponse;
+  buildings: {
+    stats: {
+      total: number;
+      active: number;
+      inactive: number;
+      underMaintenance: number;
+      newThisMonth?: number;
+    };
+  };
+  areas: {
+    stats: {
+      total: number;
+      active: number;
+      inactive: number;
+      underMaintenance: number;
+      newThisMonth?: number;
+    };
+  };
   totalAll: number;
   totalActive: number;
   totalInactive: number;
@@ -62,24 +78,32 @@ export interface BuildingAreaStats {
 
 export const getBuildingAreaStats = async (): Promise<BuildingAreaStats> => {
   try {
-    const [buildingRes, areaRes] = (await Promise.all([
+    const [buildingRes, areaRes] = await Promise.all([
       getBuildingStats(),
       getAreaStats(),
-    ])) as [BuildingStatsResponse, AreaStatsResponse];
+    ]);
 
-    const buildingStats =
-      buildingRes?.stats ?? { total: 0, active: 0, inactive: 0, newThisMonth: 0 };
-    const areaStats =
-      areaRes?.stats ?? { total: 0, active: 0, inactive: 0, newThisMonth: 0 };
+    const buildingStats = buildingRes ?? { total: 0, active: 0, inactive: 0, underMaintenance: 0 };
+    const areaStats = areaRes ?? { total: 0, active: 0, inactive: 0, underMaintenance: 0 };
 
     const totalAll = buildingStats.total + areaStats.total;
     const totalActive = buildingStats.active + areaStats.active;
     const totalInactive = buildingStats.inactive + areaStats.inactive;
-    const totalUnderMaintenance = 0; // chưa có API
+    const totalUnderMaintenance = buildingStats.underMaintenance + areaStats.underMaintenance;
 
     return {
-      buildings: buildingRes,
-      areas: areaRes,
+      buildings: { 
+        stats: { 
+          ...buildingStats, 
+          newThisMonth: 0 // API mới không có trường này
+        } 
+      },
+      areas: { 
+        stats: { 
+          ...areaStats, 
+          newThisMonth: 0 // API mới không có trường này
+        } 
+      },
       totalAll,
       totalActive,
       totalInactive,
