@@ -19,7 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Loader2, Plus, Save } from "lucide-react";
+import { Loader2, Plus, Save, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 import type { News, NewsStatus } from "../types/news.type";
 import { createNews, updateNews } from "../api/news.api";
@@ -53,8 +53,23 @@ export function CreateEditNewsDialog({
     }
     return null;
   };
+
+  const getFullName = () => {
+    const storedAccount = localStorage.getItem("account");
+    if (storedAccount && storedAccount !== "undefined") {
+      try {
+        const account = JSON.parse(storedAccount);
+        return account.fullName || "";
+      } catch (error) {
+        console.error("Failed to parse account data:", error);
+      }
+    }
+    return "";
+  };
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
+  const [authorName, setAuthorName] = useState("");
   const [thumbnail, setThumbnail] = useState("");
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [thumbnailPreview, setThumbnailPreview] = useState("");
@@ -94,6 +109,15 @@ export function CreateEditNewsDialog({
     if (news) {
       setTitle(news.title);
       setDescription(news.description);
+      // Get author name from news object
+      if (typeof news.author === "object" && news.author.fullName) {
+        setAuthorName(news.author.fullName);
+      } else if (typeof news.author === "string") {
+        // If author is just ID, try to get from localStorage as fallback
+        setAuthorName(getFullName());
+      } else {
+        setAuthorName(getFullName());
+      }
       setThumbnail(news.thumbnail);
       setThumbnailFile(null);
       setThumbnailPreview(news.thumbnail);
@@ -107,6 +131,7 @@ export function CreateEditNewsDialog({
     } else {
       setTitle("");
       setDescription("");
+      setAuthorName(getFullName());
       setThumbnail("");
       setThumbnailFile(null);
       setThumbnailPreview("");
@@ -169,6 +194,11 @@ export function CreateEditNewsDialog({
       return;
     }
 
+    if (!authorName.trim()) {
+      toast.error("Vui lòng nhập tên tác giả");
+      return;
+    }
+
     const userId = getUserId();
     if (!userId && !isEditMode) {
       toast.error("Không tìm thấy thông tin tác giả");
@@ -183,6 +213,7 @@ export function CreateEditNewsDialog({
       formData.append("description", description.trim());
       formData.append("content", content);
       formData.append("status", status);
+      formData.append("author", authorName.trim());
 
       if (category) {
         formData.append("category", category);
@@ -282,42 +313,107 @@ export function CreateEditNewsDialog({
               </p>
             </div>
 
-            {/* Thumbnail */}
+            {/* Author Name */}
             <div className="space-y-2">
-              <Label htmlFor="thumbnail">
-                Ảnh Thumbnail <span className="text-red-500">*</span>
+              <Label htmlFor="author">
+                Tên tác giả <span className="text-red-500">*</span>
               </Label>
               <Input
-                id="thumbnail"
-                type="file"
-                accept="image/*"
-                onChange={handleThumbnailChange}
-                className="bg-white cursor-pointer"
+                id="author"
+                placeholder="Nhập tên tác giả..."
+                value={authorName}
+                onChange={(e) => setAuthorName(e.target.value)}
+                className="bg-white"
+                maxLength={100}
               />
               <p className="text-xs text-muted-foreground">
-                Chọn ảnh thumbnail (tối đa 5MB, định dạng JPG, PNG, WebP)
+                {authorName.length}/100 ký tự
               </p>
-              {thumbnailPreview && (
-                <div className="mt-2">
-                  <img
-                    src={
-                      thumbnailPreview.startsWith("blob:")
-                        ? thumbnailPreview
-                        : thumbnailPreview.startsWith("http")
-                        ? thumbnailPreview
-                        : `${
-                            import.meta.env.VITE_URL_UPLOADS
-                          }${thumbnailPreview}`
-                    }
-                    alt="Preview"
-                    className="w-full h-40 object-cover rounded border"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://via.placeholder.com/400x300?text=Invalid+Image";
-                    }}
-                  />
-                </div>
-              )}
+            </div>
+
+            {/* Thumbnail */}
+            <div className="space-y-2">
+              <Label>
+                Ảnh Thumbnail <span className="text-red-500">*</span>
+              </Label>
+              <div className="relative">
+                <input
+                  id="thumbnail"
+                  type="file"
+                  accept="image/*"
+                  onChange={handleThumbnailChange}
+                  className="hidden"
+                />
+                {thumbnailPreview ? (
+                  <div className="relative group">
+                    <div className="w-full h-48 rounded-lg border-2 border-dashed border-muted-foreground/25 overflow-hidden">
+                      <img
+                        src={
+                          thumbnailPreview.startsWith("blob:")
+                            ? thumbnailPreview
+                            : thumbnailPreview.startsWith("http")
+                            ? thumbnailPreview
+                            : `${
+                                import.meta.env.VITE_URL_UPLOADS
+                              }${thumbnailPreview}`
+                        }
+                        alt="Thumbnail preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://via.placeholder.com/400x300?text=Invalid+Image";
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setThumbnailFile(null);
+                        setThumbnailPreview("");
+                        setThumbnail("");
+                        const input = document.getElementById(
+                          "thumbnail"
+                        ) as HTMLInputElement;
+                        if (input) input.value = "";
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        document.getElementById("thumbnail")?.click();
+                      }}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      Thay đổi ảnh
+                    </Button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="thumbnail"
+                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-muted-foreground/25 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+                      <p className="mb-2 text-sm text-muted-foreground">
+                        <span className="font-semibold">Click để chọn ảnh</span>{" "}
+                        hoặc kéo thả vào đây
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        JPG, PNG, WebP (tối đa 5MB)
+                      </p>
+                    </div>
+                  </label>
+                )}
+              </div>
             </div>
 
             {/* Content */}

@@ -49,17 +49,27 @@ export const getNewsCategoryBySlug = async (
 };
 
 export const createNewsCategory = async (
-  data: CreateNewsCategoryDto
+  data: CreateNewsCategoryDto | FormData
 ): Promise<ApiResponse<NewsCategory>> => {
-  const response = await axios.post("/news-categories", data);
+  const response = await axios.post("/news-categories", data, {
+    headers:
+      data instanceof FormData
+        ? { "Content-Type": "multipart/form-data" }
+        : undefined,
+  });
   return response.data;
 };
 
 export const updateNewsCategory = async (
   id: string,
-  data: UpdateNewsCategoryDto
+  data: UpdateNewsCategoryDto | FormData
 ): Promise<ApiResponse<NewsCategory>> => {
-  const response = await axios.patch(`/news-categories/${id}`, data);
+  const response = await axios.patch(`/news-categories/${id}`, data, {
+    headers:
+      data instanceof FormData
+        ? { "Content-Type": "multipart/form-data" }
+        : undefined,
+  });
   return response.data;
 };
 
