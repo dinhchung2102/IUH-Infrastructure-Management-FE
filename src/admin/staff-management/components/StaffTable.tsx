@@ -45,15 +45,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { RoleSelect } from "@/components/RoleSelect";
-import { toast } from "sonner";
 import { TableSkeleton } from "@/components/TableSkeleton";
-import {
-  getStaffById,
-  lockStaff,
-  unlockStaff,
-  deleteStaff,
-} from "../api/staff-actions.api";
+import { lockStaff, unlockStaff, deleteStaff } from "../api/staff-actions.api";
 import { AssignLocationDialog } from "./AssignLocationDialog";
+import { toast } from "sonner";
 
 interface StaffTableProps {
   staff: StaffResponse[];
@@ -68,6 +63,7 @@ interface StaffTableProps {
   onFiltersChange: (filters: Partial<QueryStaffDto>) => void;
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
   onStaffStatusUpdate?: (staffId: string, newStatus: boolean) => void;
+  onViewDetails?: (staffId: string) => void;
 }
 
 export default function StaffTable({
@@ -78,6 +74,7 @@ export default function StaffTable({
   onFiltersChange,
   onSortChange,
   onStaffStatusUpdate,
+  onViewDetails,
 }: StaffTableProps) {
   const [searchInput, setSearchInput] = React.useState(filters.search);
   const [selectedStaffForAssign, setSelectedStaffForAssign] =
@@ -113,21 +110,9 @@ export default function StaffTable({
     onFiltersChange({ search: searchInput });
   };
 
-  const handleViewDetails = async (staffId: string) => {
-    try {
-      const response = await getStaffById(staffId);
-      console.log("Chi tiết nhân sự:", response.data);
-
-      // TODO: Mở dialog hoặc navigate đến trang chi tiết
-      toast.success(
-        `Đã tải thông tin nhân sự ${
-          response?.data?.fullName || response?.data?.email || "N/A"
-        }`
-      );
-    } catch (error) {
-      console.error("Lỗi khi tải chi tiết nhân sự:", error);
-      toast.error("Không thể tải thông tin nhân sự");
-    }
+  const handleViewDetails = (staffId: string) => {
+    // Trigger callback to open dialog in parent component
+    onViewDetails?.(staffId);
   };
 
   const handleToggleStaffStatus = async (
@@ -361,7 +346,11 @@ export default function StaffTable({
             )}
             {!loading &&
               staff.map((staffMember, idx) => (
-                <TableRow key={staffMember._id}>
+                <TableRow
+                  key={staffMember._id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleViewDetails(staffMember._id)}
+                >
                   <TableCell className="text-center">
                     {(paginationRequest.page - 1) * paginationRequest.limit +
                       idx +
@@ -369,10 +358,18 @@ export default function StaffTable({
                   </TableCell>
                   <TableCell>
                     <Avatar className="size-12">
-                      <AvatarImage
-                        src={staffMember.avatar}
-                        alt={staffMember.fullName}
-                      />
+                      {staffMember.avatar && (
+                        <AvatarImage
+                          src={
+                            staffMember.avatar.startsWith("http")
+                              ? staffMember.avatar
+                              : `${import.meta.env.VITE_URL_UPLOADS}${
+                                  staffMember.avatar
+                                }`
+                          }
+                          alt={staffMember.fullName}
+                        />
+                      )}
                       <AvatarFallback>
                         {staffMember.fullName
                           ?.split(" ")
@@ -499,7 +496,10 @@ export default function StaffTable({
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell
+                    className="text-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <TableActionMenu
                       showLabel
                       actions={[

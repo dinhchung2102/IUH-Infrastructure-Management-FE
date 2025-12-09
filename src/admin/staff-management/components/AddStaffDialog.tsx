@@ -10,12 +10,22 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { RoleSelect } from "@/components/RoleSelect";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { toast } from "sonner";
-import { Loader2, Copy, RefreshCw, Upload, X } from "lucide-react";
+import { Loader2, Copy, RefreshCw, X, Plus } from "lucide-react";
 import { createStaff } from "../api/staff-actions.api";
 import type { CreateStaffDto } from "../types/staff.type";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useRoles } from "@/hooks/use-roles";
+import { converRoleToDisplay } from "@/utils/convertDisplay.util";
+import type { RoleName } from "@/types/role.enum";
 
 interface AddStaffDialogProps {
   open: boolean;
@@ -28,6 +38,7 @@ export function AddStaffDialog({
   onOpenChange,
   onSuccess,
 }: AddStaffDialogProps) {
+  const { roles } = useRoles();
   const [form, setForm] = useState<CreateStaffDto>({
     email: "",
     password: "",
@@ -41,6 +52,11 @@ export function AddStaffDialog({
   const [loading, setLoading] = useState(false);
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string>("");
+
+  // Filter out GUEST role
+  const availableRoles = roles.filter(
+    (role) => role.isActive && role.roleName !== "GUEST"
+  );
 
   // Generate random password
   const generatePassword = () => {
@@ -243,6 +259,45 @@ export function AddStaffDialog({
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+          {/* Avatar Upload - At the top */}
+          <div className="flex flex-col items-center space-y-3 pb-4 border-b">
+            <div className="relative">
+              <label htmlFor="avatar" className="cursor-pointer">
+                <Avatar className="size-24 border-2 border-dashed border-gray-300 hover:border-primary transition-colors">
+                  {avatarPreview ? (
+                    <AvatarImage src={avatarPreview} alt="Avatar preview" />
+                  ) : (
+                    <AvatarFallback className="text-sm flex flex-col items-center justify-center gap-1 bg-muted">
+                      <Plus className="h-6 w-6 text-muted-foreground" />
+                      <span className="text-xs text-muted-foreground font-medium">
+                        Thêm ảnh
+                      </span>
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+                <Input
+                  id="avatar"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleAvatarChange}
+                />
+              </label>
+              {avatarPreview && (
+                <button
+                  type="button"
+                  onClick={handleRemoveAvatar}
+                  className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors shadow-md z-10"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-muted-foreground text-center">
+              PNG, JPG tối đa 5MB
+            </p>
+          </div>
+
           {/* Email & Full Name on same row */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -313,14 +368,30 @@ export function AddStaffDialog({
 
           {/* Role & Gender on same row */}
           <div className="grid grid-cols-2 gap-4">
-            <RoleSelect
-              value={form.role}
-              onValueChange={(val) => handleChange("role", val)}
-              label="Vai trò"
-              showLabel={true}
-              required={true}
-              placeholder="Chọn vai trò"
-            />
+            <div className="space-y-2">
+              <Label>
+                Vai trò <span className="text-red-500">*</span>
+              </Label>
+              <Select
+                value={form.role}
+                onValueChange={(val) => handleChange("role", val)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Chọn vai trò" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableRoles.map((role) => (
+                    <SelectItem
+                      key={role._id}
+                      value={role.roleName}
+                      className="cursor-pointer"
+                    >
+                      {converRoleToDisplay(role.roleName as RoleName)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
             <div className="space-y-3">
               <Label>Giới tính</Label>
@@ -369,54 +440,6 @@ export function AddStaffDialog({
                 onChange={(e) => handleChange("address", e.target.value)}
               />
             </div>
-          </div>
-
-          {/* Avatar Upload */}
-          <div className="space-y-2">
-            <Label htmlFor="avatar">Ảnh đại diện</Label>
-            {avatarPreview ? (
-              <div className="space-y-2">
-                <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-dashed border-gray-300">
-                  <img
-                    src={avatarPreview}
-                    alt="Avatar preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleRemoveAvatar}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Click vào dấu X để xóa ảnh
-                </p>
-              </div>
-            ) : (
-              <div>
-                <label
-                  htmlFor="avatar"
-                  className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-                >
-                  <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-500">
-                    Click để chọn ảnh
-                  </span>
-                  <span className="text-xs text-gray-400 mt-1">
-                    PNG, JPG tối đa 5MB
-                  </span>
-                  <Input
-                    id="avatar"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleAvatarChange}
-                  />
-                </label>
-              </div>
-            )}
           </div>
 
           <DialogFooter className="flex justify-end gap-2 pt-4">

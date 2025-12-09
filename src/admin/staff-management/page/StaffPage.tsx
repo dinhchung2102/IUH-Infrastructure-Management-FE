@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { StaffTable, StaffStatsCards, AddStaffDialog } from "../components";
+import { StaffTable, StaffStatsCards, AddStaffDialog, StaffDetailDialog } from "../components";
 import PaginationComponent from "@/components/PaginationComponent";
 import { useStaffManagement, useStaffStats } from "../hooks";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { ChartBar, UserPlus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getStaffById } from "../api/staff-actions.api";
+import type { StaffResponse } from "../types/staff.type";
+import { toast } from "sonner";
 
 export default function StaffPage() {
   const navigate = useNavigate();
@@ -28,10 +31,35 @@ export default function StaffPage() {
     refetch: refetchStats,
   } = useStaffStats();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedStaff, setSelectedStaff] = useState<StaffResponse | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
   const handleAddSuccess = () => {
     refetch(); // Refresh danh sách nhân sự
     refetchStats(); // Refresh thống kê
+  };
+
+  const handleViewDetails = async (staffId: string) => {
+    try {
+      setDetailLoading(true);
+      setDetailDialogOpen(true);
+      const response = await getStaffById(staffId);
+      if (response.success && response.data) {
+        // Handle nested structure: response.data.account or response.data
+        const staffData = (response.data as any).account || response.data;
+        setSelectedStaff(staffData);
+      } else {
+        toast.error("Không thể tải thông tin nhân viên");
+        setDetailDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải chi tiết nhân viên:", error);
+      toast.error("Không thể tải thông tin nhân viên");
+      setDetailDialogOpen(false);
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
   return (
@@ -79,12 +107,20 @@ export default function StaffPage() {
         onFiltersChange={handleFiltersChange}
         onSortChange={handleSortChange}
         onStaffStatusUpdate={updateStaffStatus}
+        onViewDetails={handleViewDetails}
       />
 
       <PaginationComponent
         pagination={pagination}
         currentPage={paginationRequest.page}
         onPageChange={handlePageChange}
+      />
+
+      <StaffDetailDialog
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        staff={selectedStaff}
+        loading={detailLoading}
       />
     </div>
   );

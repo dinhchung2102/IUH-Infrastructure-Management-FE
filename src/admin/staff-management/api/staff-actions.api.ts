@@ -16,9 +16,10 @@ export const createStaff = async (
 };
 
 // Get staff by ID
+// Response structure: { success: true, data: { account: StaffResponse } }
 export const getStaffById = async (
   id: string
-): Promise<ApiResponse<StaffResponse>> => {
+): Promise<ApiResponse<{ account: StaffResponse } | StaffResponse>> => {
   const response = await api.get(`/auth/accounts/${id}`);
   return response.data;
 };

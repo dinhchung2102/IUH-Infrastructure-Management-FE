@@ -37,10 +37,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { TableSkeleton } from "@/components/TableSkeleton";
-import {
-  lockAccount,
-  unlockAccount,
-} from "../api/account-actions.api";
+import { lockAccount, unlockAccount } from "../api/account-actions.api";
+import { toast } from "sonner";
 
 interface AccountTableProps {
   accounts: AccountResponse[];
@@ -375,7 +373,10 @@ export default function AccountTable({
                   <TableCell>
                     {getAccountStatusBadge(account.isActive)}
                   </TableCell>
-                  <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
+                  <TableCell
+                    className="text-center"
+                    onClick={(e) => e.stopPropagation()}
+                  >
                     <TableActionMenu
                       showLabel
                       actions={[

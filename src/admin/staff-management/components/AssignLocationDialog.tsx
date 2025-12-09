@@ -31,13 +31,17 @@ import {
   removeAreaFromAccount,
 } from "../api/staff-actions.api";
 import { getCampus } from "@/admin/campus/api/campus.api";
-import { getBuildings } from "@/admin/building-area/api/building.api";
-import { getAreas } from "@/admin/building-area/api/area.api";
-import { getZoneAreasByBuildingId } from "@/user/report/api/building.api";
+import {
+  getBuildingsByCampusId,
+  getZoneAreasByBuildingId,
+  type Building,
+  type ZoneArea,
+} from "@/user/report/api/building.api";
+import {
+  getOutdoorAreasByCampusId,
+  type Area,
+} from "@/user/report/api/area.api";
 import type { CampusResponse } from "@/admin/campus/api/campus.api";
-import type { BuildingResponse } from "@/admin/building-area/api/building.api";
-import type { AreaResponse } from "@/admin/building-area/api/area.api";
-import type { ZoneArea } from "@/user/report/api/building.api";
 
 interface AssignLocationDialogProps {
   open: boolean;
@@ -57,34 +61,77 @@ export function AssignLocationDialog({
 
   // Data lists
   const [campuses, setCampuses] = useState<CampusResponse[]>([]);
-  const [buildings, setBuildings] = useState<BuildingResponse[]>([]);
+  const [buildings, setBuildings] = useState<Building[]>([]);
   const [zones, setZones] = useState<ZoneArea[]>([]);
-  const [areas, setAreas] = useState<AreaResponse[]>([]);
+  const [areas, setAreas] = useState<Area[]>([]);
 
-  // Selected values
+  // Selected values for Campus tab
   const [selectedCampus, setSelectedCampus] = useState<string>("");
+
+  // Selected values for Building tab
+  const [selectedCampusForBuilding, setSelectedCampusForBuilding] =
+    useState<string>("");
   const [selectedBuildings, setSelectedBuildings] = useState<string[]>([]);
-  const [selectedBuilding, setSelectedBuilding] = useState<string>("");
+
+  // Selected values for Zone tab
+  const [selectedCampusForZone, setSelectedCampusForZone] =
+    useState<string>("");
+  const [selectedBuildingForZone, setSelectedBuildingForZone] =
+    useState<string>("");
   const [selectedZones, setSelectedZones] = useState<string[]>([]);
+
+  // Selected values for Area tab
+  const [selectedCampusForArea, setSelectedCampusForArea] =
+    useState<string>("");
   const [selectedAreas, setSelectedAreas] = useState<string[]>([]);
 
-  // Fetch data on open
+  // Fetch campuses on open
   useEffect(() => {
     if (open) {
       fetchCampuses();
-      fetchBuildings();
-      fetchAreas();
     }
   }, [open]);
 
-  // Fetch zones when building is selected
+  // Fetch buildings when campus is selected in Building tab
   useEffect(() => {
-    if (selectedBuilding) {
-      fetchZones(selectedBuilding);
+    if (selectedCampusForBuilding) {
+      fetchBuildingsByCampus(selectedCampusForBuilding);
+    } else {
+      setBuildings([]);
+      setSelectedBuildings([]);
+    }
+  }, [selectedCampusForBuilding]);
+
+  // Fetch buildings when campus is selected in Zone tab
+  useEffect(() => {
+    if (selectedCampusForZone) {
+      fetchBuildingsByCampus(selectedCampusForZone);
+    } else {
+      setBuildings([]);
+      setSelectedBuildingForZone("");
+      setSelectedZones([]);
+    }
+  }, [selectedCampusForZone]);
+
+  // Fetch zones when building is selected in Zone tab
+  useEffect(() => {
+    if (selectedBuildingForZone) {
+      fetchZones(selectedBuildingForZone);
     } else {
       setZones([]);
+      setSelectedZones([]);
     }
-  }, [selectedBuilding]);
+  }, [selectedBuildingForZone]);
+
+  // Fetch areas when campus is selected in Area tab
+  useEffect(() => {
+    if (selectedCampusForArea) {
+      fetchAreasByCampus(selectedCampusForArea);
+    } else {
+      setAreas([]);
+      setSelectedAreas([]);
+    }
+  }, [selectedCampusForArea]);
 
   const fetchCampuses = async () => {
     try {
@@ -95,12 +142,13 @@ export function AssignLocationDialog({
     }
   };
 
-  const fetchBuildings = async () => {
+  const fetchBuildingsByCampus = async (campusId: string) => {
     try {
-      const res = await getBuildings();
+      const res = await getBuildingsByCampusId(campusId);
       setBuildings(res?.data?.buildings || []);
     } catch (error) {
       console.error("Error fetching buildings:", error);
+      setBuildings([]);
     }
   };
 
@@ -114,12 +162,13 @@ export function AssignLocationDialog({
     }
   };
 
-  const fetchAreas = async () => {
+  const fetchAreasByCampus = async (campusId: string) => {
     try {
-      const res = await getAreas();
+      const res = await getOutdoorAreasByCampusId(campusId);
       setAreas(res?.data?.areas || []);
     } catch (error) {
       console.error("Error fetching areas:", error);
+      setAreas([]);
     }
   };
 
@@ -177,7 +226,7 @@ export function AssignLocationDialog({
       await assignZonesToAccount(staff._id, selectedZones);
       toast.success(`Đã phân công ${selectedZones.length} khu vực`);
       setSelectedZones([]);
-      setSelectedBuilding("");
+      setSelectedBuildingForZone("");
       onSuccess?.();
     } catch (error) {
       console.error("Error assigning zones:", error);
@@ -392,62 +441,96 @@ export function AssignLocationDialog({
 
             {/* Assign new */}
             <div className="space-y-3">
-              <Label>Phân công tòa nhà mới</Label>
-              <div className="flex gap-2">
+              <div className="space-y-2">
+                <Label>Bước 1: Chọn cơ sở</Label>
                 <Select
-                  value={selectedBuildings.length > 0 ? "selected" : ""}
-                  onValueChange={(value) => {
-                    if (value && value !== "selected") {
-                      setSelectedBuildings((prev) =>
-                        prev.includes(value) ? prev : [...prev, value]
-                      );
-                    }
-                  }}
+                  value={selectedCampusForBuilding}
+                  onValueChange={setSelectedCampusForBuilding}
                 >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Chọn tòa nhà..." />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn cơ sở..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {buildings.map((building) => (
-                      <SelectItem key={building._id} value={building._id}>
-                        {building.name}
+                    {campuses.map((campus) => (
+                      <SelectItem key={campus._id} value={campus._id}>
+                        {campus.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <Button
-                  onClick={handleAssignBuildings}
-                  disabled={selectedBuildings.length === 0 || loading}
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                  Phân công
-                </Button>
               </div>
-              {selectedBuildings.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedBuildings.map((id) => {
-                    const building = buildings.find((b) => b._id === id);
-                    return building ? (
-                      <Badge key={id} variant="secondary">
-                        {building.name}
-                        <button
-                          onClick={() =>
+
+              {selectedCampusForBuilding && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Bước 2: Phân công tòa nhà</Label>
+                    <div className="flex gap-2">
+                      <Select
+                        value={selectedBuildings.length > 0 ? "selected" : ""}
+                        onValueChange={(value) => {
+                          if (value && value !== "selected") {
                             setSelectedBuildings((prev) =>
-                              prev.filter((bid) => bid !== id)
-                            )
+                              prev.includes(value) ? prev : [...prev, value]
+                            );
                           }
-                          className="ml-2"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ) : null;
-                  })}
-                </div>
+                        }}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Chọn tòa nhà..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {buildings.length > 0 ? (
+                            buildings.map((building) => (
+                              <SelectItem
+                                key={building._id}
+                                value={building._id}
+                              >
+                                {building.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="empty" disabled>
+                              Không có tòa nhà
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        onClick={handleAssignBuildings}
+                        disabled={selectedBuildings.length === 0 || loading}
+                      >
+                        {loading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                        Phân công
+                      </Button>
+                    </div>
+                  </div>
+                  {selectedBuildings.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedBuildings.map((id) => {
+                        const building = buildings.find((b) => b._id === id);
+                        return building ? (
+                          <Badge key={id} variant="secondary">
+                            {building.name}
+                            <button
+                              onClick={() =>
+                                setSelectedBuildings((prev) =>
+                                  prev.filter((bid) => bid !== id)
+                                )
+                              }
+                              className="ml-2"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </TabsContent>
@@ -482,59 +565,96 @@ export function AssignLocationDialog({
 
             {/* Assign new */}
             <div className="space-y-3">
-              <Label>Chọn tòa nhà trước</Label>
-              <Select
-                value={selectedBuilding}
-                onValueChange={setSelectedBuilding}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Chọn tòa nhà..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {buildings.map((building) => (
-                    <SelectItem key={building._id} value={building._id}>
-                      {building.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <div className="space-y-2">
+                <Label>Bước 1: Chọn cơ sở</Label>
+                <Select
+                  value={selectedCampusForZone}
+                  onValueChange={setSelectedCampusForZone}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn cơ sở..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {campuses.map((campus) => (
+                      <SelectItem key={campus._id} value={campus._id}>
+                        {campus.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-              {selectedBuilding && (
-                <>
-                  <Label>Phân công khu vực nội bộ</Label>
-                  <div className="flex gap-2">
-                    <Select
-                      value={selectedZones.length > 0 ? "selected" : ""}
-                      onValueChange={(value) => {
-                        if (value && value !== "selected") {
-                          setSelectedZones((prev) =>
-                            prev.includes(value) ? prev : [...prev, value]
-                          );
-                        }
-                      }}
-                    >
-                      <SelectTrigger className="flex-1">
-                        <SelectValue placeholder="Chọn khu vực..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {zones.map((zone) => (
-                          <SelectItem key={zone._id} value={zone._id}>
-                            {zone.name} - Tầng {zone.floorLocation}
+              {selectedCampusForZone && (
+                <div className="space-y-2">
+                  <Label>Bước 2: Chọn tòa nhà</Label>
+                  <Select
+                    value={selectedBuildingForZone}
+                    onValueChange={setSelectedBuildingForZone}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Chọn tòa nhà..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {buildings.length > 0 ? (
+                        buildings.map((building) => (
+                          <SelectItem key={building._id} value={building._id}>
+                            {building.name}
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Button
-                      onClick={handleAssignZones}
-                      disabled={selectedZones.length === 0 || loading}
-                    >
-                      {loading ? (
-                        <Loader2 className="h-4 w-4 animate-spin" />
+                        ))
                       ) : (
-                        <Plus className="h-4 w-4" />
+                        <SelectItem value="empty" disabled>
+                          Không có tòa nhà
+                        </SelectItem>
                       )}
-                      Phân công
-                    </Button>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+
+              {selectedBuildingForZone && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Bước 3: Phân công khu vực nội bộ</Label>
+                    <div className="flex gap-2">
+                      <Select
+                        value={selectedZones.length > 0 ? "selected" : ""}
+                        onValueChange={(value) => {
+                          if (value && value !== "selected") {
+                            setSelectedZones((prev) =>
+                              prev.includes(value) ? prev : [...prev, value]
+                            );
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Chọn khu vực..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {zones.length > 0 ? (
+                            zones.map((zone) => (
+                              <SelectItem key={zone._id} value={zone._id}>
+                                {zone.name} - Tầng {zone.floorLocation}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="empty" disabled>
+                              Không có khu vực
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        onClick={handleAssignZones}
+                        disabled={selectedZones.length === 0 || loading}
+                      >
+                        {loading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                        Phân công
+                      </Button>
+                    </div>
                   </div>
                   {selectedZones.length > 0 && (
                     <div className="flex flex-wrap gap-2">
@@ -593,62 +713,93 @@ export function AssignLocationDialog({
 
             {/* Assign new */}
             <div className="space-y-3">
-              <Label>Phân công khu vực ngoài trời mới</Label>
-              <div className="flex gap-2">
+              <div className="space-y-2">
+                <Label>Bước 1: Chọn cơ sở</Label>
                 <Select
-                  value={selectedAreas.length > 0 ? "selected" : ""}
-                  onValueChange={(value) => {
-                    if (value && value !== "selected") {
-                      setSelectedAreas((prev) =>
-                        prev.includes(value) ? prev : [...prev, value]
-                      );
-                    }
-                  }}
+                  value={selectedCampusForArea}
+                  onValueChange={setSelectedCampusForArea}
                 >
-                  <SelectTrigger className="flex-1">
-                    <SelectValue placeholder="Chọn khu vực..." />
+                  <SelectTrigger>
+                    <SelectValue placeholder="Chọn cơ sở..." />
                   </SelectTrigger>
                   <SelectContent>
-                    {areas.map((area) => (
-                      <SelectItem key={area._id} value={area._id}>
-                        {area.name}
+                    {campuses.map((campus) => (
+                      <SelectItem key={campus._id} value={campus._id}>
+                        {campus.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
-                <Button
-                  onClick={handleAssignAreas}
-                  disabled={selectedAreas.length === 0 || loading}
-                >
-                  {loading ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Plus className="h-4 w-4" />
-                  )}
-                  Phân công
-                </Button>
               </div>
-              {selectedAreas.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {selectedAreas.map((id) => {
-                    const area = areas.find((a) => a._id === id);
-                    return area ? (
-                      <Badge key={id} variant="secondary">
-                        {area.name}
-                        <button
-                          onClick={() =>
+
+              {selectedCampusForArea && (
+                <>
+                  <div className="space-y-2">
+                    <Label>Bước 2: Phân công khu vực ngoài trời</Label>
+                    <div className="flex gap-2">
+                      <Select
+                        value={selectedAreas.length > 0 ? "selected" : ""}
+                        onValueChange={(value) => {
+                          if (value && value !== "selected") {
                             setSelectedAreas((prev) =>
-                              prev.filter((aid) => aid !== id)
-                            )
+                              prev.includes(value) ? prev : [...prev, value]
+                            );
                           }
-                          className="ml-2"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </Badge>
-                    ) : null;
-                  })}
-                </div>
+                        }}
+                      >
+                        <SelectTrigger className="flex-1">
+                          <SelectValue placeholder="Chọn khu vực..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {areas.length > 0 ? (
+                            areas.map((area) => (
+                              <SelectItem key={area._id} value={area._id}>
+                                {area.name}
+                              </SelectItem>
+                            ))
+                          ) : (
+                            <SelectItem value="empty" disabled>
+                              Không có khu vực ngoài trời
+                            </SelectItem>
+                          )}
+                        </SelectContent>
+                      </Select>
+                      <Button
+                        onClick={handleAssignAreas}
+                        disabled={selectedAreas.length === 0 || loading}
+                      >
+                        {loading ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <Plus className="h-4 w-4" />
+                        )}
+                        Phân công
+                      </Button>
+                    </div>
+                  </div>
+                  {selectedAreas.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {selectedAreas.map((id) => {
+                        const area = areas.find((a) => a._id === id);
+                        return area ? (
+                          <Badge key={id} variant="secondary">
+                            {area.name}
+                            <button
+                              onClick={() =>
+                                setSelectedAreas((prev) =>
+                                  prev.filter((aid) => aid !== id)
+                                )
+                              }
+                              className="ml-2"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </Badge>
+                        ) : null;
+                      })}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </TabsContent>
