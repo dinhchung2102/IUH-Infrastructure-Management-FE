@@ -36,10 +36,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { toast } from "sonner";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import {
-  getAccountById,
   lockAccount,
   unlockAccount,
 } from "../api/account-actions.api";
@@ -57,6 +55,7 @@ interface AccountTableProps {
   onFiltersChange: (filters: Partial<QueryAccountsDto>) => void;
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
   onAccountStatusUpdate?: (accountId: string, newStatus: boolean) => void;
+  onViewDetails?: (accountId: string) => void;
 }
 
 export default function AccountTable({
@@ -67,6 +66,7 @@ export default function AccountTable({
   onFiltersChange,
   onSortChange,
   onAccountStatusUpdate,
+  onViewDetails,
 }: AccountTableProps) {
   const [searchInput, setSearchInput] = React.useState(filters.search);
 
@@ -100,21 +100,9 @@ export default function AccountTable({
     onFiltersChange({ search: searchInput });
   };
 
-  const handleViewDetails = async (accountId: string) => {
-    try {
-      const response = await getAccountById(accountId);
-      console.log("Chi tiết tài khoản:", response.data);
-
-      // TODO: Mở dialog hoặc navigate đến trang chi tiết
-      toast.success(
-        `Đã tải thông tin tài khoản ${
-          response?.data?.fullName || response?.data?.email || "N/A"
-        }`
-      );
-    } catch (error) {
-      console.error("Lỗi khi tải chi tiết tài khoản:", error);
-      toast.error("Không thể tải thông tin tài khoản");
-    }
+  const handleViewDetails = (accountId: string) => {
+    // Trigger callback to open dialog in parent component
+    onViewDetails?.(accountId);
   };
 
   const handleToggleAccountStatus = async (
@@ -345,7 +333,11 @@ export default function AccountTable({
             )}
             {!loading &&
               accounts.map((account, idx) => (
-                <TableRow key={account._id}>
+                <TableRow
+                  key={account._id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => handleViewDetails(account._id)}
+                >
                   <TableCell className="text-center">
                     {(paginationRequest.page - 1) * paginationRequest.limit +
                       idx +
@@ -383,7 +375,7 @@ export default function AccountTable({
                   <TableCell>
                     {getAccountStatusBadge(account.isActive)}
                   </TableCell>
-                  <TableCell className="text-center">
+                  <TableCell className="text-center" onClick={(e) => e.stopPropagation()}>
                     <TableActionMenu
                       showLabel
                       actions={[

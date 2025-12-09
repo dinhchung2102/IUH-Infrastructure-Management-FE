@@ -3,9 +3,10 @@ import type { ApiResponse } from "@/types/response.type";
 import type { AccountResponse } from "../types/account.type";
 
 // Get account by ID
+// Response structure: { success: true, data: { account: AccountResponse } }
 export const getAccountById = async (
   id: string
-): Promise<ApiResponse<AccountResponse>> => {
+): Promise<ApiResponse<{ account: AccountResponse } | AccountResponse>> => {
   const response = await api.get(`/auth/accounts/${id}`);
   return response.data;
 };

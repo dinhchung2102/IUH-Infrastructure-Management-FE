@@ -1,10 +1,14 @@
-import { AccountTable, AccountStatsCards } from "../components";
+import { useState } from "react";
+import { AccountTable, AccountStatsCards, AccountDetailDialog } from "../components";
 import PaginationComponent from "@/components/PaginationComponent";
 import { useAccountManagement, useAccountStats } from "../hooks";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { ChartBar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { getAccountById } from "../api/account-actions.api";
+import type { AccountResponse } from "../types/account.type";
+import { toast } from "sonner";
 
 export default function AccountPage() {
   const navigate = useNavigate();
@@ -21,6 +25,31 @@ export default function AccountPage() {
   } = useAccountManagement();
 
   const { stats, loading: statsLoading } = useAccountStats();
+  const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [selectedAccount, setSelectedAccount] = useState<AccountResponse | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  const handleViewDetails = async (accountId: string) => {
+    try {
+      setDetailLoading(true);
+      setDetailDialogOpen(true);
+      const response = await getAccountById(accountId);
+      if (response.success && response.data) {
+        // Handle nested structure: response.data.account or response.data
+        const accountData = (response.data as any).account || response.data;
+        setSelectedAccount(accountData);
+      } else {
+        toast.error("Không thể tải thông tin tài khoản");
+        setDetailDialogOpen(false);
+      }
+    } catch (error) {
+      console.error("Lỗi khi tải chi tiết tài khoản:", error);
+      toast.error("Không thể tải thông tin tài khoản");
+      setDetailDialogOpen(false);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -51,12 +80,20 @@ export default function AccountPage() {
         onFiltersChange={handleFiltersChange}
         onSortChange={handleSortChange}
         onAccountStatusUpdate={updateAccountStatus}
+        onViewDetails={handleViewDetails}
       />
 
       <PaginationComponent
         pagination={pagination}
         currentPage={paginationRequest.page}
         onPageChange={handlePageChange}
+      />
+
+      <AccountDetailDialog
+        open={detailDialogOpen}
+        onOpenChange={setDetailDialogOpen}
+        account={selectedAccount}
+        loading={detailLoading}
       />
     </div>
   );

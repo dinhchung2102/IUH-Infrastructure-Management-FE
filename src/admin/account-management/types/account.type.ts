@@ -17,10 +17,10 @@ export type AccountResponse = {
     roleName: RoleName;
   };
   isActive: boolean;
-  avatar: string;
-  dateOfBirth: string;
-  phoneNumber: string;
-  address: string;
+  avatar?: string;
+  dateOfBirth?: string;
+  phoneNumber?: string;
+  address?: string;
   fullName: string;
   gender: "MALE" | "FEMALE";
   createdAt: string;
