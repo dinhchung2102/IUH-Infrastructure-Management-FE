@@ -1,8 +1,11 @@
-import { getBuildings, getBuildingStats } from "@/admin/building-area/api/building.api";
+import {
+  getBuildings,
+  getBuildingStats,
+} from "@/admin/building-area/api/building.api";
 import { getAreas, getAreaStats } from "@/admin/building-area/api/area.api";
 
-import type { BuildingResponse, BuildingStatsResponse } from "@/admin/building-area/api/building.api";
-import type { AreaResponse, AreaStatsResponse } from "@/admin/building-area/api/area.api";
+import type { BuildingResponse } from "@/admin/building-area/api/building.api";
+import type { AreaResponse } from "@/admin/building-area/api/area.api";
 
 export type BuildingAreaItem = (BuildingResponse | AreaResponse) & {
   type: "BUILDING" | "AREA";
@@ -38,7 +41,8 @@ export const getBuildingAreaList = async () => {
         }));
 
     const merged: BuildingAreaItem[] = [...buildings, ...areas].sort(
-      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      (a, b) =>
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
     );
 
     return merged;
@@ -83,26 +87,37 @@ export const getBuildingAreaStats = async (): Promise<BuildingAreaStats> => {
       getAreaStats(),
     ]);
 
-    const buildingStats = buildingRes ?? { total: 0, active: 0, inactive: 0, underMaintenance: 0 };
-    const areaStats = areaRes ?? { total: 0, active: 0, inactive: 0, underMaintenance: 0 };
+    const buildingStats = buildingRes ?? {
+      total: 0,
+      active: 0,
+      inactive: 0,
+      underMaintenance: 0,
+    };
+    const areaStats = areaRes ?? {
+      total: 0,
+      active: 0,
+      inactive: 0,
+      underMaintenance: 0,
+    };
 
     const totalAll = buildingStats.total + areaStats.total;
     const totalActive = buildingStats.active + areaStats.active;
     const totalInactive = buildingStats.inactive + areaStats.inactive;
-    const totalUnderMaintenance = buildingStats.underMaintenance + areaStats.underMaintenance;
+    const totalUnderMaintenance =
+      buildingStats.underMaintenance + areaStats.underMaintenance;
 
     return {
-      buildings: { 
-        stats: { 
-          ...buildingStats, 
-          newThisMonth: 0 // API mới không có trường này
-        } 
+      buildings: {
+        stats: {
+          ...buildingStats,
+          newThisMonth: 0, // API mới không có trường này
+        },
       },
-      areas: { 
-        stats: { 
-          ...areaStats, 
-          newThisMonth: 0 // API mới không có trường này
-        } 
+      areas: {
+        stats: {
+          ...areaStats,
+          newThisMonth: 0, // API mới không có trường này
+        },
       },
       totalAll,
       totalActive,

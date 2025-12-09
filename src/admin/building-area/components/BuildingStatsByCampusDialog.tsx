@@ -60,8 +60,6 @@ export function BuildingStatsByCampusDialog({
     "Đang bảo trì": item.underMaintenance,
   }));
 
-  const totalBuildings = stats.reduce((sum, item) => sum + item.total, 0);
-
   const chartConfig = {
     "Hoạt động": { label: "Hoạt động", color: "hsl(var(--chart-1))" },
     "Ngừng hoạt động": {
