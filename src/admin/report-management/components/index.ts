@@ -4,6 +4,7 @@ export { ReportTable } from "./ReportTable";
 export { ReportDetailDialog } from "./ReportDetailDialog";
 export { ReportStatsDialog } from "./ReportStatsDialog";
 export { ApproveReportDialog } from "./ApproveReportDialog";
+export { RejectReportDialog } from "./RejectReportDialog";
 export { DashboardStatsTab } from "./DashboardStatsTab";
 export { TimeSeriesTab } from "./TimeSeriesTab";
 export { LocationStatsTab } from "./LocationStatsTab";

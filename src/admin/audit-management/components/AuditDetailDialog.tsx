@@ -7,7 +7,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Separator } from "@/components/ui/separator";
 import { Calendar, User, Mail } from "lucide-react";
 import type { AuditLog } from "../types/audit.type";
 import { format } from "date-fns";
@@ -120,8 +119,8 @@ export function AuditDetailDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[88vh]">
-          <DialogHeader className="space-y-2 pb-2">
+        <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
+          <DialogHeader className="space-y-2 pb-2 flex-shrink-0">
             <div className="flex items-center">
               <DialogTitle className="text-lg flex items-center gap-2">
                 Chi tiết nhiệm vụ
@@ -201,8 +200,8 @@ export function AuditDetailDialog({
             </div>
           </DialogHeader>
 
-          <ScrollArea className="max-h-[calc(88vh-140px)]">
-            <div className="space-y-3 pr-3">
+          <ScrollArea className="h-[calc(88vh-160px)] pr-3">
+            <div className="space-y-3">
               {/* Reporter Info - Only show if from report */}
               {audit.report && (
                 <>
@@ -232,11 +231,8 @@ export function AuditDetailDialog({
                       </div>
                     </div>
                   </div>
-                  <Separator />
                 </>
               )}
-
-              <Separator />
 
               {/* Asset Info & Location - 2 Columns */}
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -380,8 +376,6 @@ export function AuditDetailDialog({
                 </>
               )}
 
-              <Separator />
-
               {/* Report Description - Only show if from report */}
               {audit.report && (
                 <div className="space-y-1.5 pt-6">
@@ -399,33 +393,36 @@ export function AuditDetailDialog({
               {/* Images */}
               {allImages.length > 0 && (
                 <>
-                  <Separator />
                   <div className="space-y-1.5">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase">
                       Hình ảnh đính kèm ({allImages.length})
                     </h3>
-                    <div className="grid grid-cols-4 gap-2">
-                      {allImages.map((image, index) => (
-                        <div
-                          key={index}
-                          className="rounded-md border overflow-hidden group relative aspect-video cursor-pointer hover:border-primary transition-colors"
-                          onClick={() => handleImageClick(index)}
-                        >
-                          <img
-                            src={image}
-                            alt={`Hình ảnh ${index + 1}`}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
-                          <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
-                            {index + 1}/{allImages.length}
+                    <div className="max-h-[260px] overflow-auto pr-1">
+                      <div className="grid grid-cols-4 gap-2">
+                        {allImages.map((image, index) => (
+                          <div
+                            key={index}
+                            className="rounded-md border overflow-hidden group relative cursor-pointer hover:border-primary transition-colors"
+                            style={{ aspectRatio: "16/9" }}
+                            onClick={() => handleImageClick(index)}
+                          >
+                            <img
+                              src={image}
+                              alt={`Hình ảnh ${index + 1}`}
+                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
+                            <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                              {index + 1}/{allImages.length}
+                            </div>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
                 </>
               )}
+              <div className="pt-8"></div>
             </div>
           </ScrollArea>
         </DialogContent>

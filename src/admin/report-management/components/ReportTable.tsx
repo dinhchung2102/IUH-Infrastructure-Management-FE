@@ -24,6 +24,7 @@ interface ReportTableProps {
   reports: Report[];
   onViewDetails: (report: Report) => void;
   onUpdateStatus: (reportId: string, status: ReportStatus) => void;
+  onReject: (report: Report) => void;
   currentPage: number;
   itemsPerPage: number;
 }
@@ -32,6 +33,7 @@ export function ReportTable({
   reports,
   onViewDetails,
   onUpdateStatus,
+  onReject,
   currentPage,
   itemsPerPage,
 }: ReportTableProps) {
@@ -152,8 +154,7 @@ export function ReportTable({
                             {
                               label: "Từ chối",
                               icon: XCircle,
-                              onClick: () =>
-                                onUpdateStatus(report._id, "REJECTED"),
+                              onClick: () => onReject(report),
                               variant: "destructive" as const,
                             } as TableAction,
                           ]

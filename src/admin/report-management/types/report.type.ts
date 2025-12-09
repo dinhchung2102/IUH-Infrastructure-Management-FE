@@ -37,6 +37,7 @@ export interface Report {
   description: string;
   images: string[]; // Hình ảnh báo cáo (hiển thị trong detail dialog)
   suggestedProcessingDays?: number; // Gợi ý số ngày xử lý từ AI
+  rejectReason?: string; // Lý do từ chối (nếu có)
   createdBy: {
     _id: string;
     fullName: string;

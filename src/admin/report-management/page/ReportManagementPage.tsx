@@ -4,6 +4,7 @@ import {
   ReportFilters,
   ReportTable,
   ReportDetailDialog,
+  RejectReportDialog,
 } from "../components";
 import type {
   Report,
@@ -37,6 +38,8 @@ export default function ReportManagementPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [rejectReport, setRejectReport] = useState<Report | null>(null);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Pagination
@@ -155,6 +158,18 @@ export default function ReportManagementPage() {
     }
   };
 
+  const handleReject = (report: Report) => {
+    setRejectReport(report);
+    setRejectDialogOpen(true);
+  };
+
+  const handleRejectSuccess = () => {
+    fetchReports();
+    fetchStats();
+    setRejectDialogOpen(false);
+    setRejectReport(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -226,6 +241,7 @@ export default function ReportManagementPage() {
             reports={reports}
             onViewDetails={handleViewDetails}
             onUpdateStatus={handleUpdateStatus}
+            onReject={handleReject}
             currentPage={currentPage}
             itemsPerPage={pagination.itemsPerPage}
           />
@@ -248,6 +264,13 @@ export default function ReportManagementPage() {
         onApproveSuccess={fetchReports}
       />
 
+      {/* Reject Dialog */}
+      <RejectReportDialog
+        report={rejectReport}
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+        onSuccess={handleRejectSuccess}
+      />
     </div>
   );
 }

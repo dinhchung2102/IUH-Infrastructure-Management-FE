@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
-import { Calendar, User, Mail, CheckCircle2 } from "lucide-react";
+import { Calendar, User, Mail, CheckCircle2, XCircle } from "lucide-react";
 import type { Report } from "../types/report.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -18,6 +18,7 @@ import { useState } from "react";
 import { getAssetStatusConfig } from "@/utils/assetStatus.util";
 import { Button } from "@/components/ui/button";
 import { ApproveReportDialog } from "./ApproveReportDialog";
+import { RejectReportDialog } from "./RejectReportDialog";
 import { getPriorityBadge } from "@/config/badge.config";
 
 interface ReportDetailDialogProps {
@@ -104,6 +105,7 @@ export function ReportDetailDialog({
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
 
   if (!report) return null;
 
@@ -116,7 +118,18 @@ export function ReportDetailDialog({
     setApproveDialogOpen(true);
   };
 
+  const handleRejectClick = () => {
+    setRejectDialogOpen(true);
+  };
+
   const handleApproveSuccess = () => {
+    if (onApproveSuccess) {
+      onApproveSuccess();
+    }
+    onOpenChange(false);
+  };
+
+  const handleRejectSuccess = () => {
     if (onApproveSuccess) {
       onApproveSuccess();
     }
@@ -336,6 +349,23 @@ export function ReportDetailDialog({
                 </div>
               </div>
 
+              {/* Reject Reason - Only show if report is rejected and has rejectReason */}
+              {report.status === "REJECTED" && report.rejectReason && (
+                <>
+                  <Separator />
+                  <div className="space-y-1.5">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                      Lý do từ chối
+                    </h3>
+                    <div className="bg-red-50 border border-red-200 rounded-md p-2.5">
+                      <p className="text-xs leading-relaxed whitespace-pre-wrap text-red-800">
+                        {report.rejectReason}
+                      </p>
+                    </div>
+                  </div>
+                </>
+              )}
+
               {/* Images */}
               {report.images.length > 0 && (
                 <>
@@ -371,7 +401,15 @@ export function ReportDetailDialog({
 
           {/* Dialog Footer with Action Buttons */}
           {report.status === "PENDING" && (
-            <DialogFooter className="border-t pt-2.5">
+            <DialogFooter className="border-t pt-2.5 gap-2">
+              <Button
+                onClick={handleRejectClick}
+                variant="outline"
+                className="text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 text-sm h-9 cursor-pointer"
+              >
+                <XCircle className="h-3.5 w-3.5" />
+                Từ chối
+              </Button>
               <Button
                 onClick={handleApproveClick}
                 className="bg-green-600 hover:bg-green-700 text-sm h-9 cursor-pointer"
@@ -400,6 +438,14 @@ export function ReportDetailDialog({
         open={approveDialogOpen}
         onOpenChange={setApproveDialogOpen}
         onSuccess={handleApproveSuccess}
+      />
+
+      {/* Reject Report Dialog */}
+      <RejectReportDialog
+        report={report}
+        open={rejectDialogOpen}
+        onOpenChange={setRejectDialogOpen}
+        onSuccess={handleRejectSuccess}
       />
     </>
   );

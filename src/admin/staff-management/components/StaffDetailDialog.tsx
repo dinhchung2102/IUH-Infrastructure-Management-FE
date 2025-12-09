@@ -8,8 +8,19 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getAccountStatusBadge, getRoleBadge } from "@/config/badge.config";
-import { converGenderToDisplay, converRoleToDisplay } from "@/utils/convertDisplay.util";
-import { Mars, Venus, Mail, Phone, MapPin, Calendar, User, Building2, Map, Home } from "lucide-react";
+import { converGenderToDisplay } from "@/utils/convertDisplay.util";
+import {
+  Mars,
+  Venus,
+  Mail,
+  Phone,
+  MapPin,
+  Calendar,
+  User,
+  Building2,
+  Map,
+  Home,
+} from "lucide-react";
 import type { StaffResponse } from "../types/staff.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -77,8 +88,7 @@ export function StaffDetailDialog({
                 </h3>
                 <p className="text-sm text-muted-foreground">{staff.email}</p>
                 <div className="flex items-center justify-center gap-2 mt-2">
-                  {staff.role?.roleName &&
-                    getRoleBadge(staff.role.roleName)}
+                  {staff.role?.roleName && getRoleBadge(staff.role.roleName)}
                   {getAccountStatusBadge(staff.isActive)}
                 </div>
               </div>
@@ -248,30 +258,32 @@ export function StaffDetailDialog({
                     </div>
                   )}
 
-                  {staff.buildingsManaged && staff.buildingsManaged.length > 0 && (
-                    <div className="flex items-start gap-3">
-                      <Building2 className="h-5 w-5 text-muted-foreground mt-0.5" />
-                      <div className="flex-1">
-                        <p className="text-sm font-medium text-muted-foreground">
-                          Tòa nhà quản lý ({staff.buildingsManaged.length})
-                        </p>
-                        <div className="flex flex-wrap gap-2 mt-1">
-                          {staff.buildingsManaged.map((building) => (
-                            <Badge key={building._id} variant="outline">
-                              {building.name}
-                            </Badge>
-                          ))}
+                  {staff.buildingsManaged &&
+                    staff.buildingsManaged.length > 0 && (
+                      <div className="flex items-start gap-3">
+                        <Building2 className="h-5 w-5 text-muted-foreground mt-0.5" />
+                        <div className="flex-1">
+                          <p className="text-sm font-medium text-muted-foreground">
+                            Tòa nhà quản lý ({staff.buildingsManaged.length})
+                          </p>
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {staff.buildingsManaged.map((building) => (
+                              <Badge key={building._id} variant="outline">
+                                {building.name}
+                              </Badge>
+                            ))}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
                   {staff.areasManaged && staff.areasManaged.length > 0 && (
                     <div className="flex items-start gap-3">
                       <Map className="h-5 w-5 text-muted-foreground mt-0.5" />
                       <div className="flex-1">
                         <p className="text-sm font-medium text-muted-foreground">
-                          Khu vực ngoài trời quản lý ({staff.areasManaged.length})
+                          Khu vực ngoài trời quản lý (
+                          {staff.areasManaged.length})
                         </p>
                         <div className="flex flex-wrap gap-2 mt-1">
                           {staff.areasManaged.map((area) => (
@@ -314,4 +326,3 @@ export function StaffDetailDialog({
     </Dialog>
   );
 }
-

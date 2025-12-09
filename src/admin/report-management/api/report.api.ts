@@ -47,6 +47,7 @@ export interface ReportApiResponse {
   description: string;
   images: string[];
   suggestedProcessingDays?: number; // AI suggested processing days
+  rejectReason?: string; // Lý do từ chối (nếu có)
   createdBy: ReportApiCreatedBy | null;
   createdAt: string;
   updatedAt: string;
@@ -93,10 +94,12 @@ export const getReports = async (params?: GetReportsParams) => {
 // Cập nhật trạng thái báo cáo
 export const updateReportStatus = async (
   reportId: string,
-  status: "PENDING" | "APPROVED" | "REJECTED"
+  status: "PENDING" | "APPROVED" | "REJECTED",
+  rejectReason?: string
 ) => {
   const response = await api.patch<ApiResponse>(`/report/${reportId}/status`, {
     status,
+    ...(rejectReason && { rejectReason }),
   });
   console.log("[API: UPDATE REPORT STATUS]:", response.data);
   return response.data;
@@ -469,6 +472,7 @@ export const transformReportApiToUI = (
     description: apiReport.description,
     images: apiReport.images, // Giữ nguyên paths
     suggestedProcessingDays: apiReport.suggestedProcessingDays,
+    rejectReason: apiReport.rejectReason, // Lý do từ chối (nếu có)
     createdBy: {
       _id: apiReport.createdBy._id,
       fullName: apiReport.createdBy.fullName,

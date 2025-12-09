@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, PlayCircle, CheckCircle, XCircle } from "lucide-react";
+import { Eye, CheckCircle, XCircle } from "lucide-react";
 import {
   TableActionMenu,
   type TableAction,
@@ -195,16 +195,6 @@ export function AuditTable({
                           icon: Eye,
                           onClick: () => onViewDetails(audit),
                         },
-                        ...(audit.status === "PENDING"
-                          ? [
-                              {
-                                label: "Bắt đầu xử lý",
-                                icon: PlayCircle,
-                                onClick: () =>
-                                  onUpdateStatus(audit._id, "IN_PROGRESS"),
-                              } as TableAction,
-                            ]
-                          : []),
                         ...(audit.status === "IN_PROGRESS"
                           ? [
                               {
