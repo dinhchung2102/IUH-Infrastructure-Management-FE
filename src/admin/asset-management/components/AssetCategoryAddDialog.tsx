@@ -209,45 +209,73 @@ export function AssetCategoryAddDialog({
           {/* Upload ảnh danh mục */}
           <div className="space-y-2">
             <Label>Ảnh danh mục</Label>
-            {preview ? (
-              <div className="space-y-2">
-                <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-dashed border-gray-300">
-                  <img
-                    src={preview}
-                    alt="Preview"
-                    className="w-full h-full object-cover"
-                  />
-                  <button
+            <div className="relative">
+              <input
+                id="image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              {preview ? (
+                <div className="relative group">
+                  <div className="w-full h-48 rounded-lg border-2 border-dashed border-muted-foreground/25 overflow-hidden">
+                    <img
+                      src={
+                        preview.startsWith("blob:")
+                          ? preview
+                          : preview.startsWith("http")
+                          ? preview
+                          : `${import.meta.env.VITE_URL_UPLOADS}${preview}`
+                      }
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src =
+                          "https://via.placeholder.com/400x300?text=Invalid+Image";
+                      }}
+                    />
+                  </div>
+                  <Button
                     type="button"
+                    variant="destructive"
+                    size="sm"
+                    className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
                     onClick={handleRemoveImage}
-                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
                   >
                     <X className="h-4 w-4" />
-                  </button>
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => {
+                      document.getElementById("image-upload")?.click();
+                    }}
+                  >
+                    <Upload className="h-4 w-4 mr-2" />
+                    Thay đổi ảnh
+                  </Button>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  Click vào dấu X để xóa ảnh
-                </p>
-              </div>
-            ) : (
-              <label
-                htmlFor="image-upload"
-                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors"
-              >
-                <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                <span className="text-sm text-gray-500">Click để chọn ảnh</span>
-                <span className="text-xs text-gray-400 mt-1">
-                  PNG, JPG tối đa 5MB
-                </span>
-                <Input
-                  id="image-upload"
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-              </label>
-            )}
+              ) : (
+                <label
+                  htmlFor="image-upload"
+                  className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-muted-foreground/25 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                    <Upload className="h-10 w-10 text-muted-foreground mb-3" />
+                    <p className="mb-2 text-sm text-muted-foreground">
+                      <span className="font-semibold">Click để chọn ảnh</span>{" "}
+                      hoặc kéo thả vào đây
+                    </p>
+                    <p className="text-xs text-muted-foreground">
+                      JPG, PNG, WebP (tối đa 5MB)
+                    </p>
+                  </div>
+                </label>
+              )}
+            </div>
           </div>
 
           {/* Trạng thái */}

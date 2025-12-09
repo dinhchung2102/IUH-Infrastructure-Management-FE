@@ -25,6 +25,7 @@ import {
   MapPin,
   Image as ImageIcon,
   Info,
+  X,
 } from "lucide-react";
 import type { AssetListItem } from "../hooks";
 import { useAssetAddForm } from "../hooks";
@@ -319,13 +320,13 @@ export function AssetAddDialog({
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {outdoorAreas.length > 0 ? (
-                          outdoorAreas.map((area) => (
-                            <SelectItem key={area._id} value={area._id}>
-                              {area.name}
-                            </SelectItem>
-                          ))
-                        ) : null}
+                        {outdoorAreas.length > 0
+                          ? outdoorAreas.map((area) => (
+                              <SelectItem key={area._id} value={area._id}>
+                                {area.name}
+                              </SelectItem>
+                            ))
+                          : null}
                       </SelectContent>
                     </Select>
                   </div>
@@ -351,13 +352,16 @@ export function AssetAddDialog({
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {buildings.length > 0 ? (
-                          buildings.map((building) => (
-                            <SelectItem key={building._id} value={building._id}>
-                              {building.name}
-                            </SelectItem>
-                          ))
-                        ) : null}
+                        {buildings.length > 0
+                          ? buildings.map((building) => (
+                              <SelectItem
+                                key={building._id}
+                                value={building._id}
+                              >
+                                {building.name}
+                              </SelectItem>
+                            ))
+                          : null}
                       </SelectContent>
                     </Select>
                   </div>
@@ -390,7 +394,9 @@ export function AssetAddDialog({
                       <Label htmlFor="floor">Tầng (tùy chọn)</Label>
                       <Select
                         value={selectedFloor || "all"}
-                        onValueChange={(val) => setSelectedFloor(val === "all" ? "" : val)}
+                        onValueChange={(val) =>
+                          setSelectedFloor(val === "all" ? "" : val)
+                        }
                       >
                         <SelectTrigger id="floor" className="bg-white">
                           <SelectValue placeholder="Tất cả các tầng" />
@@ -436,18 +442,18 @@ export function AssetAddDialog({
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {indoorZones.length > 0 ? (
-                          indoorZones.map((zone) => (
-                            <SelectItem key={zone._id} value={zone._id}>
-                              {zone.name}
-                              {zone.floorLocation && (
-                                <span className="text-xs text-muted-foreground ml-2">
-                                  (Tầng {zone.floorLocation})
-                                </span>
-                              )}
-                            </SelectItem>
-                          ))
-                        ) : null}
+                        {indoorZones.length > 0
+                          ? indoorZones.map((zone) => (
+                              <SelectItem key={zone._id} value={zone._id}>
+                                {zone.name}
+                                {zone.floorLocation && (
+                                  <span className="text-xs text-muted-foreground ml-2">
+                                    (Tầng {zone.floorLocation})
+                                  </span>
+                                )}
+                              </SelectItem>
+                            ))
+                          : null}
                       </SelectContent>
                     </Select>
                   </div>
@@ -467,33 +473,85 @@ export function AssetAddDialog({
             <Separator />
 
             <div className="space-y-2">
-              <Label htmlFor="image">Ảnh thiết bị</Label>
-              <Input
-                id="image"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0] || null;
-                  handleImageChange(file);
-                }}
-                className="bg-white cursor-pointer"
-              />
-              <p className="text-xs text-muted-foreground">
-                Chọn ảnh thiết bị (tối đa 10MB, định dạng JPEG, PNG, GIF, WebP)
-              </p>
-              {imagePreview && (
-                <div className="mt-2">
-                  <img
-                    src={imagePreview}
-                    alt="Preview"
-                    className="w-full h-40 object-cover rounded border"
-                    onError={(e) => {
-                      e.currentTarget.src =
-                        "https://via.placeholder.com/400x300?text=Invalid+Image";
-                    }}
-                  />
-                </div>
-              )}
+              <Label>Ảnh thiết bị</Label>
+              <div className="relative">
+                <input
+                  id="image"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0] || null;
+                    handleImageChange(file);
+                  }}
+                  className="hidden"
+                />
+                {imagePreview ? (
+                  <div className="relative group">
+                    <div className="w-full h-48 rounded-lg border-2 border-dashed border-muted-foreground/25 overflow-hidden">
+                      <img
+                        src={
+                          imagePreview.startsWith("blob:")
+                            ? imagePreview
+                            : imagePreview.startsWith("http")
+                            ? imagePreview
+                            : `${
+                                import.meta.env.VITE_URL_UPLOADS
+                              }${imagePreview}`
+                        }
+                        alt="Preview"
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src =
+                            "https://via.placeholder.com/400x300?text=Invalid+Image";
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        handleImageChange(null);
+                        const input = document.getElementById(
+                          "image"
+                        ) as HTMLInputElement;
+                        if (input) input.value = "";
+                      }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      className="absolute bottom-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => {
+                        document.getElementById("image")?.click();
+                      }}
+                    >
+                      <ImageIcon className="h-4 w-4 mr-2" />
+                      Thay đổi ảnh
+                    </Button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="image"
+                    className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-muted-foreground/25 rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                  >
+                    <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                      <ImageIcon className="h-10 w-10 text-muted-foreground mb-3" />
+                      <p className="mb-2 text-sm text-muted-foreground">
+                        <span className="font-semibold">Click để chọn ảnh</span>{" "}
+                        hoặc kéo thả vào đây
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        JPG, PNG, WebP (tối đa 10MB)
+                      </p>
+                    </div>
+                  </label>
+                )}
+              </div>
             </div>
           </div>
 
