@@ -45,7 +45,7 @@ const navigation = [
         icon: LayoutDashboard,
       },
       {
-        title: "Thống kê",
+        title: "Thống kê cơ bản",
         href: "/admin/analytics",
         icon: BarChart3,
       },
@@ -137,6 +137,36 @@ const navigation = [
             icon: Map,
           },
         ],
+      },
+    ],
+  },
+  {
+    title: "Báo cáo & Thống kê",
+    items: [
+      {
+        title: "Thống kê báo cáo",
+        href: "/admin/reports/statistics",
+        icon: FileText,
+      },
+      {
+        title: "Thống kê tài khoản",
+        href: "/admin/statistics/account",
+        icon: User,
+      },
+      {
+        title: "Thống kê nhân sự",
+        href: "/admin/statistics/staff",
+        icon: Users,
+      },
+      {
+        title: "Thống kê nhiệm vụ",
+        href: "/admin/statistics/audit",
+        icon: Wrench,
+      },
+      {
+        title: "Thống kê Tòa nhà & Khu vực",
+        href: "/admin/statistics/building-area",
+        icon: Building2,
       },
     ],
   },

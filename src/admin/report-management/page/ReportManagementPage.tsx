@@ -4,7 +4,6 @@ import {
   ReportFilters,
   ReportTable,
   ReportDetailDialog,
-  ReportStatsDialog,
 } from "../components";
 import type {
   Report,
@@ -16,6 +15,14 @@ import PaginationComponent from "@/components/PaginationComponent";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { ChartBar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import {
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   getReports,
   updateReportStatus,
@@ -26,10 +33,10 @@ import { TableSkeleton } from "@/components/TableSkeleton";
 import type { PaginationResponse } from "@/types/pagination.type";
 
 export default function ReportManagementPage() {
+  const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
-  const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
   // Pagination
@@ -161,7 +168,7 @@ export default function ReportManagementPage() {
         />
         <Button
           className="w-full cursor-pointer md:w-auto"
-          onClick={() => setIsStatsDialogOpen(true)}
+          onClick={() => navigate("/admin/reports/statistics")}
         >
           <ChartBar className="h-4 w-4" />
           Xem thống kê
@@ -181,20 +188,39 @@ export default function ReportManagementPage() {
       {/* Table */}
       <div className="space-y-4">
         {loading ? (
-          <TableSkeleton
-            rows={5}
-            columns={[
-              { type: "number", width: "w-[60px]", align: "center" },
-              { type: "text", width: "w-[180px]" },
-              { type: "avatar", width: "w-[200px]" },
-              { type: "text", width: "w-[150px]" },
-              { type: "badge", width: "w-[100px]" },
-              { type: "badge", width: "w-[100px]" },
-              { type: "badge", width: "w-[100px]" },
-              { type: "text", width: "w-[120px]" },
-              { type: "text", width: "w-[80px]", align: "right" },
-            ]}
-          />
+          <div className="rounded-md border bg-white">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="text-center">STT</TableHead>
+                  <TableHead>Tiêu đề</TableHead>
+                  <TableHead>Thiết bị</TableHead>
+                  <TableHead>Người tạo</TableHead>
+                  <TableHead>Loại</TableHead>
+                  <TableHead>Trạng thái</TableHead>
+                  <TableHead>Độ ưu tiên</TableHead>
+                  <TableHead>Ngày tạo</TableHead>
+                  <TableHead className="text-right">Thao tác</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                <TableSkeleton
+                  rows={5}
+                  columns={[
+                    { type: "number", width: "w-[60px]", align: "center" },
+                    { type: "text", width: "w-[180px]" },
+                    { type: "avatar", width: "w-[200px]" },
+                    { type: "text", width: "w-[150px]" },
+                    { type: "badge", width: "w-[100px]" },
+                    { type: "badge", width: "w-[100px]" },
+                    { type: "badge", width: "w-[100px]" },
+                    { type: "text", width: "w-[120px]" },
+                    { type: "text", width: "w-[80px]", align: "right" },
+                  ]}
+                />
+              </TableBody>
+            </Table>
+          </div>
         ) : (
           <ReportTable
             reports={reports}
@@ -222,11 +248,6 @@ export default function ReportManagementPage() {
         onApproveSuccess={fetchReports}
       />
 
-      {/* Stats Dialog */}
-      <ReportStatsDialog
-        open={isStatsDialogOpen}
-        onOpenChange={setIsStatsDialogOpen}
-      />
     </div>
   );
 }

@@ -1,16 +1,13 @@
-import { useState } from "react";
-import {
-  AccountTable,
-  AccountStatsCards,
-  AccountStatsDialog,
-} from "../components";
+import { AccountTable, AccountStatsCards } from "../components";
 import PaginationComponent from "@/components/PaginationComponent";
 import { useAccountManagement, useAccountStats } from "../hooks";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { ChartBar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function AccountPage() {
+  const navigate = useNavigate();
   const {
     accounts,
     loading,
@@ -24,7 +21,6 @@ export default function AccountPage() {
   } = useAccountManagement();
 
   const { stats, loading: statsLoading } = useAccountStats();
-  const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
 
   return (
     <div className="space-y-6">
@@ -38,7 +34,7 @@ export default function AccountPage() {
         />
         <Button
           className="w-full cursor-pointer md:w-auto"
-          onClick={() => setIsStatsDialogOpen(true)}
+          onClick={() => navigate("/admin/statistics/account")}
         >
           <ChartBar className="h-4 w-4" />
           Xem thống kê
@@ -46,11 +42,6 @@ export default function AccountPage() {
       </div>
 
       <AccountStatsCards stats={stats} loading={statsLoading} />
-
-      <AccountStatsDialog
-        open={isStatsDialogOpen}
-        onOpenChange={setIsStatsDialogOpen}
-      />
 
       <AccountTable
         accounts={accounts}

@@ -20,7 +20,6 @@ export function useCampusManagement() {
     useCampusFilters();
 
   // Dialog / edit state
-  const [openStatsDialog, setOpenStatsDialog] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [editCampus, setEditCampus] = useState<Campus | null>(null);
 
@@ -62,8 +61,6 @@ export function useCampusManagement() {
     handleFiltersChange,
     handleClearFilters,
 
-    openStatsDialog,
-    setOpenStatsDialog,
     openAddDialog,
     setOpenAddDialog,
     editCampus,

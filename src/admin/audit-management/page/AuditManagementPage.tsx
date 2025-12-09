@@ -15,7 +15,8 @@ import { toast } from "sonner";
 import PaginationComponent from "@/components/PaginationComponent";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import { Plus, ChartBar } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import {
   getAuditLogs,
   updateAuditStatus,
@@ -25,6 +26,7 @@ import {
 import type { PaginationResponse } from "@/types/pagination.type";
 
 export default function AuditManagementPage() {
+  const navigate = useNavigate();
   const [auditLogs, setAuditLogs] = useState<AuditLog[]>([]);
   const [selectedAudit, setSelectedAudit] = useState<AuditLog | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -157,13 +159,23 @@ export default function AuditManagementPage() {
             { label: "Nhiệm vụ", isCurrent: true },
           ]}
         />
-        <Button
-          className="w-full cursor-pointer md:w-auto mt-2 md:mt-0"
-          onClick={() => setCreateDialogOpen(true)}
-        >
-          <Plus className="h-4 w-4" />
-          Tạo nhiệm vụ
-        </Button>
+        <div className="flex gap-2 mt-2 md:mt-0">
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            variant="outline"
+            onClick={() => navigate("/admin/statistics/audit")}
+          >
+            <ChartBar className="h-4 w-4" />
+            Xem thống kê
+          </Button>
+          <Button
+            className="flex-1 md:flex-initial cursor-pointer"
+            onClick={() => setCreateDialogOpen(true)}
+          >
+            <Plus className="h-4 w-4" />
+            Tạo nhiệm vụ
+          </Button>
+        </div>
       </div>
 
       {/* Stats Cards */}

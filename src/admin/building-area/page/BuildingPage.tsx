@@ -6,10 +6,10 @@ import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { RefreshCcw, BarChart3, Plus } from "lucide-react";
 import { BuildingStatsCards } from "../components/BuildingStatsCards";
 import { BuildingAreaAddDialog } from "../components/BuildingAreaAddDialog";
-import { BuildingStatsByCampusDialog } from "../components/BuildingStatsByCampusDialog";
 import { BuildingAreaFilters } from "../components/BuildingAreaFilters";
 import { BuildingAreaTable } from "../components/BuildingAreaTable";
 import PaginationComponent from "@/components/PaginationComponent";
+import { useNavigate } from "react-router-dom";
 import {
   useBuildingAreaFilters,
   useBuildingAreaPagination,
@@ -20,8 +20,8 @@ import { getBuildingStats } from "../api/building.api";
 import type { BuildingStatsResponse } from "../api/building.api";
 
 export default function BuildingPage() {
+  const navigate = useNavigate();
   const [openAdd, setOpenAdd] = useState(false);
-  const [openStats, setOpenStats] = useState(false);
   const [editingItem, setEditingItem] = useState<BuildingAreaItem | null>(null);
   const [buildingStats, setBuildingStats] = useState<
     BuildingStatsResponse | undefined
@@ -120,7 +120,7 @@ export default function BuildingPage() {
           <Button
             className="flex-1 md:flex-initial cursor-pointer"
             variant="outline"
-            onClick={() => setOpenStats(true)}
+            onClick={() => navigate("/admin/statistics/building-area")}
           >
             <BarChart3 className="h-4 w-4" />
             Xem thống kê
@@ -190,13 +190,6 @@ export default function BuildingPage() {
         item={editingItem}
         campuses={campuses}
         defaultType="BUILDING"
-      />
-
-      {/* Dialog thống kê */}
-      <BuildingStatsByCampusDialog
-        open={openStats}
-        onOpenChange={setOpenStats}
-        campuses={campuses}
       />
     </div>
   );

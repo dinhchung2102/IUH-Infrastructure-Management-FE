@@ -31,6 +31,11 @@ import BuildingAreaPage from "./admin/building-area/page/building-areaPage";
 import BuildingPage from "./admin/building-area/page/BuildingPage";
 import AreaPage from "./admin/building-area/page/AreaPage";
 import ReportManagementPage from "./admin/report-management/page/ReportManagementPage";
+import ReportStatisticsPage from "./admin/report-management/page/ReportStatisticsPage";
+import AccountStatisticsPage from "./admin/account-management/page/AccountStatisticsPage";
+import StaffStatisticsPage from "./admin/staff-management/page/StaffStatisticsPage";
+import AuditStatisticsPage from "./admin/audit-management/page/AuditStatisticsPage";
+import BuildingAreaStatisticsPage from "./admin/building-area/page/BuildingAreaStatisticsPage";
 import AuditManagementPage from "./admin/audit-management/page/AuditManagementPage";
 import RoleManagementPage from "./admin/role-management/page/RoleManagementPage";
 import NewsManagementPage from "./admin/news-management/page/NewsManagementPage";
@@ -78,6 +83,11 @@ function AppRoutes() {
           <Route path="account" element={<AccountPage />} />
           <Route path="staff" element={<StaffPage />} />
           <Route path="reports" element={<ReportManagementPage />} />
+          <Route path="reports/statistics" element={<ReportStatisticsPage />} />
+          <Route path="statistics/account" element={<AccountStatisticsPage />} />
+          <Route path="statistics/staff" element={<StaffStatisticsPage />} />
+          <Route path="statistics/audit" element={<AuditStatisticsPage />} />
+          <Route path="statistics/building-area" element={<BuildingAreaStatisticsPage />} />
           <Route path="audits" element={<AuditManagementPage />} />
           <Route path="roles" element={<RoleManagementPage />} />
           <Route path="news" element={<NewsManagementPage />} />

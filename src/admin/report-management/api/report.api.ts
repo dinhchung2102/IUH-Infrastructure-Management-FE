@@ -191,6 +191,238 @@ export const approveReport = async (data: ApproveReportDto) => {
   return response.data;
 };
 
+// ==================== Statistics API Types ====================
+
+// Period Statistics Response
+export interface PeriodStatisticsResponse {
+  period: "month" | "quarter" | "year";
+  startDate: string;
+  endDate: string;
+  reports: {
+    total: number;
+    byStatus: {
+      PENDING?: number;
+      APPROVED?: number;
+      REJECTED?: number;
+      RESOLVED?: number;
+      CLOSED?: number;
+    };
+    byType: {
+      ISSUE?: number;
+      MAINTENANCE?: number;
+      REQUEST?: number;
+    };
+    byPriority: {
+      LOW?: number;
+      MEDIUM?: number;
+      HIGH?: number;
+      CRITICAL?: number;
+    };
+    resolved: number;
+    pending: number;
+    inProgress: number;
+  };
+  audits: {
+    total: number;
+    byStatus: {
+      PENDING?: number;
+      COMPLETED?: number;
+      OVERDUE?: number;
+    };
+    completed: number;
+    pending: number;
+    overdue: number;
+  };
+  performance: {
+    averageResolutionTime: number;
+    averageProcessingTime: number;
+    resolutionRate: number;
+  };
+}
+
+// Time Series Response
+export interface TimeSeriesItem {
+  date: string;
+  total: number;
+  byStatus: {
+    PENDING?: number;
+    APPROVED?: number;
+    RESOLVED?: number;
+    CLOSED?: number;
+  };
+  byType: {
+    ISSUE?: number;
+    MAINTENANCE?: number;
+    REQUEST?: number;
+  };
+  byPriority: {
+    LOW?: number;
+    MEDIUM?: number;
+    HIGH?: number;
+    CRITICAL?: number;
+  };
+}
+
+// By Location Response
+export interface LocationStatisticsItem {
+  locationId: string;
+  locationName: string;
+  total: number;
+  byStatus: {
+    PENDING?: number;
+    APPROVED?: number;
+    RESOLVED?: number;
+    CLOSED?: number;
+  };
+  byType: {
+    ISSUE?: number;
+    MAINTENANCE?: number;
+    REQUEST?: number;
+  };
+  byPriority: {
+    LOW?: number;
+    MEDIUM?: number;
+    HIGH?: number;
+    CRITICAL?: number;
+  };
+}
+
+// Top Asset Response
+export interface TopAssetItem {
+  assetId: string;
+  assetName: string;
+  assetCode: string;
+  totalReports: number;
+  byStatus: {
+    PENDING?: number;
+    APPROVED?: number;
+    RESOLVED?: number;
+    CLOSED?: number;
+  };
+  byType: {
+    ISSUE?: number;
+    MAINTENANCE?: number;
+    REQUEST?: number;
+  };
+}
+
+// Top Reporter Response
+export interface TopReporterItem {
+  userId: string;
+  userName: string;
+  userEmail: string;
+  totalReports: number;
+  byType: {
+    ISSUE?: number;
+    MAINTENANCE?: number;
+    REQUEST?: number;
+  };
+}
+
+// ==================== Statistics API Functions ====================
+
+// Get period statistics
+export const getReportStatisticsByPeriod = async (params?: {
+  period?: "month" | "quarter" | "year";
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const response = await api.get<ApiResponse<PeriodStatisticsResponse>>(
+    "/automation/statistics",
+    {
+      params: {
+        period: params?.period || "month",
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+      },
+    }
+  );
+  console.log("[API: GET PERIOD STATISTICS]:", response.data);
+  return response.data;
+};
+
+// Get time series statistics
+export const getReportTimeSeries = async (params?: {
+  type: "daily" | "weekly" | "monthly";
+  startDate?: string;
+  endDate?: string;
+  status?: string;
+}) => {
+  const response = await api.get<ApiResponse<TimeSeriesItem[]>>(
+    "/report/statistics/time-series",
+    {
+      params: {
+        type: params?.type || "daily",
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+        status: params?.status,
+      },
+    }
+  );
+  console.log("[API: GET TIME SERIES]:", response.data);
+  return response.data;
+};
+
+// Get statistics by location
+export const getReportStatisticsByLocation = async (params?: {
+  groupBy: "campus" | "building" | "area" | "zone";
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const response = await api.get<ApiResponse<LocationStatisticsItem[]>>(
+    "/report/statistics/by-location",
+    {
+      params: {
+        groupBy: params?.groupBy || "campus",
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+      },
+    }
+  );
+  console.log("[API: GET STATISTICS BY LOCATION]:", response.data);
+  return response.data;
+};
+
+// Get top assets
+export const getTopAssets = async (params?: {
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const response = await api.get<ApiResponse<TopAssetItem[]>>(
+    "/report/statistics/top-assets",
+    {
+      params: {
+        limit: params?.limit || 10,
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+      },
+    }
+  );
+  console.log("[API: GET TOP ASSETS]:", response.data);
+  return response.data;
+};
+
+// Get top reporters
+export const getTopReporters = async (params?: {
+  limit?: number;
+  startDate?: string;
+  endDate?: string;
+}) => {
+  const response = await api.get<ApiResponse<TopReporterItem[]>>(
+    "/report/statistics/top-reporters",
+    {
+      params: {
+        limit: params?.limit || 10,
+        startDate: params?.startDate,
+        endDate: params?.endDate,
+      },
+    }
+  );
+  console.log("[API: GET TOP REPORTERS]:", response.data);
+  return response.data;
+};
+
 // Utility function: Transform API response sang UI format
 export const transformReportApiToUI = (
   apiReport: ReportApiResponse

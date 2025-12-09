@@ -4,13 +4,14 @@ import { Plus, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { CampusStatsCards } from "../components/CampusStatsCards";
-import { CampusStatsDialog } from "../components/CampusStatsDialog";
 import { CampusAddDialog } from "../components/CampusAddDialog";
 import { CampusFilters } from "../components/CampusFilters";
 import { CampusTable } from "../components/CampusTable";
 import { useCampusManagement } from "../hooks";
+import { useNavigate } from "react-router-dom";
 
 function CampusPage() {
+  const navigate = useNavigate();
   const {
     filteredCampuses,
     loading,
@@ -18,8 +19,6 @@ function CampusPage() {
     filters,
     handleFiltersChange,
     handleClearFilters,
-    openStatsDialog,
-    setOpenStatsDialog,
     openAddDialog,
     setOpenAddDialog,
     editCampus,
@@ -47,13 +46,13 @@ function CampusPage() {
           <Button
             className="flex-1 md:flex-initial cursor-pointer"
             variant="outline"
-            onClick={() => setOpenStatsDialog(true)}
+            onClick={() => navigate("/admin/statistics/building-area")}
           >
             <BarChart3 className="h-4 w-4" />
             Xem thống kê
           </Button>
           <Button
-            className="flex-1 md:flex-initial cursor-pointer"
+            className="flex-1 md:flex-initial cursor-pointer hidden"
             variant="default"
             onClick={() => setOpenAddDialog(true)}
           >
@@ -88,12 +87,6 @@ function CampusPage() {
         onEdit={setEditCampus}
         onDelete={handleDelete}
         onToggleStatus={handleToggleStatus}
-      />
-
-      {/* Dialog thống kê */}
-      <CampusStatsDialog
-        open={openStatsDialog}
-        onOpenChange={setOpenStatsDialog}
       />
 
       {/* Dialog thêm cơ sở */}

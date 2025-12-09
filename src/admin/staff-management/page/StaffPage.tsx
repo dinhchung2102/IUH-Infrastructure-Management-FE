@@ -1,17 +1,14 @@
 import { useState } from "react";
-import {
-  StaffTable,
-  StaffStatsCards,
-  StaffStatsDialog,
-  AddStaffDialog,
-} from "../components";
+import { StaffTable, StaffStatsCards, AddStaffDialog } from "../components";
 import PaginationComponent from "@/components/PaginationComponent";
 import { useStaffManagement, useStaffStats } from "../hooks";
 import { Button } from "@/components/ui/button";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { ChartBar, UserPlus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function StaffPage() {
+  const navigate = useNavigate();
   const {
     staff,
     loading,
@@ -30,7 +27,6 @@ export default function StaffPage() {
     loading: statsLoading,
     refetch: refetchStats,
   } = useStaffStats();
-  const [isStatsDialogOpen, setIsStatsDialogOpen] = useState(false);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
 
   const handleAddSuccess = () => {
@@ -52,7 +48,7 @@ export default function StaffPage() {
           <Button
             className="flex-1 md:flex-initial cursor-pointer"
             variant="outline"
-            onClick={() => setIsStatsDialogOpen(true)}
+            onClick={() => navigate("/admin/statistics/staff")}
           >
             <ChartBar className="h-4 w-4" />
             Xem thống kê
@@ -68,11 +64,6 @@ export default function StaffPage() {
       </div>
 
       <StaffStatsCards stats={stats} loading={statsLoading} />
-
-      <StaffStatsDialog
-        open={isStatsDialogOpen}
-        onOpenChange={setIsStatsDialogOpen}
-      />
 
       <AddStaffDialog
         open={isAddDialogOpen}
