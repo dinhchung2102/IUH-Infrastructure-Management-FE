@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { getActiveStatusBadge } from "@/config/badge.config";
 import { TableSkeleton } from "@/components/TableSkeleton";
 import { TableActionMenu } from "@/components/TableActionMenu";
-import { Pencil, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { ZoneTypeHoverCard } from "@/admin/building-area/components/ZoneTypeHoverCard";
 
 /* =========================================
@@ -105,7 +105,9 @@ export function ZoneTable({
                   <TableCell>
                     {zt ? (
                       <ZoneTypeHoverCard zoneType={z.zoneType}>
-                        <Badge className={`flex items-center gap-1 ${zt.color}`}>
+                        <Badge
+                          className={`flex items-center gap-1 ${zt.color}`}
+                        >
                           {zt.label}
                         </Badge>
                       </ZoneTypeHoverCard>
@@ -139,7 +141,7 @@ export function ZoneTable({
                       actions={[
                         {
                           label: "Chỉnh sửa",
-                          icon: Pencil,
+                          icon: Edit,
                           onClick: () => onEdit(z),
                         },
                         {

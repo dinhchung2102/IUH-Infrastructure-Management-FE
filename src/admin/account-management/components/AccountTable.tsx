@@ -18,7 +18,6 @@ import {
   ChevronDown,
   ChevronUp,
   Eye,
-  Trash2,
   UserCheck,
   UserX,
 } from "lucide-react";
@@ -43,7 +42,6 @@ import {
   getAccountById,
   lockAccount,
   unlockAccount,
-  deleteAccount,
 } from "../api/account-actions.api";
 
 interface AccountTableProps {
@@ -144,25 +142,6 @@ export default function AccountTable({
     } catch (error) {
       console.error("Lỗi khi cập nhật trạng thái tài khoản:", error);
       toast.error("Không thể cập nhật trạng thái tài khoản");
-    }
-  };
-
-  const handleDeleteAccount = async (accountId: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa tài khoản này?")) {
-      return;
-    }
-
-    try {
-      await deleteAccount(accountId);
-      console.log("Đã xóa tài khoản:", accountId);
-
-      toast.success("Tài khoản đã được xóa");
-
-      // TODO: Refresh danh sách tài khoản
-      // onRefresh?.();
-    } catch (error) {
-      console.error("Lỗi khi xóa tài khoản:", error);
-      toast.error("Không thể xóa tài khoản");
     }
   };
 
@@ -438,12 +417,6 @@ export default function AccountTable({
                               )}
                             </>
                           ),
-                        },
-                        {
-                          label: "Xóa tài khoản",
-                          icon: Trash2,
-                          onClick: () => handleDeleteAccount(account._id),
-                          variant: "destructive",
                         },
                       ]}
                     />

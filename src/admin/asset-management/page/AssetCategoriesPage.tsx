@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   MoreHorizontal,
-  Pencil,
+  Edit,
   Trash2,
   ChevronsUpDown,
   ChevronUp,
@@ -315,7 +315,7 @@ export default function AssetCategoriesPage() {
                             setDialogOpen(true);
                           }}
                         >
-                          <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
+                          <Edit className="mr-2 h-4 w-4" /> Chỉnh sửa
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(cat._id)}

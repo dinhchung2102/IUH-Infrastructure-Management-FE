@@ -5,7 +5,7 @@ import {
   Plus,
   BarChart3,
   MoreHorizontal,
-  Pencil,
+  Edit,
   Trash2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -282,7 +282,7 @@ function AssetPage() {
                           onClick={() => setEditAsset(a)}
                           className="cursor-pointer"
                         >
-                          <Pencil className="mr-2 h-4 w-4" />
+                          <Edit className="mr-2 h-4 w-4" />
                           Chỉnh sửa
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />

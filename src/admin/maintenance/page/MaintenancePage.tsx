@@ -5,7 +5,7 @@ import {
   Plus,
   CalendarDays,
   MoreHorizontal,
-  Pencil,
+  Edit,
   Trash2,
   Eye,
 } from "lucide-react";
@@ -479,7 +479,7 @@ export default function MaintenancePage() {
                           className="cursor-pointer"
                           onClick={() => handleEdit(m)}
                         >
-                          <Pencil className="mr-2 h-4 w-4" /> Chỉnh sửa
+                          <Edit className="mr-2 h-4 w-4" /> Chỉnh sửa
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem

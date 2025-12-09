@@ -194,7 +194,46 @@ export function BuildingAreaAddDialog({
 
         {form.type === "AREA" ? (
           <div className="grid grid-cols-2 gap-6">
-            {/* Cột trái: Form */}
+            {/* Cột trái: Hướng dẫn ZoneType */}
+            <div>
+              <Card className="border-2">
+                <CardHeader>
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Hướng dẫn về Loại khu vực
+                  </CardTitle>
+                  <CardDescription>
+                    Chọn loại khu vực phù hợp với mục đích sử dụng
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {Object.entries(zoneTypeDescriptions).map(([key, info]) => (
+                    <div
+                      key={key}
+                      className={`p-3 rounded-lg border ${
+                        form.zoneType === key
+                          ? "ring-2 ring-primary"
+                          : "bg-gray-50"
+                      }`}
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <Badge
+                          className={`${info.color} border`}
+                          variant="outline"
+                        >
+                          {info.title}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        {info.description}
+                      </p>
+                    </div>
+                  ))}
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Cột phải: Form */}
             <div className="space-y-4">
               <div>
                 <Label>Cơ sở</Label>
@@ -274,45 +313,6 @@ export function BuildingAreaAddDialog({
                   {mode === "edit" ? "Lưu thay đổi" : "Thêm mới"}
                 </Button>
               </div>
-            </div>
-
-            {/* Cột phải: Hướng dẫn ZoneType */}
-            <div>
-              <Card className="border-2">
-                <CardHeader>
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <Info className="h-4 w-4" />
-                    Hướng dẫn về Loại khu vực
-                  </CardTitle>
-                  <CardDescription>
-                    Chọn loại khu vực phù hợp với mục đích sử dụng
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.entries(zoneTypeDescriptions).map(([key, info]) => (
-                    <div
-                      key={key}
-                      className={`p-3 rounded-lg border ${
-                        form.zoneType === key
-                          ? "ring-2 ring-primary"
-                          : "bg-gray-50"
-                      }`}
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <Badge
-                          className={`${info.color} border`}
-                          variant="outline"
-                        >
-                          {info.title}
-                        </Badge>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        {info.description}
-                      </p>
-                    </div>
-                  ))}
-                </CardContent>
-              </Card>
             </div>
           </div>
         ) : (

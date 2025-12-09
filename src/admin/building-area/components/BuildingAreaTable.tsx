@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Edit3, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { TableActionMenu } from "@/components/TableActionMenu";
 import {
   getActiveStatusBadge,
@@ -95,7 +95,7 @@ export function BuildingAreaTable({
                     actions={[
                       {
                         label: "Chỉnh sửa",
-                        icon: Edit3,
+                        icon: Edit,
                         onClick: () => onEdit(item),
                       },
                       {
