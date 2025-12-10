@@ -275,11 +275,28 @@ export default function AssetCategoriesPage() {
                     {cat.description}
                   </TableCell>
                   <TableCell>
-                    <img
-                      src={cat.image || "/placeholder.png"}
-                      alt={cat.name}
-                      className="size-12 rounded-md border object-cover"
-                    />
+                    {cat.image ? (
+                      <img
+                        src={
+                          cat.image.startsWith("http")
+                            ? cat.image
+                            : `${import.meta.env.VITE_URL_UPLOADS}${cat.image}`
+                        }
+                        alt={cat.name}
+                        className="size-12 rounded-md border object-cover"
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src =
+                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='48'%3E%3Crect width='48' height='48' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='10' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
+                        }}
+                      />
+                    ) : (
+                      <div className="size-12 rounded-md border bg-muted flex items-center justify-center">
+                        <span className="text-xs text-muted-foreground">
+                          No image
+                        </span>
+                      </div>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Badge
