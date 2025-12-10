@@ -67,11 +67,19 @@ export function ZoneAddDialog({
   const [selectedType, setSelectedType] = useState<"area" | "building" | null>(
     null
   );
+  const [areaSearch, setAreaSearch] = useState("");
+  const [buildingSearch, setBuildingSearch] = useState("");
+  const [isLoadingAreas, setIsLoadingAreas] = useState(false);
+  const [isLoadingBuildings, setIsLoadingBuildings] = useState(false);
+  const areaSearchInitialized = React.useRef(false);
+  const buildingSearchInitialized = React.useRef(false);
 
   // Load areas when selectedType is "area"
   useEffect(() => {
     if (open && selectedType === "area") {
       fetchAreas();
+      areaSearchInitialized.current = false;
+      setAreaSearch("");
     }
   }, [open, selectedType]);
 
@@ -79,8 +87,40 @@ export function ZoneAddDialog({
   useEffect(() => {
     if (open && selectedType === "building") {
       fetchBuildings();
+      buildingSearchInitialized.current = false;
+      setBuildingSearch("");
     }
   }, [open, selectedType]);
+
+  // Debounce search for areas
+  useEffect(() => {
+    if (selectedType !== "area" || !open) return;
+    // Skip initial load (handled by the other useEffect)
+    if (!areaSearchInitialized.current) {
+      areaSearchInitialized.current = true;
+      return;
+    }
+    const timer = setTimeout(() => {
+      fetchAreas(areaSearch.trim() || undefined);
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [areaSearch]);
+
+  // Debounce search for buildings
+  useEffect(() => {
+    if (selectedType !== "building" || !open) return;
+    // Skip initial load (handled by the other useEffect)
+    if (!buildingSearchInitialized.current) {
+      buildingSearchInitialized.current = true;
+      return;
+    }
+    const timer = setTimeout(() => {
+      fetchBuildings(buildingSearch.trim() || undefined);
+    }, 300);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [buildingSearch]);
 
   // Load data when editing
   useEffect(() => {
@@ -102,25 +142,37 @@ export function ZoneAddDialog({
     }
   }, [open, mode, zone]);
 
-  const fetchAreas = async () => {
+  const fetchAreas = async (search?: string) => {
     try {
-      const res = await getAreas({});
+      setIsLoadingAreas(true);
+      const res = await getAreas({
+        search: search || undefined,
+        limit: 50,
+      });
       setAreas(res?.data?.areas || []);
     } catch (err) {
       console.error("Lỗi khi tải danh sách khu vực:", err);
       toast.error("Không thể tải danh sách khu vực.");
       setAreas([]);
+    } finally {
+      setIsLoadingAreas(false);
     }
   };
 
-  const fetchBuildings = async () => {
+  const fetchBuildings = async (search?: string) => {
     try {
-      const res = await getBuildings({});
+      setIsLoadingBuildings(true);
+      const res = await getBuildings({
+        search: search || undefined,
+        limit: 50,
+      });
       setBuildings(res?.data?.buildings || []);
     } catch (err) {
       console.error("Lỗi khi tải danh sách tòa nhà:", err);
       toast.error("Không thể tải danh sách tòa nhà.");
       setBuildings([]);
+    } finally {
+      setIsLoadingBuildings(false);
     }
   };
 
@@ -188,6 +240,9 @@ export function ZoneAddDialog({
       location: "", // Reset location when changing type
       floorLocation: type === "area" ? "" : prev.floorLocation,
     }));
+    // Reset search when changing type
+    setAreaSearch("");
+    setBuildingSearch("");
   };
 
   // Convert areas to combobox options
@@ -456,7 +511,9 @@ export function ZoneAddDialog({
                     options={areaOptions}
                     value={form.location}
                     onValueChange={handleSelectLocation}
+                    onSearchChange={setAreaSearch}
                     placeholder="Chọn khu vực ngoài trời..."
+                    isLoading={isLoadingAreas}
                   />
                 </div>
               )}
@@ -470,7 +527,9 @@ export function ZoneAddDialog({
                       options={buildingOptions}
                       value={form.location}
                       onValueChange={handleSelectLocation}
+                      onSearchChange={setBuildingSearch}
                       placeholder="Chọn tòa nhà..."
+                      isLoading={isLoadingBuildings}
                     />
                   </div>
                   <div className="col-span-1 space-y-2">
