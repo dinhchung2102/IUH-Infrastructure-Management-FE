@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Reveal } from "@/components/motion";
-import { Calendar, FolderOpen } from "lucide-react";
+import { Calendar } from "lucide-react";
 import {
   Pagination,
   PaginationContent,
@@ -59,7 +59,6 @@ export function NewsGrid({
     <div className="lg:col-span-3">
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-2">
-          <FolderOpen className="h-5 w-5" />
           <h2
             className="text-2xl font-bold uppercase"
             style={{ color: "#204195" }}
@@ -93,9 +92,9 @@ export function NewsGrid({
               return (
                 <Reveal key={item._id} delay={index * 0.1}>
                   <Link to={`/news/${item.slug}`} className="block">
-                    <Card className="group flex flex-col md:flex-row overflow-hidden transition-all duration-300 hover:shadow-lg">
+                    <Card className="group flex flex-col md:flex-row overflow-hidden transition-all duration-300 hover:shadow-lg p-0">
                       {/* Image - Left side */}
-                      <div className="relative w-full md:w-80 h-48 md:h-48 flex-shrink-0 overflow-hidden bg-muted">
+                      <div className="relative w-full md:w-80 h-48 md:h-auto flex-shrink-0 overflow-hidden bg-muted">
                         <img
                           src={
                             item.thumbnail.startsWith("http")

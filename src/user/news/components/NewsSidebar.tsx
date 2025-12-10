@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Tag, Calendar, Building2, Star, ChevronRight } from "lucide-react";
+import { Calendar, Building2, Star, ChevronRight } from "lucide-react";
 import type { PublicNews, PublicNewsCategory } from "../api/news.api";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -32,7 +32,6 @@ export function NewsSidebar({
             className="text-lg font-bold uppercase flex items-center gap-2"
             style={{ color: "#204195" }}
           >
-            <Tag className="h-5 w-5" style={{ color: "#204195" }} />
             Danh mục
           </CardTitle>
         </CardHeader>
@@ -48,10 +47,7 @@ export function NewsSidebar({
               )}
               onClick={() => onCategoryChange("")}
             >
-              <span className="flex items-center gap-2">
-                <Tag className="h-4 w-4" />
-                Tất cả
-              </span>
+              <span className="flex items-center gap-2">Tất cả</span>
               <ChevronRight className="h-4 w-4" />
             </Button>
             {categories.map((category) => (
@@ -68,10 +64,7 @@ export function NewsSidebar({
                 )}
                 onClick={() => onCategoryChange(category._id)}
               >
-                <span className="flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
-                  {category.name}
-                </span>
+                <span className="flex items-center gap-2">{category.name}</span>
                 <ChevronRight className="h-4 w-4" />
               </Button>
             ))}
