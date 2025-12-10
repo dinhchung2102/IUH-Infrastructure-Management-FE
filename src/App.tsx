@@ -19,6 +19,7 @@ import FacilitiesPage from "./user/facilities/FacilitiesPage";
 import NewsPage from "./user/news/NewsPage";
 import NewsDetailPage from "./user/news/NewsDetailPage";
 import ReportPage from "./user/report/ReportPage";
+import MyReportsPage from "./user/report/MyReportsPage";
 import QuickReportPage from "./user/report/QuickReportPage";
 import QRTestPage from "./user/report/QRTestPage";
 
@@ -68,6 +69,7 @@ function AppRoutes() {
           <Route path="news" element={<NewsPage />} />
           <Route path="news/:slug" element={<NewsDetailPage />} />
           <Route path="report" element={<ReportPage />} />
+          <Route path="my-reports" element={<MyReportsPage />} />
         </Route>
 
         {/* Admin Routes with AdminLayout */}

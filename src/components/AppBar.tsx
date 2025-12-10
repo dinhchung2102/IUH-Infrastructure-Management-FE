@@ -19,6 +19,7 @@ import {
   Settings,
   ChevronDown,
   ChevronUp,
+  ClipboardList,
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { motion, useScroll, useMotionValueEvent } from "framer-motion";
@@ -329,6 +330,17 @@ export default function AppBar() {
                         Hồ sơ
                       </a>
                     </Button>
+                    <Button
+                      variant="ghost"
+                      className="justify-start gap-2"
+                      style={{ color: "#204195" }}
+                      asChild
+                    >
+                      <a href="/my-reports" className="cursor-pointer">
+                        <ClipboardList className="size-4" />
+                        Báo cáo của tôi
+                      </a>
+                    </Button>
                     {account?.role === "ADMIN" && (
                       <Button
                         variant="ghost"
@@ -453,6 +465,18 @@ export default function AppBar() {
                       <a href="/profile">
                         <User className="size-4" />
                         Hồ sơ
+                      </a>
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full justify-start gap-2"
+                      style={{ color: "#204195" }}
+                      asChild
+                      onClick={() => setOpen(false)}
+                    >
+                      <a href="/my-reports">
+                        <ClipboardList className="size-4" />
+                        Báo cáo của tôi
                       </a>
                     </Button>
                     {account?.role === "ADMIN" && (

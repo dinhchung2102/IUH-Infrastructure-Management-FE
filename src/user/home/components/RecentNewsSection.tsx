@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -5,72 +6,9 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar } from "lucide-react";
 import { Reveal, Parallax } from "@/components/motion";
 import type { PublicNews } from "@/user/news/api/news.api";
+import { getPublicNews } from "@/user/news/api/news.api";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
-
-// Mock data - sau này sẽ replace bằng API call từ getPublicNews()
-const mockNews: PublicNews[] = [
-  {
-    _id: "1",
-    title: "Bảo trì hệ thống điện định kỳ tòa nhà E",
-    slug: "bao-tri-he-thong-dien-toa-nha-e",
-    description:
-      "Thực hiện công tác bảo trì định kỳ hệ thống điện tòa nhà E nhằm đảm bảo an toàn và ổn định trong hoạt động giảng dạy và học tập.",
-    thumbnail: "/uploads/maintenance-electric.jpg",
-    content: "",
-    status: "PUBLISHED",
-    author: "Phòng Quản trị",
-    category: "bao-tri",
-    views: 245,
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    _id: "2",
-    title: "Nâng cấp phòng thí nghiệm Khoa Cơ Khí",
-    slug: "nang-cap-phong-thi-nghiem-co-khi",
-    description:
-      "Lắp đặt máy móc thiết bị hiện đại, nâng cấp toàn diện phòng thí nghiệm Khoa Cơ Khí phục vụ nghiên cứu và thực hành sinh viên.",
-    thumbnail: "/uploads/lab-upgrade.jpg",
-    content: "",
-    status: "PUBLISHED",
-    author: "Phòng Quản trị",
-    category: "nang-cap",
-    views: 512,
-    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: "3",
-    title: "Sửa chữa hệ thống cấp nước khu B",
-    slug: "sua-chua-he-thong-cap-nuoc-khu-b",
-    description:
-      "Khắc phục tình trạng rò rỉ đường ống, thay thế van khóa cũ, hoàn thiện hệ thống cấp thoát nước khu vực B.",
-    thumbnail: "/uploads/water-system.jpg",
-    content: "",
-    status: "PUBLISHED",
-    author: "Phòng Quản trị",
-    category: "sua-chua",
-    views: 189,
-    createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-  {
-    _id: "4",
-    title: "Thông báo lịch bảo trì định kỳ Quý 4/2025",
-    slug: "thong-bao-lich-bao-tri-dinh-ky-q4-2025",
-    description:
-      "Kế hoạch bảo trì định kỳ các hạng mục thiết bị, cơ sở vật chất trong Quý 4 năm 2025. Sinh viên và giảng viên lưu ý thời gian.",
-    thumbnail: "/uploads/announcement.jpg",
-    content: "",
-    status: "PUBLISHED",
-    author: "Phòng Quản trị",
-    category: "thong-bao",
-    views: 823,
-    createdAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-  },
-];
 
 // Category mapping for display (match với news-category slugs)
 const categoryConfig: Record<
@@ -114,14 +52,31 @@ const colorClasses = {
 };
 
 export function RecentNewsSection() {
-  // TODO: Replace with API call
-  // const { data, isLoading } = useQuery({
-  //   queryKey: ["public-news", { limit: 4 }],
-  //   queryFn: () => getPublicNews({ limit: 4, sortBy: "createdAt", sortOrder: "desc" }),
-  // });
-  // const news = data?.data?.news || [];
+  const [news, setNews] = useState<PublicNews[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const news = mockNews; // Using mockdata for now
+  useEffect(() => {
+    const fetchNews = async () => {
+      try {
+        setLoading(true);
+        const response = await getPublicNews({
+          limit: 3,
+          sortBy: "createdAt",
+          sortOrder: "desc",
+        });
+
+        if (response.success && response.data) {
+          setNews(response.data.news);
+        }
+      } catch (error) {
+        console.error("Error fetching news:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNews();
+  }, []);
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-b from-muted/20 via-background to-muted/20 py-8 md:py-12 lg:py-16 border-t">
@@ -144,8 +99,29 @@ export function RecentNewsSection() {
 
         {/* News Grid - Show only 3 items */}
         <Parallax from={-15} to={15}>
-          <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8">
-            {news.slice(0, 3).map((item, index) => {
+          {loading ? (
+            <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+              {[1, 2, 3].map((index) => (
+                <Card
+                  key={index}
+                  className="h-full flex flex-col border border-gray-200/50 dark:border-gray-700/50 shadow-lg rounded-2xl p-0"
+                >
+                  <div className="relative h-60 overflow-hidden rounded-t-2xl m-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
+                  <CardContent className="pt-0 pb-4 px-6 flex flex-col flex-1">
+                    <div className="h-6 bg-gray-200 dark:bg-gray-700 rounded mb-3 animate-pulse" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-2 animate-pulse" />
+                    <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded mb-6 animate-pulse" />
+                    <div className="flex items-center justify-between pt-2 border-t border-gray-200/60 dark:border-gray-700/60 mt-auto">
+                      <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                      <div className="h-8 w-20 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : news.length > 0 ? (
+            <div className="grid gap-4 md:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 mb-8">
+              {news.map((item, index) => {
               const categorySlug = (item.category as string) || "thong-bao";
               const config =
                 categoryConfig[categorySlug] || categoryConfig["thong-bao"];
@@ -217,8 +193,13 @@ export function RecentNewsSection() {
                   </Card>
                 </Reveal>
               );
-            })}
-          </div>
+              })}
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              <p>Chưa có tin tức nào</p>
+            </div>
+          )}
         </Parallax>
 
         {/* View All Button */}
@@ -232,7 +213,7 @@ export function RecentNewsSection() {
           >
             <Link to="/news" className="flex items-center gap-2">
               Xem tất cả
-              <ArrowRight className="h-5 w-" />
+              <ArrowRight className="h-5 w-5" />
             </Link>
           </Button>
         </div>

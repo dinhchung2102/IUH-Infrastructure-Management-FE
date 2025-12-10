@@ -44,7 +44,10 @@ export const AUDIT_STATUS_BADGE: Record<AuditStatus, BadgeStyle> = {
 };
 
 // Report Status Badge Config
-export const REPORT_STATUS_BADGE: Record<ReportStatus, BadgeStyle> = {
+export const REPORT_STATUS_BADGE: Record<
+  ReportStatus | "RESOLVED",
+  BadgeStyle
+> = {
   PENDING: {
     label: "Chờ xử lý",
     className:
@@ -60,6 +63,11 @@ export const REPORT_STATUS_BADGE: Record<ReportStatus, BadgeStyle> = {
   REJECTED: {
     label: "Đã từ chối",
     className: "bg-red-100 text-red-700 hover:bg-red-100 border-red-200",
+    variant: "outline",
+  },
+  RESOLVED: {
+    label: "Đã xử lý",
+    className: "bg-blue-100 text-blue-700 hover:bg-blue-100 border-blue-200",
     variant: "outline",
   },
 };
@@ -274,7 +282,7 @@ export function getAuditStatusBadge(status: AuditStatus) {
   return renderBadge(getBadgeConfig(AUDIT_STATUS_BADGE, status));
 }
 
-export function getReportStatusBadge(status: ReportStatus) {
+export function getReportStatusBadge(status: ReportStatus | "RESOLVED") {
   return renderBadge(getBadgeConfig(REPORT_STATUS_BADGE, status));
 }
 
