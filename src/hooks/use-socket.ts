@@ -33,22 +33,7 @@ export function useSocket() {
     }
 
     // Get WebSocket URL from environment or construct from API URL
-    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-
-    // Extract base URL and protocol
-    let socketUrl: string;
-    if (apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1")) {
-      // Development: ws://localhost:3000/events
-      socketUrl = "ws://localhost:3000/events";
-    } else {
-      // Production: Construct from API URL
-      // Remove /api suffix if present
-      const baseUrl = apiUrl.replace(/\/api$/, "");
-      // Extract protocol and host
-      const urlObj = new URL(baseUrl);
-      const protocol = urlObj.protocol === "https:" ? "wss:" : "ws:";
-      socketUrl = `${protocol}//${urlObj.host}/events`;
-    }
+    const socketUrl = import.meta.env.VITE_WS_URL;
 
     // Create socket connection
     const newSocket = io(socketUrl, {
