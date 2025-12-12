@@ -5,6 +5,7 @@ import {
   ReportTable,
   ReportDetailDialog,
   RejectReportDialog,
+  ApproveReportDialog,
 } from "../components";
 import type {
   Report,
@@ -39,6 +40,8 @@ export default function ReportManagementPage() {
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
+  const [reportToApprove, setReportToApprove] = useState<Report | null>(null);
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [rejectReport, setRejectReport] = useState<Report | null>(null);
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -140,7 +143,9 @@ export default function ReportManagementPage() {
       } else if (reports.length > 0) {
         // Report not found in current page, show toast and clear state
         toast.info(
-          `Báo cáo khẩn cấp đã được tạo. Vui lòng tìm kiếm với ID: ${state.openReportId.slice(-8)}`
+          `Báo cáo khẩn cấp đã được tạo. Vui lòng tìm kiếm với ID: ${state.openReportId.slice(
+            -8
+          )}`
         );
         navigate(location.pathname, { replace: true, state: {} });
       }
@@ -178,6 +183,18 @@ export default function ReportManagementPage() {
       console.error("Error updating report status:", error);
       toast.error("Không thể cập nhật trạng thái báo cáo");
     }
+  };
+
+  const handleApprove = (report: Report) => {
+    setReportToApprove(report);
+    setApproveDialogOpen(true);
+  };
+
+  const handleApproveSuccess = () => {
+    fetchReports();
+    fetchStats();
+    setApproveDialogOpen(false);
+    setReportToApprove(null);
   };
 
   const handleReject = (report: Report) => {
@@ -263,6 +280,7 @@ export default function ReportManagementPage() {
             reports={reports}
             onViewDetails={handleViewDetails}
             onUpdateStatus={handleUpdateStatus}
+            onApprove={handleApprove}
             onReject={handleReject}
             currentPage={currentPage}
             itemsPerPage={pagination.itemsPerPage}
@@ -284,6 +302,14 @@ export default function ReportManagementPage() {
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
         onApproveSuccess={fetchReports}
+      />
+
+      {/* Approve Dialog */}
+      <ApproveReportDialog
+        report={reportToApprove}
+        open={approveDialogOpen}
+        onOpenChange={setApproveDialogOpen}
+        onSuccess={handleApproveSuccess}
       />
 
       {/* Reject Dialog */}

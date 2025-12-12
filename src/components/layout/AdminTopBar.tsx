@@ -1,4 +1,4 @@
-import { Menu, Bell, Home } from "lucide-react";
+import { Menu, Home } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -103,18 +103,6 @@ export default function AdminTopBar({ onMenuClick }: AdminTopBarProps) {
 
           {/* Notifications */}
           <DropdownMenu>
-            <DropdownMenuTrigger asChild className="mr-4 hidden md:flex">
-              <Button variant="ghost" size="icon" className="relative">
-                <Bell className="size-6" />
-                <Badge
-                  variant="destructive"
-                  className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full p-0 text-xs"
-                >
-                  3
-                </Badge>
-              </Button>
-            </DropdownMenuTrigger>
-
             <DropdownMenuContent align="end" className="w-80">
               <DropdownMenuLabel>Thông báo</DropdownMenuLabel>
               <DropdownMenuSeparator />

@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import {
   TableActionMenu,
   type TableAction,
@@ -24,6 +24,7 @@ interface ReportTableProps {
   reports: Report[];
   onViewDetails: (report: Report) => void;
   onUpdateStatus: (reportId: string, status: ReportStatus) => void;
+  onApprove?: (report: Report) => void;
   onReject: (report: Report) => void;
   currentPage: number;
   itemsPerPage: number;
@@ -33,6 +34,7 @@ export function ReportTable({
   reports,
   onViewDetails,
   onUpdateStatus,
+  onApprove,
   onReject,
   currentPage,
   itemsPerPage,
@@ -67,7 +69,11 @@ export function ReportTable({
           {reports.map((report, index) => {
             const stt = (currentPage - 1) * itemsPerPage + index + 1;
             return (
-              <TableRow key={report._id}>
+              <TableRow
+                key={report._id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => onViewDetails(report)}
+              >
                 <TableCell className="text-center font-medium">{stt}</TableCell>
                 <TableCell>
                   <div>
@@ -136,22 +142,22 @@ export function ReportTable({
                     </p>
                   </div>
                 </TableCell>
-                <TableCell className="text-right">
+                <TableCell
+                  className="text-right"
+                  onClick={(e) => e.stopPropagation()}
+                >
                   <TableActionMenu
                     showLabel
                     actions={[
-                      {
-                        label: "Xem chi tiết",
-                        icon: Eye,
-                        onClick: () => onViewDetails(report),
-                      },
                       ...(report.status === "PENDING"
                         ? [
                             {
                               label: "Duyệt báo cáo",
                               icon: CheckCircle,
                               onClick: () =>
-                                onUpdateStatus(report._id, "APPROVED"),
+                                onApprove
+                                  ? onApprove(report)
+                                  : onUpdateStatus(report._id, "APPROVED"),
                             } as TableAction,
                             {
                               label: "Từ chối",

@@ -18,8 +18,6 @@ import {
   ChevronsUpDown,
   ChevronDown,
   ChevronUp,
-  Eye,
-  Trash2,
   UserCheck,
   UserX,
   Mail,
@@ -47,7 +45,7 @@ import {
 } from "@/components/ui/select";
 import { RoleSelect } from "@/components/RoleSelect";
 import { TableSkeleton } from "@/components/TableSkeleton";
-import { lockStaff, unlockStaff, deleteStaff } from "../api/staff-actions.api";
+import { lockStaff, unlockStaff } from "../api/staff-actions.api";
 import { AssignLocationDialog } from "./AssignLocationDialog";
 import { toast } from "sonner";
 
@@ -113,11 +111,6 @@ export default function StaffTable({
     onFiltersChange({ search: searchInput });
   };
 
-  const handleViewDetails = (staffId: string) => {
-    // Trigger callback to open dialog in parent component
-    onViewDetails?.(staffId);
-  };
-
   const handleToggleStaffStatus = async (
     staffId: string,
     currentStatus: boolean
@@ -143,25 +136,6 @@ export default function StaffTable({
     } catch (error) {
       console.error("Lỗi khi cập nhật trạng thái nhân sự:", error);
       toast.error("Không thể cập nhật trạng thái nhân sự");
-    }
-  };
-
-  const handleDeleteStaff = async (staffId: string) => {
-    if (!confirm("Bạn có chắc chắn muốn xóa tài khoản nhân sự này?")) {
-      return;
-    }
-
-    try {
-      await deleteStaff(staffId);
-      console.log("Đã xóa tài khoản nhân sự:", staffId);
-
-      toast.success("Tài khoản nhân sự đã được xóa");
-
-      // TODO: Refresh danh sách nhân sự
-      // onRefresh?.();
-    } catch (error) {
-      console.error("Lỗi khi xóa nhân sự:", error);
-      toast.error("Không thể xóa nhân sự");
     }
   };
 
@@ -352,7 +326,7 @@ export default function StaffTable({
                 <TableRow
                   key={staffMember._id}
                   className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => handleViewDetails(staffMember._id)}
+                  onClick={() => onViewDetails?.(staffMember._id)}
                 >
                   <TableCell className="text-center">
                     {(paginationRequest.page - 1) * paginationRequest.limit +
@@ -507,11 +481,6 @@ export default function StaffTable({
                       showLabel
                       actions={[
                         {
-                          label: "Xem chi tiết",
-                          icon: Eye,
-                          onClick: () => handleViewDetails(staffMember._id),
-                        },
-                        {
                           label: "Chỉnh sửa",
                           icon: Edit,
                           onClick: () => onEdit?.(staffMember),
@@ -546,12 +515,6 @@ export default function StaffTable({
                               )}
                             </>
                           ),
-                        },
-                        {
-                          label: "Xóa tài khoản",
-                          icon: Trash2,
-                          onClick: () => handleDeleteStaff(staffMember._id),
-                          variant: "destructive",
                         },
                       ]}
                     />

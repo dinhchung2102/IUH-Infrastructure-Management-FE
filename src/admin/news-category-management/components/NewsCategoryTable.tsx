@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { TableActionMenu } from "@/components/TableActionMenu";
 import type { NewsCategory } from "../types/news-category.type";
 import { format } from "date-fns";
@@ -53,7 +53,11 @@ export function NewsCategoryTable({
             </TableRow>
           ) : (
             categories.map((category, index) => (
-              <TableRow key={category._id}>
+              <TableRow
+                key={category._id}
+                className="cursor-pointer hover:bg-muted/50 transition-colors"
+                onClick={() => onViewDetails(category)}
+              >
                 <TableCell className="font-medium">
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
@@ -111,11 +115,6 @@ export function NewsCategoryTable({
                   <TableActionMenu
                     showLabel
                     actions={[
-                      {
-                        label: "Xem chi tiết",
-                        icon: Eye,
-                        onClick: () => onViewDetails(category),
-                      },
                       {
                         label: "Chỉnh sửa",
                         icon: Edit,

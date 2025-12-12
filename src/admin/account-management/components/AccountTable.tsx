@@ -17,7 +17,6 @@ import {
   ChevronsUpDown,
   ChevronDown,
   ChevronUp,
-  Eye,
   UserCheck,
   UserX,
 } from "lucide-react";
@@ -96,11 +95,6 @@ export default function AccountTable({
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     onFiltersChange({ search: searchInput });
-  };
-
-  const handleViewDetails = (accountId: string) => {
-    // Trigger callback to open dialog in parent component
-    onViewDetails?.(accountId);
   };
 
   const handleToggleAccountStatus = async (
@@ -334,7 +328,7 @@ export default function AccountTable({
                 <TableRow
                   key={account._id}
                   className="cursor-pointer hover:bg-muted/50 transition-colors"
-                  onClick={() => handleViewDetails(account._id)}
+                  onClick={() => onViewDetails?.(account._id)}
                 >
                   <TableCell className="text-center">
                     {(paginationRequest.page - 1) * paginationRequest.limit +
@@ -388,11 +382,6 @@ export default function AccountTable({
                     <TableActionMenu
                       showLabel
                       actions={[
-                        {
-                          label: "Xem chi tiết",
-                          icon: Eye,
-                          onClick: () => handleViewDetails(account._id),
-                        },
                         {
                           label: account.isActive
                             ? "Khóa tài khoản"

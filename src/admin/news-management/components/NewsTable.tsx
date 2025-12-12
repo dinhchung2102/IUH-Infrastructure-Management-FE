@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Eye, Edit, Trash2 } from "lucide-react";
+import { Edit, Trash2 } from "lucide-react";
 import { TableActionMenu } from "@/components/TableActionMenu";
 import type { News } from "../types/news.type";
 import { format } from "date-fns";
@@ -75,7 +75,11 @@ export function NewsTable({
               </TableRow>
             ) : (
               news.map((item, index) => (
-                <TableRow key={item._id}>
+                <TableRow
+                  key={item._id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => onViewDetails(item)}
+                >
                   <TableCell className="font-medium">
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </TableCell>
@@ -184,11 +188,6 @@ export function NewsTable({
                     <TableActionMenu
                       showLabel
                       actions={[
-                        {
-                          label: "Xem chi tiết",
-                          icon: Eye,
-                          onClick: () => onViewDetails(item),
-                        },
                         {
                           label: "Chỉnh sửa",
                           icon: Edit,

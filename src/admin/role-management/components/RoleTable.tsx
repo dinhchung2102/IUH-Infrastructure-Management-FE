@@ -7,7 +7,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Eye, Edit, Trash2, Lock } from "lucide-react";
+import { Edit, Trash2, Lock } from "lucide-react";
 import { TableActionMenu } from "@/components/TableActionMenu";
 import type { Role } from "../types/role.type";
 import { format } from "date-fns";
@@ -79,7 +79,11 @@ export function RoleTable({
         </TableHeader>
         <TableBody>
           {roles.map((role, index) => (
-            <TableRow key={role._id}>
+            <TableRow
+              key={role._id}
+              className="cursor-pointer hover:bg-muted/50 transition-colors"
+              onClick={() => onViewDetails(role)}
+            >
               <TableCell className="text-center font-medium">
                 {index + 1}
               </TableCell>
@@ -112,11 +116,6 @@ export function RoleTable({
                 <TableActionMenu
                   showLabel
                   actions={[
-                    {
-                      label: "Xem chi tiết",
-                      icon: Eye,
-                      onClick: () => onViewDetails(role),
-                    },
                     {
                       label: "Chỉnh sửa",
                       icon: Edit,

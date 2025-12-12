@@ -6,7 +6,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Eye, CheckCircle, XCircle } from "lucide-react";
+import { CheckCircle, XCircle } from "lucide-react";
 import {
   TableActionMenu,
   type TableAction,
@@ -80,7 +80,11 @@ export function AuditTable({
             auditLogs.map((audit, index) => {
               const stt = (currentPage - 1) * itemsPerPage + index + 1;
               return (
-                <TableRow key={audit._id}>
+                <TableRow
+                  key={audit._id}
+                  className="cursor-pointer hover:bg-muted/50 transition-colors"
+                  onClick={() => onViewDetails(audit)}
+                >
                   <TableCell className="text-center font-medium">
                     {stt}
                   </TableCell>
@@ -192,12 +196,8 @@ export function AuditTable({
                     <TableActionMenu
                       showLabel
                       actions={[
-                        {
-                          label: "Xem chi tiết",
-                          icon: Eye,
-                          onClick: () => onViewDetails(audit),
-                        },
-                        ...(audit.status === "PENDING" || audit.status === "IN_PROGRESS"
+                        ...(audit.status === "PENDING" ||
+                        audit.status === "IN_PROGRESS"
                           ? [
                               ...(audit.status === "IN_PROGRESS"
                                 ? [
