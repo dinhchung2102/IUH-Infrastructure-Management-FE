@@ -25,13 +25,21 @@ export default function ReportStatisticsPage() {
       </div>
 
       {/* Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className="space-y-6"
+      >
         <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="dashboard">Tổng quan</TabsTrigger>
           <TabsTrigger value="time-series">Xu hướng</TabsTrigger>
           <TabsTrigger value="location">Theo vị trí</TabsTrigger>
-          <TabsTrigger value="top-assets">Top Assets</TabsTrigger>
-          <TabsTrigger value="top-reporters">Top Reporters</TabsTrigger>
+          <TabsTrigger value="top-assets">
+            Thiết bị có nhiều báo cáo nhất
+          </TabsTrigger>
+          <TabsTrigger value="top-reporters">
+            Người báo cáo nhiều nhất
+          </TabsTrigger>
           <TabsTrigger value="period">Khoảng thời gian</TabsTrigger>
         </TabsList>
 
@@ -57,4 +65,3 @@ export default function ReportStatisticsPage() {
     </div>
   );
 }
-

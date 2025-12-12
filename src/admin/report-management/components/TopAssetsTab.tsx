@@ -24,8 +24,8 @@ export function TopAssetsTab() {
         const response = await getTopAssets({ limit: 10 });
         if (response.success && response.data) {
           // Handle nested data structure if needed
-          const responseData = Array.isArray(response.data) 
-            ? response.data 
+          const responseData = Array.isArray(response.data)
+            ? response.data
             : (response.data as any)?.data || [];
           setData(Array.isArray(responseData) ? responseData : []);
         } else {
@@ -61,7 +61,7 @@ export function TopAssetsTab() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Top Assets có nhiều báo cáo nhất</CardTitle>
+        <CardTitle>Thiết bị có nhiều báo cáo nhất</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
@@ -116,4 +116,3 @@ export function TopAssetsTab() {
     </Card>
   );
 }
-
