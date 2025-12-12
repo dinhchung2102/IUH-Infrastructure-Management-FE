@@ -30,7 +30,7 @@ export interface Report {
         name: string;
       };
     } | null;
-  };
+  } | null;
   type: string;
   status: ReportStatus;
   priority?: ReportPriority;

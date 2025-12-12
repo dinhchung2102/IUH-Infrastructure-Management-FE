@@ -40,7 +40,7 @@ export interface ReportApiCreatedBy {
 
 export interface ReportApiResponse {
   _id: string;
-  asset: ReportApiAsset;
+  asset: ReportApiAsset | null;
   type: string;
   status: "PENDING" | "APPROVED" | "REJECTED";
   priority?: ReportPriority;
@@ -438,6 +438,11 @@ export const transformReportApiToUI = (
 
   // Helper function to build location object
   const buildLocation = () => {
+    if (!apiReport.asset) {
+      return {
+        campus: "Chưa xác định",
+      };
+    }
     if (apiReport.asset.zone) {
       return {
         campus: apiReport.asset.zone.building.campus.name,
@@ -457,15 +462,17 @@ export const transformReportApiToUI = (
 
   return {
     _id: apiReport._id,
-    asset: {
-      _id: apiReport.asset._id,
-      name: apiReport.asset.name,
-      code: apiReport.asset.code,
-      status: apiReport.asset.status,
-      zone: apiReport.asset.zone,
-      area: apiReport.asset.area,
-      image: apiReport.asset.image, // Giữ nguyên path
-    },
+    asset: apiReport.asset
+      ? {
+          _id: apiReport.asset._id,
+          name: apiReport.asset.name,
+          code: apiReport.asset.code,
+          status: apiReport.asset.status,
+          zone: apiReport.asset.zone,
+          area: apiReport.asset.area,
+          image: apiReport.asset.image, // Giữ nguyên path
+        }
+      : null,
     type: apiReport.type,
     status: apiReport.status,
     priority: apiReport.priority,

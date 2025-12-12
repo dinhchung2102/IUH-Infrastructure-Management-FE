@@ -251,47 +251,55 @@ export function ReportDetailDialog({
                     Thông tin thiết bị
                   </h3>
                   <div className="bg-muted/30 rounded-md p-2.5 h-full">
-                    <div className="flex items-start gap-3">
-                      {report.asset.image ? (
-                        <img
-                          src={`${import.meta.env.VITE_URL_UPLOADS}${
-                            report.asset.image
-                          }`}
-                          alt={report.asset.name}
-                          className="h-25 w-25 rounded-md object-cover border flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="h-20 w-20 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
-                          <span className="text-[10px] text-muted-foreground">
-                            N/A
-                          </span>
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1 space-y-2">
-                        <div>
-                          <p className="text-[11px] text-muted-foreground mb-0.5">
-                            Tên thiết bị
-                          </p>
-                          <p className="font-medium text-sm truncate">
-                            {report.asset.name}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[11px] text-muted-foreground mb-0.5">
-                            Trạng thái
-                          </p>
-                          <Badge
-                            variant="outline"
-                            className={`text-xs ${
-                              getAssetStatusConfig(report.asset.status)
-                                .className
+                    {report.asset ? (
+                      <div className="flex items-start gap-3">
+                        {report.asset.image ? (
+                          <img
+                            src={`${import.meta.env.VITE_URL_UPLOADS}${
+                              report.asset.image
                             }`}
-                          >
-                            {getAssetStatusConfig(report.asset.status).label}
-                          </Badge>
+                            alt={report.asset.name}
+                            className="h-25 w-25 rounded-md object-cover border flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="h-20 w-20 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
+                            <span className="text-[10px] text-muted-foreground">
+                              N/A
+                            </span>
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1 space-y-2">
+                          <div>
+                            <p className="text-[11px] text-muted-foreground mb-0.5">
+                              Tên thiết bị
+                            </p>
+                            <p className="font-medium text-sm truncate">
+                              {report.asset.name}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] text-muted-foreground mb-0.5">
+                              Trạng thái
+                            </p>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${
+                                getAssetStatusConfig(report.asset.status)
+                                  .className
+                              }`}
+                            >
+                              {getAssetStatusConfig(report.asset.status).label}
+                            </Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="flex items-center justify-center h-20">
+                        <span className="text-sm text-muted-foreground">
+                          Không có thông tin thiết bị
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
 

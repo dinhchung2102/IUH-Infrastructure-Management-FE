@@ -30,7 +30,7 @@ export interface AuditLog {
           name: string;
         };
       } | null;
-    };
+    } | null;
     type: string;
     status: string;
     description: string;

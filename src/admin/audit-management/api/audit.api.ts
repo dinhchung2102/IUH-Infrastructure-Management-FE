@@ -37,7 +37,7 @@ export interface AuditLogApiResponse {
   _id: string;
   report?: {
     _id: string;
-    asset: AssetInfo;
+    asset: AssetInfo | null;
     type: string;
     status: string;
     description: string;
@@ -205,13 +205,13 @@ export const transformAuditLogApiToUI = (
 ): AuditLog => {
   // Helper function to build location object
   const buildLocation = () => {
-    if (apiAuditLog.report?.asset.zone) {
+    if (apiAuditLog.report?.asset?.zone) {
       return {
         campus: apiAuditLog.report.asset.zone.building.campus.name,
         building: apiAuditLog.report.asset.zone.building.name,
         zone: apiAuditLog.report.asset.zone.name,
       };
-    } else if (apiAuditLog.report?.asset.area) {
+    } else if (apiAuditLog.report?.asset?.area) {
       return {
         campus: apiAuditLog.report.asset.area.campus.name,
         zone: apiAuditLog.report.asset.area.name,
@@ -267,10 +267,12 @@ export const transformAuditLogApiToUI = (
       ? {
           ...apiAuditLog.report,
           images: apiAuditLog.report.images, // Giữ nguyên paths
-          asset: {
-            ...apiAuditLog.report.asset,
-            image: apiAuditLog.report.asset.image, // Giữ nguyên path
-          },
+          asset: apiAuditLog.report.asset
+            ? {
+                ...apiAuditLog.report.asset,
+                image: apiAuditLog.report.asset.image, // Giữ nguyên path
+              }
+            : null,
         }
       : null,
     asset: assetInfo,

@@ -81,12 +81,12 @@ export function ReportTable({
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-3">
-                    {report.asset.image ? (
+                    {report.asset?.image ? (
                       <img
                         src={`${import.meta.env.VITE_URL_UPLOADS}${
                           report.asset.image
                         }`}
-                        alt={report.asset.name}
+                        alt={report.asset?.name || "Asset"}
                         className="h-12 w-12 rounded object-cover border"
                       />
                     ) : (
@@ -95,9 +95,11 @@ export function ReportTable({
                       </div>
                     )}
                     <div>
-                      <p className="text-sm font-medium">{report.asset.name}</p>
+                      <p className="text-sm font-medium">
+                        {report.asset?.name || "Không có thiết bị"}
+                      </p>
                       <p className="text-xs text-muted-foreground">
-                        {report.asset.code}
+                        {report.asset?.code || "N/A"}
                       </p>
                     </div>
                   </div>
