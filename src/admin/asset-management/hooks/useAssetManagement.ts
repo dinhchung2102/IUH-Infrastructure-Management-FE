@@ -30,7 +30,7 @@ export function useAssetManagement() {
   } = useAssetPagination();
 
   // Data fetching
-  const { assets, loading, stats, handleDelete, refetchAll, refetch } =
+  const { assets, loading, stats, statsLoading, handleDelete, refetchAll, refetch } =
     useAssetData({
       filters,
       paginationRequest,
@@ -50,6 +50,7 @@ export function useAssetManagement() {
     assets,
     loading,
     stats,
+    statsLoading,
 
     // Filters
     filters,

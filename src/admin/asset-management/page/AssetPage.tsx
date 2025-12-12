@@ -54,6 +54,7 @@ function AssetPage() {
     assets,
     loading,
     stats,
+    statsLoading,
     filters,
     pagination,
     paginationRequest,
@@ -120,7 +121,7 @@ function AssetPage() {
       </div>
 
       {/* Cards thống kê */}
-      <AssetStatsCards stats={stats} loading={loading} />
+      <AssetStatsCards stats={stats} loading={statsLoading} />
 
       {/* Bộ lọc */}
       <div className="flex flex-wrap gap-4 items-end">

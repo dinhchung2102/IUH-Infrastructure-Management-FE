@@ -56,6 +56,7 @@ export function useAssetData({
 }: UseAssetDataProps) {
   const [assets, setAssets] = useState<AssetListItem[]>([]);
   const [loading, setLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(false);
   const [stats, setStats] = useState<AssetDashboardStats | undefined>(
     undefined
   );
@@ -99,7 +100,10 @@ export function useAssetData({
 
   const fetchStats = useCallback(async () => {
     try {
+      setStatsLoading(true);
       const res = await getAssetStatsDashboard();
+      console.log("[Asset Stats] API Response:", res);
+      
       if (!res.success || !res.data) {
         if (!res.success) {
           toast.error(res.message || "Không thể tải thống kê thiết bị.");
@@ -108,11 +112,14 @@ export function useAssetData({
         return;
       }
 
+      console.log("[Asset Stats] Setting stats:", res.data);
       setStats(res.data);
     } catch (err: unknown) {
       console.error("Lỗi khi tải thống kê thiết bị:", err);
       toast.error("Không thể tải thống kê thiết bị.");
       setStats(undefined);
+    } finally {
+      setStatsLoading(false);
     }
   }, []);
 
@@ -150,6 +157,7 @@ export function useAssetData({
     assets,
     loading,
     stats,
+    statsLoading,
     handleDelete,
     refetchAll,
     refetch: fetchAssets,

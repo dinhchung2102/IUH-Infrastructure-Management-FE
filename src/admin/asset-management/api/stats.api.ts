@@ -124,24 +124,87 @@ export interface AssetMaintenanceWarrantyStats {
 /**
  * 1️⃣ Lấy thống kê tổng quan Dashboard
  * Endpoint: GET /assets/statistics/dashboard
+ * Response structure: { success, message, data: { data: AssetDashboardStats } }
  */
 export const getAssetStatsDashboard = async (): Promise<
   ApiResponse<AssetDashboardStats>
 > => {
-  const res = await api.get<ApiResponse<{ data: AssetDashboardStats }>>(
-    "/assets/statistics/dashboard"
-  );
+  const res = await api.get<
+    ApiResponse<{ data: AssetDashboardStats } | AssetDashboardStats>
+  >("/assets/statistics/dashboard");
+
   // Transform nested response to match expected format
-  if (res.data.success && res.data.data?.data) {
-    return {
-      ...res.data,
-      data: res.data.data.data,
-    } as ApiResponse<AssetDashboardStats>;
+  // Response structure: { success, message, data: { data: AssetDashboardStats } }
+  const responseData = res.data;
+
+  if (responseData.success && responseData.data) {
+    // Type guard to check if data is nested: { data: AssetDashboardStats }
+    const innerData = responseData.data;
+
+    // Check if data is nested: data.data (API returns { data: { data: AssetDashboardStats } })
+    // Check if innerData is an object with a 'data' property that contains AssetDashboardStats
+    if (
+      typeof innerData === "object" &&
+      innerData !== null &&
+      "data" in innerData &&
+      innerData.data &&
+      typeof innerData.data === "object" &&
+      "totalAssets" in innerData.data
+    ) {
+      const nestedData = innerData as { data: AssetDashboardStats };
+      console.log("[Asset Stats API] Extracted nested data:", nestedData.data);
+      return {
+        success: responseData.success,
+        message: responseData.message,
+        data: nestedData.data,
+      } as ApiResponse<AssetDashboardStats>;
+    }
+
+    // If data is directly AssetDashboardStats
+    if (
+      typeof innerData === "object" &&
+      innerData !== null &&
+      "totalAssets" in innerData &&
+      !("data" in innerData)
+    ) {
+      console.log("[Asset Stats API] Using direct data:", innerData);
+      return {
+        success: responseData.success,
+        message: responseData.message,
+        data: innerData as AssetDashboardStats,
+      } as ApiResponse<AssetDashboardStats>;
+    }
   }
-  // Fallback: return original response if structure is different
+
+  // Return error if structure is unexpected
+  console.error("Unexpected response structure from stats API:", responseData);
+  // Return empty stats instead of throwing to prevent app crash
   return {
-    ...res.data,
-    data: res.data.data as unknown as AssetDashboardStats,
+    success: false,
+    message: "Unexpected response structure",
+    data: {
+      totalAssets: 0,
+      assetsByStatus: {
+        NEW: 0,
+        IN_USE: 0,
+        UNDER_MAINTENANCE: 0,
+        DAMAGED: 0,
+        LOST: 0,
+        DISPOSED: 0,
+        TRANSFERRED: 0,
+      },
+      assetsByCategory: [],
+      assetsByType: [],
+      assetsByLocation: { zones: 0, areas: 0 },
+      assetsByCampus: [],
+      assetsThisMonth: 0,
+      assetsLastMonth: 0,
+      growthRate: 0,
+      warrantyExpiringSoon: 0,
+      warrantyExpired: 0,
+      maintenanceOverdue: 0,
+      averageAssetAge: 0,
+    } as AssetDashboardStats,
   } as ApiResponse<AssetDashboardStats>;
 };
 
