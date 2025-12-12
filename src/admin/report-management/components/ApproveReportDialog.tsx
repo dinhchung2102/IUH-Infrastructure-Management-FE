@@ -105,6 +105,21 @@ export function ApproveReportDialog({
       setLoading(true);
       const response = await getSuggestedStaffs(report._id);
       if (response.success && response.data?.data) {
+        // If no suggested staffs, fetch all staff instead
+        if (response.data.data.length === 0) {
+          // Clear assignments map since we're showing all staff
+          setStaffAssignments(new Map());
+          // Fetch all staff
+          const allStaffResponse = await getStaff({
+            page: 1,
+            limit: 100,
+          });
+          if (allStaffResponse.success && allStaffResponse.data) {
+            setStaffList(allStaffResponse.data.accounts);
+          }
+          return;
+        }
+
         // Transform suggested staffs to StaffResponse format
         const transformed = response.data.data.map(
           transformSuggestedStaffToStaffResponse
@@ -121,6 +136,19 @@ export function ApproveReportDialog({
     } catch (error) {
       console.error("Error fetching suggested staffs:", error);
       toast.error("Không thể tải danh sách nhân viên gợi ý");
+      // Fallback: try to fetch all staff if suggested staffs fails
+      try {
+        const allStaffResponse = await getStaff({
+          page: 1,
+          limit: 100,
+        });
+        if (allStaffResponse.success && allStaffResponse.data) {
+          setStaffList(allStaffResponse.data.accounts);
+          setStaffAssignments(new Map());
+        }
+      } catch (fallbackError) {
+        console.error("Error fetching all staff as fallback:", fallbackError);
+      }
     } finally {
       setLoading(false);
     }
