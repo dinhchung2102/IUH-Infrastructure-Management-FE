@@ -9,6 +9,7 @@ import { AnimatePresence } from "framer-motion";
 import MainLayout from "./components/layout/MainLayout";
 import AdminLayout from "./components/layout/AdminLayout";
 import { SessionExpiredDialog } from "./components/SessionExpiredDialog";
+import { CriticalReportNotifications } from "./components/CriticalReportNotifications";
 import { Toaster } from "./components/ui/sonner";
 import { ScrollToTop } from "./components/ScrollToTop";
 
@@ -118,6 +119,7 @@ function App() {
       <ScrollToTop />
       <AppRoutes />
       <SessionExpiredDialog />
+      <CriticalReportNotifications />
       <Toaster />
     </BrowserRouter>
   );

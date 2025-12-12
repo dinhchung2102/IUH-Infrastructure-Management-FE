@@ -16,7 +16,7 @@ import PaginationComponent from "@/components/PaginationComponent";
 import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { ChartBar } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   Table,
   TableBody,
@@ -35,6 +35,7 @@ import type { PaginationResponse } from "@/types/pagination.type";
 
 export default function ReportManagementPage() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [reports, setReports] = useState<Report[]>([]);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
@@ -124,6 +125,27 @@ export default function ReportManagementPage() {
   useEffect(() => {
     fetchStats();
   }, []);
+
+  // Handle navigation state to open report detail
+  useEffect(() => {
+    const state = location.state as { openReportId?: string } | null;
+    if (state?.openReportId) {
+      // Try to find report in current list
+      const report = reports.find((r) => r._id === state.openReportId);
+      if (report) {
+        setSelectedReport(report);
+        setDetailDialogOpen(true);
+        // Clear state to prevent reopening on re-render
+        navigate(location.pathname, { replace: true, state: {} });
+      } else if (reports.length > 0) {
+        // Report not found in current page, show toast and clear state
+        toast.info(
+          `Báo cáo khẩn cấp đã được tạo. Vui lòng tìm kiếm với ID: ${state.openReportId.slice(-8)}`
+        );
+        navigate(location.pathname, { replace: true, state: {} });
+      }
+    }
+  }, [location.state, reports, navigate, location.pathname]);
 
   const handleFilterChange = (key: string, value: string) => {
     setFilters((prev) => ({ ...prev, [key]: value }));
