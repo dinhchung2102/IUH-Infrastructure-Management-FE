@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,7 +16,12 @@ import { CheckCircle2, X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { getStaff } from "@/admin/staff-management/api/staff.api";
 import type { StaffResponse } from "@/admin/staff-management/types/staff.type";
-import { approveReport } from "../api/report.api";
+import type { RoleName } from "@/types/role.enum";
+import {
+  approveReport,
+  getSuggestedStaffs,
+  type SuggestedStaff,
+} from "../api/report.api";
 import type { Report } from "../types/report.type";
 
 interface ApproveReportDialogProps {
@@ -48,21 +53,81 @@ export function ApproveReportDialog({
   const [expirationDays, setExpirationDays] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  // Map to store assignedTo info for each staff (for suggested staffs only)
+  const [staffAssignments, setStaffAssignments] = useState<
+    Map<string, SuggestedStaff["assignedTo"]>
+  >(new Map());
 
-  // Fetch staff list
-  useEffect(() => {
-    if (open) {
-      fetchStaff();
-      // Set suggestedProcessingDays as default value if available
-      if (report?.suggestedProcessingDays) {
-        setExpirationDays(String(report.suggestedProcessingDays));
-      } else {
-        setExpirationDays("");
-      }
+  // Transform SuggestedStaff to StaffResponse format for display
+  const transformSuggestedStaffToStaffResponse = useCallback(
+    (suggested: SuggestedStaff): StaffResponse => {
+      return {
+        _id: suggested.id,
+        email: suggested.email,
+        fullName: suggested.fullName,
+        phoneNumber: suggested.phoneNumber,
+        role: {
+          _id: "",
+          roleName: suggested.role as RoleName,
+        },
+        isActive: true,
+        createdAt: "",
+        updatedAt: "",
+        __v: 0,
+      };
+    },
+    []
+  );
+
+  // Helper function to get assignedTo label in Vietnamese
+  const getAssignedToLabel = (
+    assignedTo: SuggestedStaff["assignedTo"]
+  ): string => {
+    switch (assignedTo) {
+      case "zone":
+        return "Phụ trách phòng";
+      case "building":
+        return "Phụ trách tòa nhà";
+      case "zoneManaged":
+        return "Quản lý phòng";
+      case "buildingManaged":
+        return "Quản lý tòa nhà";
+      default:
+        return "";
     }
-  }, [open, report]);
+  };
 
-  const fetchStaff = async () => {
+  // Fetch suggested staffs from API
+  const fetchSuggestedStaffs = useCallback(async () => {
+    if (!report?._id) return;
+
+    try {
+      setLoading(true);
+      const response = await getSuggestedStaffs(report._id);
+      if (response.success && response.data?.data) {
+        // Transform suggested staffs to StaffResponse format
+        const transformed = response.data.data.map(
+          transformSuggestedStaffToStaffResponse
+        );
+        setStaffList(transformed);
+
+        // Store assignedTo info for each staff
+        const assignmentsMap = new Map<string, SuggestedStaff["assignedTo"]>();
+        response.data.data.forEach((suggested) => {
+          assignmentsMap.set(suggested.id, suggested.assignedTo);
+        });
+        setStaffAssignments(assignmentsMap);
+      }
+    } catch (error) {
+      console.error("Error fetching suggested staffs:", error);
+      toast.error("Không thể tải danh sách nhân viên gợi ý");
+    } finally {
+      setLoading(false);
+    }
+  }, [report?._id, transformSuggestedStaffToStaffResponse]);
+
+  // Fetch all staff (when searching)
+  const fetchAllStaff = useCallback(async () => {
     try {
       setLoading(true);
       const response = await getStaff({
@@ -72,6 +137,8 @@ export function ApproveReportDialog({
       });
       if (response.success && response.data) {
         setStaffList(response.data.accounts);
+        // Clear assignments map when searching (not suggested staffs)
+        setStaffAssignments(new Map());
       }
     } catch (error) {
       console.error("Error fetching staff:", error);
@@ -79,7 +146,41 @@ export function ApproveReportDialog({
     } finally {
       setLoading(false);
     }
-  };
+  }, [searchStaff]);
+
+  // Fetch staff list - suggested staffs when no search, all staff when searching
+  useEffect(() => {
+    if (open && report) {
+      // Reset search when dialog opens
+      setSearchStaff("");
+      // Fetch suggested staffs initially
+      fetchSuggestedStaffs();
+      // Set suggestedProcessingDays as default value if available
+      if (report?.suggestedProcessingDays) {
+        setExpirationDays(String(report.suggestedProcessingDays));
+      } else {
+        setExpirationDays("");
+      }
+    }
+  }, [open, report, fetchSuggestedStaffs]);
+
+  // Fetch staff when search changes
+  useEffect(() => {
+    if (open && report) {
+      // Debounce search
+      const timeoutId = setTimeout(() => {
+        if (searchStaff.trim()) {
+          // If searching, fetch all staff
+          fetchAllStaff();
+        } else {
+          // If search is cleared, fetch suggested staffs again
+          fetchSuggestedStaffs();
+        }
+      }, 300);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [searchStaff, open, report, fetchAllStaff, fetchSuggestedStaffs]);
 
   const handleToggleStaff = (staffId: string) => {
     setSelectedStaffIds((prev) => {
@@ -102,7 +203,11 @@ export function ApproveReportDialog({
       return;
     }
 
-    if (!expirationDays || isNaN(Number(expirationDays)) || Number(expirationDays) <= 0) {
+    if (
+      !expirationDays ||
+      isNaN(Number(expirationDays)) ||
+      Number(expirationDays) <= 0
+    ) {
       toast.error("Vui lòng nhập số ngày hết hạn hợp lệ");
       return;
     }
@@ -111,13 +216,13 @@ export function ApproveReportDialog({
 
     try {
       setSubmitting(true);
-      
+
       // Calculate expiresAt: current date + number of days
       const currentDate = new Date();
       const daysToAdd = Number(expirationDays);
       const expiresAt = new Date(currentDate);
       expiresAt.setDate(expiresAt.getDate() + daysToAdd);
-      
+
       await approveReport({
         reportId: report._id,
         staffIds: selectedStaffIds,
@@ -217,11 +322,6 @@ export function ApproveReportDialog({
                 onChange={(e) => {
                   setSearchStaff(e.target.value);
                 }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    fetchStaff();
-                  }
-                }}
                 className="bg-white"
               />
             </div>
@@ -248,7 +348,14 @@ export function ApproveReportDialog({
 
           {/* Staff List */}
           <div className="space-y-2">
-            <Label>Danh sách nhân viên</Label>
+            <Label>
+              Danh sách nhân viên
+              {!searchStaff && report?._id && (
+                <span className="text-xs text-muted-foreground ml-2 font-normal">
+                  (Gợi ý theo khu vực)
+                </span>
+              )}
+            </Label>
             <div className="border rounded-lg bg-white max-h-[300px] overflow-y-auto">
               {loading ? (
                 <div className="py-8 text-center">
@@ -282,10 +389,19 @@ export function ApproveReportDialog({
                               {getUserInitials(staff.fullName)}
                             </AvatarFallback>
                           </Avatar>
-                          <div>
-                            <p className="font-medium text-sm">
-                              {staff.fullName}
-                            </p>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="font-medium text-sm">
+                                {staff.fullName}
+                              </p>
+                              {staffAssignments.has(staff._id) && (
+                                <Badge variant="secondary" className="text-xs">
+                                  {getAssignedToLabel(
+                                    staffAssignments.get(staff._id)!
+                                  )}
+                                </Badge>
+                              )}
+                            </div>
                             <p className="text-xs text-muted-foreground">
                               {staff.email}
                             </p>

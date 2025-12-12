@@ -3,6 +3,20 @@ import type { ApiResponse } from "@/types/response.type";
 import type { BaseQueryDto } from "@/types/pagination.type";
 import type { Report, ReportPriority } from "../types/report.type";
 
+// Suggested Staff types
+export interface SuggestedStaff {
+  id: string;
+  fullName: string;
+  email: string;
+  phoneNumber?: string;
+  role: string;
+  assignedTo: "zone" | "building" | "zoneManaged" | "buildingManaged";
+}
+
+export interface SuggestedStaffsResponse {
+  data: SuggestedStaff[];
+}
+
 // Response types từ API
 export interface ReportApiAsset {
   _id: string;
@@ -187,6 +201,21 @@ export interface ApproveReportDto {
   subject: string;
   expiresAt?: string; // Expiration date (ISO string)
 }
+
+/**
+ * Get suggested staffs for a report based on zone/building
+ * @param reportId - The ID of the report
+ * @returns Suggested staffs list
+ */
+export const getSuggestedStaffs = async (
+  reportId: string
+): Promise<ApiResponse<SuggestedStaffsResponse>> => {
+  const response = await api.get<ApiResponse<SuggestedStaffsResponse>>(
+    `/report/${reportId}/suggested-staffs`
+  );
+  console.log("[API: SUGGESTED STAFFS]:", response.data);
+  return response.data;
+};
 
 export const approveReport = async (data: ApproveReportDto) => {
   const response = await api.post<ApiResponse>("/report/approve", data);

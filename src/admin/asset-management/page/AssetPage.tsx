@@ -325,7 +325,7 @@ function AssetPage() {
                           className="text-red-600 focus:text-red-600 cursor-pointer"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
-                          Xóa
+                          Thanh lý
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
