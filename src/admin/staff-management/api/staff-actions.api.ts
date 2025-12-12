@@ -44,17 +44,28 @@ export const unlockStaff = async (
   return response.data;
 };
 
+// Update staff account response type
+export interface UpdateAccountResponse {
+  message: string;
+  updatedAccount: StaffResponse;
+}
+
 // Update staff account
 export const updateStaff = async (
   id: string,
   data: UpdateStaffDto | FormData
-): Promise<ApiResponse<StaffResponse>> => {
-  const response = await api.patch(`/auth/accounts/${id}`, data, {
-    headers:
-      data instanceof FormData
-        ? { "Content-Type": "multipart/form-data" }
-        : undefined,
-  });
+): Promise<UpdateAccountResponse> => {
+  const response = await api.patch<UpdateAccountResponse>(
+    `/auth/accounts/${id}`,
+    data,
+    {
+      headers:
+        data instanceof FormData
+          ? { "Content-Type": "multipart/form-data" }
+          : undefined,
+    }
+  );
+  console.log("[API: UPDATE STAFF]:", response.data);
   return response.data;
 };
 

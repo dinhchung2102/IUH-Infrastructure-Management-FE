@@ -203,8 +203,8 @@ export function EditStaffDialog({
 
       const res = await updateStaff(staff._id, formData);
 
-      if (res?.success) {
-        toast.success("Cập nhật thông tin nhân viên thành công!");
+      if (res?.updatedAccount) {
+        toast.success(res.message || "Cập nhật thông tin nhân viên thành công!");
         onOpenChange(false);
         onSuccess?.();
       } else {
