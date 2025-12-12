@@ -3,11 +3,13 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Calendar, User, Mail } from "lucide-react";
+import { Calendar, User, Mail, XCircle } from "lucide-react";
 import type { AuditLog } from "../types/audit.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
@@ -121,8 +123,8 @@ export function AuditDetailDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden p-0">
-          <DialogHeader className="space-y-2 pb-2 flex-shrink-0">
+        <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[88vh] flex flex-col p-0 gap-0 overflow-hidden">
+          <DialogHeader className="space-y-2 p-6 pb-4 flex-shrink-0 border-b">
             <div className="flex items-center">
               <DialogTitle className="text-lg flex items-center gap-2">
                 Chi tiết nhiệm vụ
@@ -202,233 +204,237 @@ export function AuditDetailDialog({
             </div>
           </DialogHeader>
 
-          <ScrollArea className="h-[calc(88vh-160px)] pr-3">
-            <div className="space-y-3">
-              {/* Reporter Info - Only show if from report */}
-              {audit.report && (
-                <>
+          <div className="flex-1 min-h-0 overflow-auto px-6">
+            <ScrollArea className="h-full">
+              <div className="space-y-3 py-4">
+                {/* Reporter Info - Only show if from report */}
+                {audit.report && (
+                  <>
+                    <div className="space-y-1.5">
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                        Người báo cáo
+                      </h3>
+                      <div className="flex items-center gap-2.5 bg-muted/30 rounded-md p-2.5">
+                        <Avatar className="h-9 w-9 flex-shrink-0">
+                          <AvatarFallback className="text-xs">
+                            {getUserInitials(audit.report.createdBy.fullName)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-center gap-1.5 mb-0.5">
+                            <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                            <p className="font-medium text-xs truncate">
+                              {audit.report.createdBy.fullName}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                            <p className="text-[11px] text-muted-foreground truncate">
+                              {audit.report.createdBy.email}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
+                {/* Asset Info & Location - 2 Columns */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {/* Asset Info */}
                   <div className="space-y-1.5">
                     <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                      Người báo cáo
+                      Thông tin thiết bị
                     </h3>
-                    <div className="flex items-center gap-2.5 bg-muted/30 rounded-md p-2.5">
-                      <Avatar className="h-9 w-9 flex-shrink-0">
-                        <AvatarFallback className="text-xs">
-                          {getUserInitials(audit.report.createdBy.fullName)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-center gap-1.5 mb-0.5">
-                          <User className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                          <p className="font-medium text-xs truncate">
-                            {audit.report.createdBy.fullName}
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Mail className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                          <p className="text-[11px] text-muted-foreground truncate">
-                            {audit.report.createdBy.email}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Asset Info & Location - 2 Columns */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                {/* Asset Info */}
-                <div className="space-y-1.5">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                    Thông tin thiết bị
-                  </h3>
-                  <div className="bg-muted/30 rounded-md p-2.5 h-full">
-                    <div className="flex items-start gap-3">
-                      {audit.report?.asset?.image || audit.asset?.image ? (
-                        <img
-                          src={`${import.meta.env.VITE_URL_UPLOADS}${
-                            audit.report?.asset?.image || audit.asset?.image
-                          }`}
-                          alt={
-                            audit.report?.asset?.name ||
-                            audit.asset?.name ||
-                            "Asset"
-                          }
-                          className="h-20 w-20 rounded-md object-cover border flex-shrink-0"
-                        />
-                      ) : (
-                        <div className="h-20 w-20 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
-                          <span className="text-[10px] text-muted-foreground">
-                            N/A
-                          </span>
-                        </div>
-                      )}
-                      <div className="min-w-0 flex-1 space-y-2">
-                        <div>
-                          <p className="text-[11px] text-muted-foreground mb-0.5">
-                            Tên thiết bị
-                          </p>
-                          <p className="font-medium text-sm truncate">
-                            {audit.report?.asset?.name ||
-                              audit.asset?.name ||
-                              "Chưa có tên"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-[11px] text-muted-foreground mb-0.5">
-                            Trạng thái
-                          </p>
-                          <Badge
-                            variant="outline"
-                            className={`text-xs ${
-                              getAssetStatusConfig(
-                                audit.report?.asset?.status ||
-                                  audit.asset?.status ||
-                                  "IN_USE"
-                              ).className
+                    <div className="bg-muted/30 rounded-md p-2.5 h-full">
+                      <div className="flex items-start gap-3">
+                        {audit.report?.asset?.image || audit.asset?.image ? (
+                          <img
+                            src={`${import.meta.env.VITE_URL_UPLOADS}${
+                              audit.report?.asset?.image || audit.asset?.image
                             }`}
-                          >
-                            {
-                              getAssetStatusConfig(
-                                audit.report?.asset?.status ||
-                                  audit.asset?.status ||
-                                  "IN_USE"
-                              ).label
+                            alt={
+                              audit.report?.asset?.name ||
+                              audit.asset?.name ||
+                              "Asset"
                             }
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Location Info */}
-                <div className="space-y-1.5">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                    Vị trí
-                  </h3>
-                  <div className="bg-muted/30 rounded-md p-2.5 h-full flex flex-col">
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-3">
-                        <div>
-                          <p className="text-[11px] text-muted-foreground mb-0.5">
-                            Cơ sở
-                          </p>
-                          <p className="font-medium text-xs">
-                            {audit.location?.campus || "Chưa xác định"}
-                          </p>
-                        </div>
-                        {audit.location?.building && (
+                            className="h-20 w-20 rounded-md object-cover border flex-shrink-0"
+                          />
+                        ) : (
+                          <div className="h-20 w-20 rounded-md bg-muted flex items-center justify-center border flex-shrink-0">
+                            <span className="text-[10px] text-muted-foreground">
+                              N/A
+                            </span>
+                          </div>
+                        )}
+                        <div className="min-w-0 flex-1 space-y-2">
                           <div>
                             <p className="text-[11px] text-muted-foreground mb-0.5">
-                              Tòa nhà
+                              Tên thiết bị
+                            </p>
+                            <p className="font-medium text-sm truncate">
+                              {audit.report?.asset?.name ||
+                                audit.asset?.name ||
+                                "Chưa có tên"}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[11px] text-muted-foreground mb-0.5">
+                              Trạng thái
+                            </p>
+                            <Badge
+                              variant="outline"
+                              className={`text-xs ${
+                                getAssetStatusConfig(
+                                  audit.report?.asset?.status ||
+                                    audit.asset?.status ||
+                                    "IN_USE"
+                                ).className
+                              }`}
+                            >
+                              {
+                                getAssetStatusConfig(
+                                  audit.report?.asset?.status ||
+                                    audit.asset?.status ||
+                                    "IN_USE"
+                                ).label
+                              }
+                            </Badge>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Location Info */}
+                  <div className="space-y-1.5">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                      Vị trí
+                    </h3>
+                    <div className="bg-muted/30 rounded-md p-2.5 h-full flex flex-col">
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-3">
+                          <div>
+                            <p className="text-[11px] text-muted-foreground mb-0.5">
+                              Cơ sở
                             </p>
                             <p className="font-medium text-xs">
-                              {audit.location.building}
+                              {audit.location?.campus || "Chưa xác định"}
+                            </p>
+                          </div>
+                          {audit.location?.building && (
+                            <div>
+                              <p className="text-[11px] text-muted-foreground mb-0.5">
+                                Tòa nhà
+                              </p>
+                              <p className="font-medium text-xs">
+                                {audit.location.building}
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        {audit.location?.zone && (
+                          <div>
+                            <p className="text-[11px] text-muted-foreground mb-0.5">
+                              Khu vực
+                            </p>
+                            <p className="font-medium text-xs">
+                              {audit.location.zone}
                             </p>
                           </div>
                         )}
                       </div>
-                      {audit.location?.zone && (
-                        <div>
-                          <p className="text-[11px] text-muted-foreground mb-0.5">
-                            Khu vực
-                          </p>
-                          <p className="font-medium text-xs">
-                            {audit.location.zone}
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Assigned Staffs */}
-              {audit.staffs.length > 0 && (
-                <>
-                  <div className="space-y-1.5 pt-4">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                      Nhân viên được phân công ({audit.staffs.length})
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                      {audit.staffs.map((staff) => (
-                        <div
-                          key={staff._id}
-                          className="flex items-center gap-2 bg-muted/30 rounded-md p-2"
-                        >
-                          <Avatar className="h-8 w-8">
-                            <AvatarFallback className="text-[10px]">
-                              {getUserInitials(staff.fullName)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="min-w-0 flex-1">
-                            <p className="font-medium text-xs truncate">
-                              {staff.fullName}
-                            </p>
-                            <p className="text-[11px] text-muted-foreground truncate">
-                              {staff.email}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-
-              {/* Report Description - Only show if from report */}
-              {audit.report && (
-                <div className="space-y-1.5 pt-6">
-                  <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                    Mô tả sự cố
-                  </h3>
-                  <div className="bg-muted/30 rounded-md p-2.5">
-                    <p className="text-xs leading-relaxed whitespace-pre-wrap">
-                      {audit.report.description}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Images */}
-              {allImages.length > 0 && (
-                <>
-                  <div className="space-y-1.5">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                      Hình ảnh đính kèm ({allImages.length})
-                    </h3>
-                    <div className="max-h-[260px] overflow-auto pr-1">
-                      <div className="grid grid-cols-4 gap-2">
-                        {allImages.map((image, index) => (
+                {/* Assigned Staffs */}
+                {audit.staffs.length > 0 && (
+                  <>
+                    <div className="space-y-1.5 pt-4">
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                        Nhân viên được phân công ({audit.staffs.length})
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
+                        {audit.staffs.map((staff) => (
                           <div
-                            key={index}
-                            className="rounded-md border overflow-hidden group relative cursor-pointer hover:border-primary transition-colors"
-                            style={{ aspectRatio: "16/9" }}
-                            onClick={() => handleImageClick(index)}
+                            key={staff._id}
+                            className="flex items-center gap-2 bg-muted/30 rounded-md p-2"
                           >
-                            <img
-                              src={image}
-                              alt={`Hình ảnh ${index + 1}`}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                            />
-                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
-                            <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
-                              {index + 1}/{allImages.length}
+                            <Avatar className="h-8 w-8">
+                              <AvatarFallback className="text-[10px]">
+                                {getUserInitials(staff.fullName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="min-w-0 flex-1">
+                              <p className="font-medium text-xs truncate">
+                                {staff.fullName}
+                              </p>
+                              <p className="text-[11px] text-muted-foreground truncate">
+                                {staff.email}
+                              </p>
                             </div>
                           </div>
                         ))}
                       </div>
                     </div>
-                  </div>
-                </>
-              )}
-              <div className="pt-8"></div>
-            </div>
-          </ScrollArea>
+                  </>
+                )}
 
-          <AuditDetailDialogFooter audit={audit} onCancel={onCancel} />
+                {/* Report Description - Only show if from report */}
+                {audit.report && (
+                  <div className="space-y-1.5 pt-6">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                      Mô tả sự cố
+                    </h3>
+                    <div className="bg-muted/30 rounded-md p-2.5">
+                      <p className="text-xs leading-relaxed whitespace-pre-wrap">
+                        {audit.report.description}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Images */}
+                {allImages.length > 0 && (
+                  <>
+                    <div className="space-y-1.5">
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                        Hình ảnh đính kèm ({allImages.length})
+                      </h3>
+                      <div className="max-h-[260px] overflow-auto pr-1">
+                        <div className="grid grid-cols-4 gap-2">
+                          {allImages.map((image, index) => (
+                            <div
+                              key={index}
+                              className="rounded-md border overflow-hidden group relative cursor-pointer hover:border-primary transition-colors"
+                              style={{ aspectRatio: "16/9" }}
+                              onClick={() => handleImageClick(index)}
+                            >
+                              <img
+                                src={image}
+                                alt={`Hình ảnh ${index + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
+                              <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                                {index + 1}/{allImages.length}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+                <div className="pt-8"></div>
+              </div>
+            </ScrollArea>
+          </div>
+
+          <div className="px-6 py-4 border-t flex-shrink-0 bg-background">
+            <AuditDetailDialogFooter audit={audit} onCancel={onCancel} />
+          </div>
         </DialogContent>
       </Dialog>
 
@@ -440,5 +446,34 @@ export function AuditDetailDialog({
         onOpenChange={setImageViewerOpen}
       />
     </>
+  );
+}
+
+// Helper component to add footer with cancel button
+function AuditDetailDialogFooter({
+  audit,
+  onCancel,
+}: {
+  audit: AuditLog | null;
+  onCancel?: (audit: AuditLog) => void;
+}) {
+  if (!audit || !onCancel) return null;
+
+  const canCancel =
+    audit.status === "PENDING" || audit.status === "IN_PROGRESS";
+
+  if (!canCancel) return null;
+
+  return (
+    <DialogFooter>
+      <Button
+        variant="destructive"
+        onClick={() => onCancel(audit)}
+        className="gap-2"
+      >
+        <XCircle className="h-4 w-4" />
+        Hủy bỏ nhiệm vụ
+      </Button>
+    </DialogFooter>
   );
 }
