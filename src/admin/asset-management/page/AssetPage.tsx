@@ -26,6 +26,7 @@ import { PageBreadcrumb } from "@/components/PageBreadcrumb";
 import { AssetStatsCards } from "../components/AssetStatsCards";
 import { AssetStatsDialog } from "../components/AssetStatsDialog";
 import { AssetAddDialog } from "../components/AssetAddDialog";
+import { getAssetStatusConfig } from "@/utils/assetStatus.util";
 import {
   Select,
   SelectContent,
@@ -44,6 +45,8 @@ import {
 import { useState } from "react";
 import { useAssetData, useAssetFilters } from "../hooks";
 import type { AssetListItem } from "../hooks";
+import { AssetStatus } from "@/types/asset-status.enum";
+import { getAssetStatusLabel } from "@/utils/assetStatus.util";
 
 function AssetPage() {
   const { assets, loading, stats, handleDelete, refetchAll } = useAssetData();
@@ -145,14 +148,38 @@ function AssetPage() {
               <SelectItem value="all" className="cursor-pointer">
                 Tất cả trạng thái
               </SelectItem>
-              <SelectItem value="IN_USE" className="cursor-pointer">
-                Đang sử dụng
+              <SelectItem value={AssetStatus.NEW} className="cursor-pointer">
+                {getAssetStatusLabel(AssetStatus.NEW)}
               </SelectItem>
-              <SelectItem value="MAINTENANCE" className="cursor-pointer">
-                Bảo trì
+              <SelectItem value={AssetStatus.IN_USE} className="cursor-pointer">
+                {getAssetStatusLabel(AssetStatus.IN_USE)}
               </SelectItem>
-              <SelectItem value="BROKEN" className="cursor-pointer">
-                Hư hỏng
+              <SelectItem
+                value={AssetStatus.UNDER_MAINTENANCE}
+                className="cursor-pointer"
+              >
+                {getAssetStatusLabel(AssetStatus.UNDER_MAINTENANCE)}
+              </SelectItem>
+              <SelectItem
+                value={AssetStatus.DAMAGED}
+                className="cursor-pointer"
+              >
+                {getAssetStatusLabel(AssetStatus.DAMAGED)}
+              </SelectItem>
+              <SelectItem value={AssetStatus.LOST} className="cursor-pointer">
+                {getAssetStatusLabel(AssetStatus.LOST)}
+              </SelectItem>
+              <SelectItem
+                value={AssetStatus.DISPOSED}
+                className="cursor-pointer"
+              >
+                {getAssetStatusLabel(AssetStatus.DISPOSED)}
+              </SelectItem>
+              <SelectItem
+                value={AssetStatus.TRANSFERRED}
+                className="cursor-pointer"
+              >
+                {getAssetStatusLabel(AssetStatus.TRANSFERRED)}
               </SelectItem>
             </SelectContent>
           </Select>
@@ -249,21 +276,17 @@ function AssetPage() {
                   <TableCell>{a.assetType?.name || "—"}</TableCell>
                   <TableCell>{a.zone?.name || "—"}</TableCell>
                   <TableCell>
-                    <Badge
-                      variant={
-                        a.status === "IN_USE"
-                          ? "success"
-                          : a.status === "MAINTENANCE"
-                          ? "secondary"
-                          : "destructive"
-                      }
-                    >
-                      {a.status === "IN_USE"
-                        ? "Đang sử dụng"
-                        : a.status === "MAINTENANCE"
-                        ? "Bảo trì"
-                        : "Hư hỏng"}
-                    </Badge>
+                    {(() => {
+                      const statusConfig = getAssetStatusConfig(a.status);
+                      return (
+                        <Badge
+                          variant="outline"
+                          className={statusConfig.className}
+                        >
+                          {statusConfig.label}
+                        </Badge>
+                      );
+                    })()}
                   </TableCell>
                   <TableCell className="text-center">
                     <DropdownMenu>

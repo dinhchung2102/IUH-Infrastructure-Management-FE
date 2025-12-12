@@ -4,6 +4,7 @@ import type { AuditStatus } from "@/admin/audit-management/types/audit.type";
 import type { ReportStatus } from "@/admin/report-management/types/report.type";
 import type { NewsStatus } from "@/admin/news-management/types/news.type";
 import type { RoleName } from "@/types/role.enum";
+import { AssetStatus } from "@/types/asset-status.enum";
 
 /**
  * Badge configuration for all statuses, types, and priorities in the application
@@ -112,15 +113,6 @@ export const REPORT_TYPE_BADGE: Record<ReportType, BadgeStyle> = {
 };
 
 // Asset Status Badge Config
-export type AssetStatus =
-  | "NEW"
-  | "IN_USE"
-  | "UNDER_MAINTENANCE"
-  | "DAMAGED"
-  | "LOST"
-  | "DISPOSED"
-  | "TRANSFERRED";
-
 export const ASSET_STATUS_BADGE: Record<AssetStatus, BadgeStyle> = {
   NEW: {
     label: "Mới",

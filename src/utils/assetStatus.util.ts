@@ -3,7 +3,7 @@
  */
 
 import { ASSET_STATUS_BADGE, getBadgeConfig } from "@/config/badge.config";
-import type { AssetStatus } from "@/config/badge.config";
+import { AssetStatus } from "@/types/asset-status.enum";
 
 export const getAssetStatusLabel = (status: string): string => {
   const config = getBadgeConfig(ASSET_STATUS_BADGE, status as AssetStatus);
