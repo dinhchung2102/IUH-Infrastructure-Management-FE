@@ -30,7 +30,7 @@ export interface DashboardReport {
           name: string;
         };
       };
-    };
+    } | null;
     area: {
       _id: string;
       name: string;

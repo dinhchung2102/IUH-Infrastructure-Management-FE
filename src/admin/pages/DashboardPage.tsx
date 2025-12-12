@@ -348,17 +348,18 @@ export default function DashboardPage() {
                       <div className="space-y-1 flex-1">
                         <p className="text-sm">
                           <span className="font-medium">
-                            {report.createdBy.fullName}
+                            {report.createdBy?.fullName || "Người dùng"}
                           </span>{" "}
                           đã báo cáo thông tin thiết bị{" "}
                           <span className="font-medium">
-                            {report.asset.name} ({report.asset.code})
+                            {report.asset?.name || "Thiết bị"} (
+                            {report.asset?.code || "N/A"})
                           </span>
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {formatTimeAgo(report.createdAt)} •{" "}
-                          {report.asset.zone.name}
-                          {report.asset.area && ` - ${report.asset.area.name}`}
+                          {formatTimeAgo(report.createdAt)}
+                          {report.asset?.zone && ` • ${report.asset.zone.name}`}
+                          {report.asset?.area && ` - ${report.asset.area.name}`}
                         </p>
                       </div>
                       <div className="flex items-center gap-2">
