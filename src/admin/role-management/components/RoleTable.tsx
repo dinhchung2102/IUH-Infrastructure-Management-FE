@@ -13,6 +13,8 @@ import type { Role } from "../types/role.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { isSystemRole } from "../utils/role.utils";
+import { converRoleToDisplay } from "@/utils/convertDisplay.util";
+import type { RoleName } from "@/types/role.enum";
 
 interface RoleTableProps {
   roles: Role[];
@@ -23,6 +25,7 @@ interface RoleTableProps {
 
 const getRoleNameBadge = (roleName: string, isActive: boolean) => {
   const isSystem = isSystemRole(roleName);
+  const displayName = converRoleToDisplay(roleName as RoleName);
 
   return (
     <div className="flex items-center gap-2">
@@ -30,7 +33,7 @@ const getRoleNameBadge = (roleName: string, isActive: boolean) => {
         variant={isSystem ? "default" : "outline"}
         className={isSystem ? "bg-blue-800 text-white" : ""}
       >
-        {roleName}
+        {displayName}
       </Badge>
       {isSystem && <Lock className="h-3 w-3 text-muted-foreground" />}
       {!isActive && (

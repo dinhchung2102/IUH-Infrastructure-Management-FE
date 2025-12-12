@@ -25,6 +25,8 @@ import { getStaff } from "@/admin/staff-management/api/staff.api";
 import type { StaffResponse } from "@/admin/staff-management/types/staff.type";
 import { assignRole } from "../api/role.api";
 import type { Role } from "../types/role.type";
+import { converRoleToDisplay } from "@/utils/convertDisplay.util";
+import type { RoleName } from "@/types/role.enum";
 
 interface AssignRoleDialogProps {
   roles: Role[];
@@ -183,7 +185,7 @@ export function AssignRoleDialog({
                           </div>
                           {staff.role && (
                             <Badge variant="outline" className="text-xs">
-                              {staff.role.roleName}
+                              {converRoleToDisplay(staff.role.roleName)}
                             </Badge>
                           )}
                         </div>
@@ -214,7 +216,7 @@ export function AssignRoleDialog({
                   </p>
                   {selectedStaff.role && (
                     <Badge variant="outline" className="text-xs mt-1">
-                      Vai trò hiện tại: {selectedStaff.role.roleName}
+                      Vai trò hiện tại: {converRoleToDisplay(selectedStaff.role.roleName)}
                     </Badge>
                   )}
                 </div>
@@ -234,7 +236,7 @@ export function AssignRoleDialog({
               <SelectContent>
                 {roles.map((role) => (
                   <SelectItem key={role._id} value={role._id}>
-                    {role.roleName}
+                    {converRoleToDisplay(role.roleName)}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -15,6 +15,7 @@ import type { PermissionEntity } from "../types/permission.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
 import { getPermissions } from "../api/role.api";
+import { converRoleToDisplay } from "@/utils/convertDisplay.util";
 
 interface RoleDetailDialogProps {
   role: Role | null;
@@ -113,7 +114,7 @@ export function RoleDetailDialog({
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <Badge variant="default" className="text-base px-4 py-1">
-                  {role.roleName}
+                  {converRoleToDisplay(role.roleName)}
                 </Badge>
                 {/* Tạm thời ẩn system role badge vì đang debug */}
                 {/* {role.isSystem && (
