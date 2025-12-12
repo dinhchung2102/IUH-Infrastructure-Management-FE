@@ -1,6 +1,4 @@
 import { StatsCard } from "@/components/StatsCard";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Building2, FileText, AlertCircle, CheckCircle2 } from "lucide-react";
 import type { OverallStatisticsData } from "../api/statistics.api";
 
@@ -10,25 +8,6 @@ interface SummaryCardsProps {
 }
 
 export function SummaryCards({ overallStats, loading }: SummaryCardsProps) {
-  if (loading) {
-    return (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <Card key={i}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-8 w-8 rounded-lg" />
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-8 w-24 mb-2" />
-              <Skeleton className="h-3 w-40" />
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
@@ -37,6 +16,7 @@ export function SummaryCards({ overallStats, loading }: SummaryCardsProps) {
         icon={FileText}
         description="Tổng số báo cáo trong hệ thống"
         variant="default"
+        isLoading={loading}
       />
       <StatsCard
         title="Tổng tài sản"
@@ -44,6 +24,7 @@ export function SummaryCards({ overallStats, loading }: SummaryCardsProps) {
         icon={Building2}
         description="Tổng số thiết bị trong hệ thống"
         variant="info"
+        isLoading={loading}
       />
       <StatsCard
         title="Nhiệm vụ đã hoàn thành"
@@ -57,6 +38,7 @@ export function SummaryCards({ overallStats, loading }: SummaryCardsProps) {
             : "0%"
         }`}
         variant="success"
+        isLoading={loading}
       />
       <StatsCard
         title="Tỷ lệ xử lý"
@@ -68,6 +50,7 @@ export function SummaryCards({ overallStats, loading }: SummaryCardsProps) {
         icon={AlertCircle}
         description="Tỷ lệ xử lý sự cố (báo cáo đã được phê duyệt)"
         variant="warning"
+        isLoading={loading}
       />
     </div>
   );

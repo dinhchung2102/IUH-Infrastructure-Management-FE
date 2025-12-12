@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Building2, Users, FileText, AlertCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { StatsCard } from "@/components/StatsCard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle as AlertCircleIcon } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
@@ -38,11 +38,7 @@ import { getMaintenances } from "../maintenance/api/maintenance.api";
 import type { Maintenance } from "../maintenance/types/maintenance.type";
 
 import { getReportStatusBadge, getPriorityBadge } from "@/config/badge.config";
-
-// Format number with Vietnamese locale
-const formatNumber = (num: number): string => {
-  return new Intl.NumberFormat("vi-VN").format(num);
-};
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Format time ago in Vietnamese
 const formatTimeAgo = (dateString: string): string => {
@@ -233,8 +229,7 @@ export default function DashboardPage() {
       title: "Tổng cơ sở vật chất",
       value: data?.stats?.totalAssets ?? 0,
       icon: Building2,
-      color: "text-blue-600",
-      bgColor: "bg-blue-100",
+      variant: "info" as const,
       href: "/admin/asset",
       description: "Tổng số thiết bị trong hệ thống",
     },
@@ -242,8 +237,7 @@ export default function DashboardPage() {
       title: "Người dùng hoạt động",
       value: data?.stats?.activeUsers ?? 0,
       icon: Users,
-      color: "text-green-600",
-      bgColor: "bg-green-100",
+      variant: "success" as const,
       href: "/admin/account",
       description: "Số lượng người dùng đang hoạt động",
     },
@@ -251,8 +245,7 @@ export default function DashboardPage() {
       title: "Báo cáo chờ xử lý",
       value: data?.stats?.pendingReports ?? 0,
       icon: FileText,
-      color: "text-orange-600",
-      bgColor: "bg-orange-100",
+      variant: "warning" as const,
       href: "/admin/reports",
       description: "Báo cáo đang chờ được xử lý",
     },
@@ -260,8 +253,7 @@ export default function DashboardPage() {
       title: "Phản hồi cần xử lý",
       value: data?.stats?.pendingAudits ?? 0,
       icon: AlertCircle,
-      color: "text-red-600",
-      bgColor: "bg-red-100",
+      variant: "danger" as const,
       href: "/admin/audits",
       description: "Phản hồi cần được xử lý",
     },
@@ -290,56 +282,20 @@ export default function DashboardPage() {
 
       {/* Stats Grid */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {isLoading
-          ? Array.from({ length: 4 }).map((_, i) => (
-              <Card key={i}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <Skeleton className="h-4 w-32" />
-                  <Skeleton className="h-8 w-8 rounded-full" />
-                </CardHeader>
-                <CardContent>
-                  <Skeleton className="h-8 w-24 mb-2" />
-                  <Skeleton className="h-3 w-40" />
-                </CardContent>
-              </Card>
-            ))
-          : statsConfig.map((stat) => {
-              // Map bgColor to hover class
-              const hoverClass =
-                {
-                  "bg-blue-100": "hover:bg-blue-50",
-                  "bg-green-100": "hover:bg-green-50",
-                  "bg-orange-100": "hover:bg-orange-50",
-                  "bg-red-100": "hover:bg-red-50",
-                }[stat.bgColor] || "hover:bg-muted";
-
-              return (
-                <Link key={stat.title} to={stat.href} className="block">
-                  <Card
-                    className={`transition-colors ${hoverClass} cursor-pointer`}
-                  >
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                      <CardTitle className="text-sm font-medium">
-                        {stat.title}
-                      </CardTitle>
-                      <div className={`rounded-full p-2 ${stat.bgColor}`}>
-                        <stat.icon className={`size-4 ${stat.color}`} />
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="text-2xl font-bold">
-                        {formatNumber(stat.value)}
-                      </div>
-                      {stat.description && (
-                        <p className="text-xs text-muted-foreground mt-1">
-                          {stat.description}
-                        </p>
-                      )}
-                    </CardContent>
-                  </Card>
-                </Link>
-              );
-            })}
+        {statsConfig.map((stat) => (
+          <Link key={stat.title} to={stat.href} className="block">
+            <div className="transition-transform hover:scale-[1.02]">
+              <StatsCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                description={stat.description}
+                variant={stat.variant}
+                isLoading={isLoading}
+              />
+            </div>
+          </Link>
+        ))}
       </div>
 
       {/* Charts and Tables Grid */}

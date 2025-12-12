@@ -1,6 +1,5 @@
 import { StatsCard } from "@/components/StatsCard";
 import { Users, UserCheck, UserX, UserPlus } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { StaffStatistics } from "../api/staff-stats.api";
 
 interface StaffStatsCardsProps {
@@ -9,23 +8,6 @@ interface StaffStatsCardsProps {
 }
 
 export function StaffStatsCards({ stats, loading }: StaffStatsCardsProps) {
-  if (loading) {
-    return (
-      <div className="grid md:grid-cols-2 lg:grid-cols-4">
-        {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="border rounded-lg p-6 space-y-3 bg-white">
-            <div className="flex items-center justify-between">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-8 w-8 rounded-lg" />
-            </div>
-            <Skeleton className="h-8 w-16" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       <StatsCard
@@ -34,6 +16,7 @@ export function StaffStatsCards({ stats, loading }: StaffStatsCardsProps) {
         icon={Users}
         description="Tổng số nhân sự trong hệ thống"
         variant="default"
+        isLoading={loading}
       />
       <StatsCard
         title="Đang hoạt động"
@@ -41,6 +24,7 @@ export function StaffStatsCards({ stats, loading }: StaffStatsCardsProps) {
         icon={UserCheck}
         description="Nhân sự đang hoạt động"
         variant="success"
+        isLoading={loading}
       />
       <StatsCard
         title="Không hoạt động"
@@ -48,6 +32,7 @@ export function StaffStatsCards({ stats, loading }: StaffStatsCardsProps) {
         icon={UserX}
         description="Nhân sự bị vô hiệu hóa"
         variant="warning"
+        isLoading={loading}
       />
       <StatsCard
         title="Mới tháng này"
@@ -55,6 +40,7 @@ export function StaffStatsCards({ stats, loading }: StaffStatsCardsProps) {
         icon={UserPlus}
         description="Nhân sự mới trong tháng"
         variant="info"
+        isLoading={loading}
       />
     </div>
   );
