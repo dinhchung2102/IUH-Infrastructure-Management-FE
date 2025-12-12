@@ -1,5 +1,6 @@
 import api from "@/lib/axios";
 import type { ApiResponse } from "@/types/response.type";
+import type { PaginationResponse } from "@/types/pagination.type";
 
 // ============================
 // TYPE DEFINITIONS
@@ -37,6 +38,11 @@ export interface QueryAssetDto {
   sortOrder?: "asc" | "desc";
 }
 
+export interface AssetsResponse {
+  assets: AssetResponse[];
+  pagination: PaginationResponse;
+}
+
 // ============================
 // API CALLS
 // ============================
@@ -45,10 +51,9 @@ export interface QueryAssetDto {
  * Lấy danh sách tài sản (có thể filter, phân trang)
  */
 export const getAssets = async (query?: QueryAssetDto) => {
-  const res = await api.get<ApiResponse<{ assets: AssetResponse[] }>>(
-    "/assets",
-    { params: query }
-  );
+  const res = await api.get<ApiResponse<AssetsResponse>>("/assets", {
+    params: query,
+  });
   return res.data;
 };
 
@@ -80,12 +85,16 @@ export const updateAsset = async (
   id: string,
   data: Partial<AssetResponse> | FormData
 ) => {
-  const res = await api.patch<ApiResponse<AssetResponse>>(`/assets/${id}`, data, {
-    headers:
-      data instanceof FormData
-        ? { "Content-Type": "multipart/form-data" }
-        : undefined,
-  });
+  const res = await api.patch<ApiResponse<AssetResponse>>(
+    `/assets/${id}`,
+    data,
+    {
+      headers:
+        data instanceof FormData
+          ? { "Content-Type": "multipart/form-data" }
+          : undefined,
+    }
+  );
   return res.data;
 };
 

@@ -343,10 +343,18 @@ export default function AccountTable({
                   </TableCell>
                   <TableCell>
                     <Avatar className="size-12">
-                      <AvatarImage
-                        src={account.avatar}
-                        alt={account.fullName}
-                      />
+                      {account.avatar && (
+                        <AvatarImage
+                          src={
+                            account.avatar.startsWith("http")
+                              ? account.avatar
+                              : `${import.meta.env.VITE_URL_UPLOADS}${
+                                  account.avatar
+                                }`
+                          }
+                          alt={account.fullName}
+                        />
+                      )}
                       <AvatarFallback>
                         {account.fullName
                           ?.split(" ")

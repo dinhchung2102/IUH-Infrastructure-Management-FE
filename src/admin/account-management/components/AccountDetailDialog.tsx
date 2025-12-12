@@ -48,7 +48,16 @@ export function AccountDetailDialog({
             {/* Avatar and Basic Info */}
             <div className="flex flex-col items-center space-y-4 pb-4 border-b">
               <Avatar className="size-24">
-                <AvatarImage src={account.avatar} alt={account.fullName} />
+                {account.avatar && (
+                  <AvatarImage
+                    src={
+                      account.avatar.startsWith("http")
+                        ? account.avatar
+                        : `${import.meta.env.VITE_URL_UPLOADS}${account.avatar}`
+                    }
+                    alt={account.fullName}
+                  />
+                )}
                 <AvatarFallback className="text-2xl">
                   {account.fullName
                     ?.split(" ")

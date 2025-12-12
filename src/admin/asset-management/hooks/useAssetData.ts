@@ -1,10 +1,15 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import { toast } from "sonner";
 import { deleteAsset, getAssets } from "../api/asset.api";
 import {
   getAssetStatsDashboard,
   type AssetDashboardStats,
 } from "../api/stats.api";
+import type {
+  PaginationRequest,
+  PaginationResponse,
+} from "@/types/pagination.type";
+import { DEFAULT_PAGINATION_RESPONSE } from "@/types/pagination.type";
 
 export interface AssetListItem {
   _id: string;
@@ -31,36 +36,66 @@ export interface AssetListItem {
   };
 }
 
+interface UseAssetDataProps {
+  filters: {
+    search: string;
+    statusFilter: string;
+    typeFilter: string;
+  };
+  paginationRequest: PaginationRequest;
+  onPaginationUpdate: (pagination: PaginationResponse) => void;
+}
+
 /**
  * Hook xử lý data & gọi API cho AssetPage
  */
-export function useAssetData() {
+export function useAssetData({
+  filters,
+  paginationRequest,
+  onPaginationUpdate,
+}: UseAssetDataProps) {
   const [assets, setAssets] = useState<AssetListItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [stats, setStats] = useState<AssetDashboardStats | undefined>(
     undefined
   );
 
+  // Sử dụng useRef để tránh stale closure
+  const onPaginationUpdateRef = useRef(onPaginationUpdate);
+  onPaginationUpdateRef.current = onPaginationUpdate;
+
   const fetchAssets = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await getAssets();
+      
+      const query = {
+        ...paginationRequest,
+        ...(filters.search && { keyword: filters.search }),
+        ...(filters.statusFilter !== "all" && { status: filters.statusFilter }),
+      };
+
+      const res = await getAssets(query);
       if (!res.success) {
         toast.error(res.message || "Không thể tải danh sách thiết bị.");
         setAssets([]);
+        onPaginationUpdateRef.current(DEFAULT_PAGINATION_RESPONSE);
         return;
       }
 
       const list = (res.data?.assets || []) as AssetListItem[];
       setAssets(list);
+      onPaginationUpdateRef.current(
+        res.data?.pagination || DEFAULT_PAGINATION_RESPONSE
+      );
     } catch (err: unknown) {
       console.error("Lỗi khi tải thiết bị:", err);
       toast.error("Không thể tải danh sách thiết bị.");
       setAssets([]);
+      onPaginationUpdateRef.current(DEFAULT_PAGINATION_RESPONSE);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [filters, paginationRequest]);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -117,5 +152,6 @@ export function useAssetData() {
     stats,
     handleDelete,
     refetchAll,
+    refetch: fetchAssets,
   };
 }

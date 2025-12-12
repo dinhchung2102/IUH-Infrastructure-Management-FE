@@ -43,32 +43,38 @@ import {
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
 import { useState } from "react";
-import { useAssetData, useAssetFilters } from "../hooks";
+import { useAssetManagement } from "../hooks";
 import type { AssetListItem } from "../hooks";
+import PaginationComponent from "@/components/PaginationComponent";
 import { AssetStatus } from "@/types/asset-status.enum";
 import { getAssetStatusLabel } from "@/utils/assetStatus.util";
 
 function AssetPage() {
-  const { assets, loading, stats, handleDelete, refetchAll } = useAssetData();
-  const { filters, handleFiltersChange, handleClearFilters } =
-    useAssetFilters();
+  const {
+    assets,
+    loading,
+    stats,
+    filters,
+    pagination,
+    paginationRequest,
+    handleFiltersChange,
+    handleClearFilters,
+    handlePageChange,
+    handleDelete,
+    refetchAll,
+  } = useAssetManagement();
 
   const [openStatsDialog, setOpenStatsDialog] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [editAsset, setEditAsset] = useState<AssetListItem | null>(null);
 
+  // Filter by type client-side (if needed, but ideally should be server-side)
   const filteredAssets = assets.filter((a) => {
-    const search = filters.search.toLowerCase();
-    const matchSearch = a.name?.toLowerCase().includes(search);
-
-    const matchStatus =
-      filters.statusFilter === "all" || a.status === filters.statusFilter;
-
     const matchType =
       filters.typeFilter === "all" ||
       a.assetType?.name?.toLowerCase() === filters.typeFilter.toLowerCase();
 
-    return matchSearch && matchStatus && matchType;
+    return matchType;
   });
 
   const handleAddSuccess = () => {
@@ -258,7 +264,11 @@ function AssetPage() {
             {!loading &&
               filteredAssets.map((a, i) => (
                 <TableRow key={a._id}>
-                  <TableCell className="text-center">{i + 1}</TableCell>
+                  <TableCell className="text-center">
+                    {(paginationRequest.page - 1) * paginationRequest.limit +
+                      i +
+                      1}
+                  </TableCell>
                   <TableCell>
                     {a.image ? (
                       <img
@@ -324,6 +334,13 @@ function AssetPage() {
           </TableBody>
         </Table>
       </div>
+
+      {/* Pagination */}
+      <PaginationComponent
+        pagination={pagination}
+        currentPage={paginationRequest.page}
+        onPageChange={handlePageChange}
+      />
 
       {/* Dialog thống kê */}
       <AssetStatsDialog
