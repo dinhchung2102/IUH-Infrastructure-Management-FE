@@ -1,6 +1,9 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { io, Socket } from "socket.io-client";
-import type { CriticalReportNotification } from "@/types/notification.type";
+import type {
+  CriticalReportNotification,
+  AuditCancellationNotification,
+} from "@/types/notification.type";
 import { useAuth } from "./use-auth";
 
 /**
@@ -12,6 +15,9 @@ export function useSocket() {
   const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState<
     CriticalReportNotification[]
+  >([]);
+  const [auditCancellations, setAuditCancellations] = useState<
+    AuditCancellationNotification[]
   >([]);
   const socketRef = useRef<Socket | null>(null);
 
@@ -27,9 +33,8 @@ export function useSocket() {
     }
 
     // Get WebSocket URL from environment or construct from API URL
-    const apiUrl =
-      import.meta.env.VITE_API_URL || "http://localhost:3000/api";
-    
+    const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+
     // Extract base URL and protocol
     let socketUrl: string;
     if (apiUrl.includes("localhost") || apiUrl.includes("127.0.0.1")) {
@@ -75,14 +80,55 @@ export function useSocket() {
       setIsConnected(false);
     });
 
-    // Listen for critical report notifications
-    newSocket.on("notification", (data: CriticalReportNotification) => {
-      // Only handle critical report notifications
-      if (data.type === "error" && data.data?.priority === "CRITICAL") {
-        console.log("Critical report notification received:", data);
-        setNotifications((prev) => [data, ...prev]);
+    // Listen for notifications
+    newSocket.on(
+      "notification",
+      (
+        data:
+          | CriticalReportNotification
+          | AuditCancellationNotification
+          | unknown
+      ) => {
+        // Handle critical report notifications
+        if (
+          typeof data === "object" &&
+          data !== null &&
+          "type" in data &&
+          data.type === "error" &&
+          "data" in data &&
+          typeof data.data === "object" &&
+          data.data !== null &&
+          "priority" in data.data &&
+          data.data.priority === "CRITICAL"
+        ) {
+          console.log("Critical report notification received:", data);
+          setNotifications((prev) => [
+            data as CriticalReportNotification,
+            ...prev,
+          ]);
+        }
+
+        // Handle audit cancellation notifications
+        if (
+          typeof data === "object" &&
+          data !== null &&
+          "type" in data &&
+          data.type === "warning" &&
+          "data" in data &&
+          typeof data.data === "object" &&
+          data.data !== null &&
+          "auditLogId" in data.data &&
+          "title" in data &&
+          data.title === "Nhiệm vụ kiểm tra đã bị hủy bỏ"
+        ) {
+          console.log("Audit cancellation notification received:", data);
+          setAuditCancellations((prev) => [
+            data as AuditCancellationNotification,
+            ...prev,
+          ]);
+        }
       }
-    });
+    );
 
     socketRef.current = newSocket;
     setSocket(newSocket);
@@ -110,12 +156,20 @@ export function useSocket() {
     );
   }, []);
 
+  // Function to remove a specific audit cancellation notification
+  const removeAuditCancellation = useCallback((auditLogId: string) => {
+    setAuditCancellations((prev) =>
+      prev.filter((n) => n.data.auditLogId !== auditLogId)
+    );
+  }, []);
+
   return {
     socket,
     isConnected,
     notifications,
+    auditCancellations,
     clearNotifications,
     removeNotification,
+    removeAuditCancellation,
   };
 }
-

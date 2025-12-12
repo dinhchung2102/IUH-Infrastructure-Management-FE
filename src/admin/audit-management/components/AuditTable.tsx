@@ -21,6 +21,7 @@ interface AuditTableProps {
   auditLogs: AuditLog[];
   onViewDetails: (audit: AuditLog) => void;
   onUpdateStatus: (auditId: string, status: AuditStatus) => void;
+  onCancel?: (audit: AuditLog) => void;
   currentPage: number;
   itemsPerPage: number;
   loading?: boolean;
@@ -30,6 +31,7 @@ export function AuditTable({
   auditLogs,
   onViewDetails,
   onUpdateStatus,
+  onCancel,
   currentPage,
   itemsPerPage,
   loading = false,
@@ -195,19 +197,22 @@ export function AuditTable({
                           icon: Eye,
                           onClick: () => onViewDetails(audit),
                         },
-                        ...(audit.status === "IN_PROGRESS"
+                        ...(audit.status === "PENDING" || audit.status === "IN_PROGRESS"
                           ? [
+                              ...(audit.status === "IN_PROGRESS"
+                                ? [
+                                    {
+                                      label: "Hoàn thành",
+                                      icon: CheckCircle,
+                                      onClick: () =>
+                                        onUpdateStatus(audit._id, "COMPLETED"),
+                                    } as TableAction,
+                                  ]
+                                : []),
                               {
-                                label: "Hoàn thành",
-                                icon: CheckCircle,
-                                onClick: () =>
-                                  onUpdateStatus(audit._id, "COMPLETED"),
-                              } as TableAction,
-                              {
-                                label: "Hủy",
+                                label: "Hủy bỏ",
                                 icon: XCircle,
-                                onClick: () =>
-                                  onUpdateStatus(audit._id, "CANCELLED"),
+                                onClick: () => onCancel?.(audit),
                                 variant: "destructive" as const,
                               } as TableAction,
                             ]

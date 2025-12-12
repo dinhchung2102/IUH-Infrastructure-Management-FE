@@ -19,6 +19,7 @@ interface AuditDetailDialogProps {
   audit: AuditLog | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onCancel?: (audit: AuditLog) => void;
 }
 
 const getUserInitials = (name: string) => {
@@ -97,6 +98,7 @@ export function AuditDetailDialog({
   audit,
   open,
   onOpenChange,
+  onCancel,
 }: AuditDetailDialogProps) {
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
@@ -119,7 +121,7 @@ export function AuditDetailDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden">
+        <DialogContent className="max-w-[90vw] sm:max-w-3xl max-h-[88vh] flex flex-col overflow-hidden p-0">
           <DialogHeader className="space-y-2 pb-2 flex-shrink-0">
             <div className="flex items-center">
               <DialogTitle className="text-lg flex items-center gap-2">
@@ -425,6 +427,8 @@ export function AuditDetailDialog({
               <div className="pt-8"></div>
             </div>
           </ScrollArea>
+
+          <AuditDetailDialogFooter audit={audit} onCancel={onCancel} />
         </DialogContent>
       </Dialog>
 

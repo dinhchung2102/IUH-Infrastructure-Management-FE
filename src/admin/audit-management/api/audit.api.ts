@@ -199,6 +199,48 @@ export const createAudit = async (data: CreateAuditDto) => {
   return response.data;
 };
 
+// Cancel audit log DTO
+export interface CancelAuditLogDto {
+  cancelReason: string; // 5-500 characters
+}
+
+// Response type for cancel audit
+export interface CancelAuditLogResponse {
+  _id: string;
+  subject: string;
+  status: "CANCELLED";
+  cancelledBy: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  cancelledAt: string;
+  cancelReason: string;
+  staffs: Array<{
+    _id: string;
+    fullName: string;
+    email: string;
+  }>;
+  report?: {
+    _id: string;
+    type: string;
+    description: string;
+  };
+}
+
+// Hủy bỏ audit log
+export const cancelAuditLog = async (
+  auditId: string,
+  data: CancelAuditLogDto
+) => {
+  const response = await api.post<ApiResponse<CancelAuditLogResponse>>(
+    `/audit/${auditId}/cancel`,
+    data
+  );
+  console.log("[API: CANCEL AUDIT LOG]:", response.data);
+  return response.data;
+};
+
 // Utility function: Transform API response sang UI format
 export const transformAuditLogApiToUI = (
   apiAuditLog: AuditLogApiResponse

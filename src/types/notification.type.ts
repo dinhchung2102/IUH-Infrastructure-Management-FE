@@ -25,3 +25,17 @@ export interface CriticalReportNotification {
   timestamp: Date | string;
 }
 
+export interface AuditCancellationNotification {
+  type: "warning";
+  title: string; // "Nhiệm vụ kiểm tra đã bị hủy bỏ"
+  message: string; // Mô tả ngắn gọn
+  data: {
+    auditLogId: string;
+    subject: string; // Tên nhiệm vụ
+    cancelReason: string; // Lý do hủy
+    cancelledBy: string; // Tên người hủy
+    cancelledAt: Date | string; // Thời gian hủy
+    staffName?: string; // Tên staff (nếu staff hủy)
+  };
+  timestamp: Date | string;
+}

@@ -5,6 +5,7 @@ import {
   AuditTable,
   AuditDetailDialog,
   CreateAuditDialog,
+  CancelAuditDialog,
 } from "../components";
 import type {
   AuditLog,
@@ -31,6 +32,8 @@ export default function AuditManagementPage() {
   const [selectedAudit, setSelectedAudit] = useState<AuditLog | null>(null);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [auditToCancel, setAuditToCancel] = useState<AuditLog | null>(null);
   const [loading, setLoading] = useState(false);
 
   // Pagination
@@ -142,9 +145,24 @@ export default function AuditManagementPage() {
       await updateAuditStatus(auditId, status);
       toast.success("Cập nhật trạng thái thành công!");
       fetchAuditLogs();
+      fetchStats();
     } catch (error) {
       console.error("Error updating audit status:", error);
       toast.error("Không thể cập nhật trạng thái");
+    }
+  };
+
+  const handleCancelClick = (audit: AuditLog) => {
+    setAuditToCancel(audit);
+    setCancelDialogOpen(true);
+  };
+
+  const handleCancelSuccess = () => {
+    fetchAuditLogs();
+    fetchStats();
+    // Close detail dialog if it was open
+    if (detailDialogOpen) {
+      setDetailDialogOpen(false);
     }
   };
 
@@ -193,6 +211,7 @@ export default function AuditManagementPage() {
         auditLogs={auditLogs}
         onViewDetails={handleViewDetails}
         onUpdateStatus={handleUpdateStatus}
+        onCancel={handleCancelClick}
         currentPage={currentPage}
         itemsPerPage={pagination.itemsPerPage}
         loading={loading}
@@ -211,9 +230,16 @@ export default function AuditManagementPage() {
         audit={selectedAudit}
         open={detailDialogOpen}
         onOpenChange={setDetailDialogOpen}
+        onCancel={handleCancelClick}
       />
 
-      {/* Create Audit Dialog */}
+      {/* Cancel Dialog */}
+      <CancelAuditDialog
+        audit={auditToCancel}
+        open={cancelDialogOpen}
+        onOpenChange={setCancelDialogOpen}
+        onCancelSuccess={handleCancelSuccess}
+      />{/* Create Audit Dialog */}
       <CreateAuditDialog
         open={createDialogOpen}
         onOpenChange={setCreateDialogOpen}
