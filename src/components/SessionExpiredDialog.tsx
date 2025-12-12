@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -16,8 +17,10 @@ import { toast } from "sonner";
  * Listens to 'token-expired' event from axios interceptor
  */
 export function SessionExpiredDialog() {
+  const navigate = useNavigate();
   const [showAlert, setShowAlert] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showStaffAlert, setShowStaffAlert] = useState(false);
 
   useEffect(() => {
     const handleTokenExpired = () => {
@@ -38,9 +41,39 @@ export function SessionExpiredDialog() {
   };
 
   const handleLoginSuccess = () => {
-    toast.success("Đăng nhập thành công!");
-    // Reload page to refresh data with new token
-    window.location.reload();
+    const storedAccount = localStorage.getItem("account");
+    if (storedAccount) {
+      try {
+        const parsedAccount = JSON.parse(storedAccount);
+        toast.success("Đăng nhập thành công!");
+
+        // Handle different roles
+        const role = parsedAccount.role;
+
+        if (role === "STAFF") {
+          // Show alert dialog for STAFF role
+          setShowStaffAlert(true);
+        } else if (
+          role === "ADMIN" ||
+          role === "GUEST" ||
+          role === "STUDENT" ||
+          role === "LECTURER"
+        ) {
+          // Navigate to admin for these roles
+          setTimeout(() => {
+            navigate("/admin");
+          }, 500);
+        } else {
+          // Reload page for other cases
+          window.location.reload();
+        }
+      } catch (error) {
+        console.error("Failed to parse account data:", error);
+        window.location.reload();
+      }
+    } else {
+      window.location.reload();
+    }
   };
 
   return (
@@ -58,6 +91,27 @@ export function SessionExpiredDialog() {
           <AlertDialogFooter>
             <Button onClick={handleLoginClick} className="w-full">
               Đăng nhập lại
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Staff Role Alert Dialog */}
+      <AlertDialog open={showStaffAlert} onOpenChange={setShowStaffAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Thông báo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tài khoản của bạn là nhân viên. Vui lòng sử dụng ứng dụng dành cho
+              nhân viên của Phòng quản trị để sử dụng các chức năng quản lý.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button
+              onClick={() => setShowStaffAlert(false)}
+              className="cursor-pointer"
+            >
+              Đã hiểu
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

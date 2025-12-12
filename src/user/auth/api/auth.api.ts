@@ -76,3 +76,18 @@ export const resetPassword = async (data: {
   const response = await api.put("/auth/reset-password", data);
   return response.data;
 };
+
+// Check user permissions
+export interface CheckPermissionResponse {
+  message: string;
+  role: string;
+  permissions: string[]; // PermissionString[]
+  total: number;
+}
+
+export const checkPermission = async (): Promise<CheckPermissionResponse> => {
+  const response = await api.get<CheckPermissionResponse>(
+    "/auth/check-permission"
+  );
+  return response.data;
+};

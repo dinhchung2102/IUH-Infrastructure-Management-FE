@@ -1,5 +1,11 @@
 import { useState } from "react";
-import { StaffTable, StaffStatsCards, AddStaffDialog, StaffDetailDialog } from "../components";
+import {
+  StaffTable,
+  StaffStatsCards,
+  AddStaffDialog,
+  EditStaffDialog,
+  StaffDetailDialog,
+} from "../components";
 import PaginationComponent from "@/components/PaginationComponent";
 import { useStaffManagement, useStaffStats } from "../hooks";
 import { Button } from "@/components/ui/button";
@@ -31,13 +37,26 @@ export default function StaffPage() {
     refetch: refetchStats,
   } = useStaffStats();
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [detailDialogOpen, setDetailDialogOpen] = useState(false);
   const [selectedStaff, setSelectedStaff] = useState<StaffResponse | null>(null);
+  const [editingStaff, setEditingStaff] = useState<StaffResponse | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
   const handleAddSuccess = () => {
     refetch(); // Refresh danh sách nhân sự
     refetchStats(); // Refresh thống kê
+  };
+
+  const handleEditSuccess = () => {
+    refetch(); // Refresh danh sách nhân sự
+    refetchStats(); // Refresh thống kê
+    setEditingStaff(null);
+  };
+
+  const handleEdit = (staff: StaffResponse) => {
+    setEditingStaff(staff);
+    setIsEditDialogOpen(true);
   };
 
   const handleViewDetails = async (staffId: string) => {
@@ -99,6 +118,18 @@ export default function StaffPage() {
         onSuccess={handleAddSuccess}
       />
 
+      <EditStaffDialog
+        open={isEditDialogOpen}
+        onOpenChange={(open) => {
+          setIsEditDialogOpen(open);
+          if (!open) {
+            setEditingStaff(null);
+          }
+        }}
+        staff={editingStaff}
+        onSuccess={handleEditSuccess}
+      />
+
       <StaffTable
         staff={staff}
         loading={loading}
@@ -108,6 +139,7 @@ export default function StaffPage() {
         onSortChange={handleSortChange}
         onStaffStatusUpdate={updateStaffStatus}
         onViewDetails={handleViewDetails}
+        onEdit={handleEdit}
       />
 
       <PaginationComponent

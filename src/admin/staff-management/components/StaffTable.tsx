@@ -26,6 +26,7 @@ import {
   Phone,
   MapPin,
   Building2,
+  Edit,
 } from "lucide-react";
 import { TableActionMenu } from "@/components/TableActionMenu";
 import {
@@ -64,6 +65,7 @@ interface StaffTableProps {
   onSortChange: (sortBy: string, sortOrder: "asc" | "desc") => void;
   onStaffStatusUpdate?: (staffId: string, newStatus: boolean) => void;
   onViewDetails?: (staffId: string) => void;
+  onEdit?: (staff: StaffResponse) => void;
 }
 
 export default function StaffTable({
@@ -75,6 +77,7 @@ export default function StaffTable({
   onSortChange,
   onStaffStatusUpdate,
   onViewDetails,
+  onEdit,
 }: StaffTableProps) {
   const [searchInput, setSearchInput] = React.useState(filters.search);
   const [selectedStaffForAssign, setSelectedStaffForAssign] =
@@ -507,6 +510,11 @@ export default function StaffTable({
                           label: "Xem chi tiết",
                           icon: Eye,
                           onClick: () => handleViewDetails(staffMember._id),
+                        },
+                        {
+                          label: "Chỉnh sửa",
+                          icon: Edit,
+                          onClick: () => onEdit?.(staffMember),
                         },
                         {
                           label: "Phân công khu vực",

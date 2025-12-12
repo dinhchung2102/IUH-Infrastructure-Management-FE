@@ -63,6 +63,7 @@ type DialogType =
 export default function AppBar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const [showStaffAlert, setShowStaffAlert] = useState(false);
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [activeDialog, setActiveDialog] = useState<DialogType>(null);
@@ -148,8 +149,19 @@ export default function AppBar() {
         setAccount(parsedAccount);
         toast.success("Đăng nhập thành công!");
 
-        // Only redirect to admin if role is ADMIN
-        if (parsedAccount.role === "ADMIN") {
+        // Handle different roles
+        const role = parsedAccount.role;
+
+        if (role === "STAFF") {
+          // Show alert dialog for STAFF role
+          setShowStaffAlert(true);
+        } else if (
+          role === "ADMIN" ||
+          role === "GUEST" ||
+          role === "STUDENT" ||
+          role === "LECTURER"
+        ) {
+          // Navigate to admin for these roles
           setTimeout(() => {
             navigate("/admin");
           }, 500);
@@ -614,6 +626,27 @@ export default function AppBar() {
               className="bg-destructive text-white hover:bg-destructive/90 cursor-pointer"
             >
               Đăng xuất
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Staff Role Alert Dialog */}
+      <AlertDialog open={showStaffAlert} onOpenChange={setShowStaffAlert}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Thông báo</AlertDialogTitle>
+            <AlertDialogDescription>
+              Tài khoản của bạn là nhân viên. Vui lòng sử dụng ứng dụng dành cho
+              nhân viên của Phòng quản trị để sử dụng các chức năng quản lý.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              className="cursor-pointer"
+              onClick={() => setShowStaffAlert(false)}
+            >
+              Đã hiểu
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

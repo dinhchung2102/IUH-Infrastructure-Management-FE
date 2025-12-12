@@ -56,3 +56,14 @@ export type CreateStaffDto = {
   gender?: "MALE" | "FEMALE";
   avatar?: string;
 };
+
+// DTO for updating staff
+export type UpdateStaffDto = {
+  fullName?: string;
+  role?: RoleName;
+  phoneNumber?: string;
+  address?: string;
+  gender?: "MALE" | "FEMALE";
+  avatar?: string;
+  dateOfBirth?: string;
+};

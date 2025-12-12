@@ -1,6 +1,10 @@
 import api from "@/lib/axios";
 import type { ApiResponse } from "@/types/response.type";
-import type { StaffResponse, CreateStaffDto } from "../types/staff.type";
+import type {
+  StaffResponse,
+  CreateStaffDto,
+  UpdateStaffDto,
+} from "../types/staff.type";
 
 // Create staff
 export const createStaff = async (
@@ -37,6 +41,20 @@ export const unlockStaff = async (
   id: string
 ): Promise<ApiResponse<StaffResponse>> => {
   const response = await api.patch(`/auth/accounts/${id}/unlock`);
+  return response.data;
+};
+
+// Update staff account
+export const updateStaff = async (
+  id: string,
+  data: UpdateStaffDto | FormData
+): Promise<ApiResponse<StaffResponse>> => {
+  const response = await api.patch(`/auth/accounts/${id}`, data, {
+    headers:
+      data instanceof FormData
+        ? { "Content-Type": "multipart/form-data" }
+        : undefined,
+  });
   return response.data;
 };
 
