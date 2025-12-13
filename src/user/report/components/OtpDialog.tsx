@@ -12,7 +12,6 @@ import {
   InputOTPGroup,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { FileText } from "lucide-react";
 import { sendReportOTP } from "../api/report.api";
 import { toast } from "sonner";
 
@@ -49,13 +48,10 @@ export function OtpDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border border-gray-200 shadow-xl rounded-xl mx-4 sm:mx-auto">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border border-gray-200 shadow-xl rounded-xl sm:mx-auto">
         <DialogHeader className="space-y-3 sm:space-y-4 text-center px-2 sm:px-6">
-          <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center">
-            <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
-          </div>
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800 px-2">
-            Xác thực Email
+            Xác thực báo cáo sự cố
           </DialogTitle>
           <DialogDescription className="text-sm sm:text-base text-gray-600 leading-relaxed px-2">
             Mã OTP đã được gửi đến email
@@ -104,13 +100,11 @@ export function OtpDialog({
 
           {/* Resend OTP */}
           <div className="text-center px-2">
-            <span className="text-gray-600 text-xs sm:text-sm">
-              Không nhận được OTP?{" "}
-            </span>
+            <span className="text-gray-600 text-sm">Không nhận được OTP? </span>
             <Button
               type="button"
               variant="link"
-              className="px-1 sm:px-2 h-auto text-xs sm:text-sm font-semibold text-gray-600 hover:text-gray-700 inline-block"
+              className="px-1 sm:px-2 h-auto text-sm font-semibold text-gray-600 hover:text-gray-700 inline-block"
               onClick={handleResendOtp}
               disabled={isVerifyingOtp}
             >
