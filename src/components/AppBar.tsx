@@ -156,12 +156,13 @@ export default function AppBar() {
           // Show alert dialog for STAFF role
           setShowStaffAlert(true);
         } else if (
-          role === "ADMIN" ||
-          role === "GUEST" ||
           role === "STUDENT" ||
+          role === "GUEST" ||
           role === "LECTURER"
         ) {
-          // Navigate to admin for these roles
+          // Stay on current page (home) for STUDENT, GUEST, LECTURER
+        } else {
+          // Navigate to admin for other roles (mainly ADMIN)
           setTimeout(() => {
             navigate("/admin");
           }, 500);
@@ -189,12 +190,20 @@ export default function AppBar() {
         toast.success("Đăng ký tài khoản thành công!");
 
         // Redirect based on role
-        if (parsedAccount.role === "ADMIN") {
+        const role = parsedAccount.role;
+        if (
+          role === "STUDENT" ||
+          role === "GUEST" ||
+          role === "LECTURER" ||
+          role === "STAFF"
+        ) {
+          // Stay on current page for STUDENT, GUEST, LECTURER, STAFF
+        } else {
+          // Navigate to admin for other roles (mainly ADMIN)
           setTimeout(() => {
             navigate("/admin");
           }, 500);
         }
-        // Other roles (STUDENT, STAFF, GUEST, TEACHER) stay on current page
       } catch (error) {
         console.error("Failed to parse account data:", error);
         toast.error("Đăng ký thành công nhưng có lỗi khi đăng nhập.");

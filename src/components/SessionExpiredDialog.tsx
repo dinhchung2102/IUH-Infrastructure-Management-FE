@@ -54,18 +54,17 @@ export function SessionExpiredDialog() {
           // Show alert dialog for STAFF role
           setShowStaffAlert(true);
         } else if (
-          role === "ADMIN" ||
-          role === "GUEST" ||
           role === "STUDENT" ||
+          role === "GUEST" ||
           role === "LECTURER"
         ) {
-          // Navigate to admin for these roles
+          // Stay on current page (reload) for STUDENT, GUEST, LECTURER
+          window.location.reload();
+        } else {
+          // Navigate to admin for other roles (mainly ADMIN)
           setTimeout(() => {
             navigate("/admin");
           }, 500);
-        } else {
-          // Reload page for other cases
-          window.location.reload();
         }
       } catch (error) {
         console.error("Failed to parse account data:", error);
