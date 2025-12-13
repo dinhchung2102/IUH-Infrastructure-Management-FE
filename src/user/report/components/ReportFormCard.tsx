@@ -220,65 +220,60 @@ export function ReportFormCard({
               >
                 Hình ảnh/Video *
               </Label>
-              <label
-                htmlFor="attachments"
-                className="flex items-center justify-center gap-2 sm:gap-3 h-12 sm:h-14 px-4 sm:px-6 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 hover:bg-white transition-all duration-200 bg-white active:scale-[0.98]"
-              >
-                <Upload className="h-5 w-5 sm:h-6 sm:w-6 text-gray-500" />
-                <span className="text-xs sm:text-sm text-gray-600 font-medium">
-                  {previewFiles.length > 0
-                    ? `${previewFiles.length} file đã chọn`
-                    : "Chọn hình ảnh/video"}
-                </span>
-              </label>
-              <Input
-                id="attachments"
-                type="file"
-                multiple
-                accept="image/*,video/*"
-                className="hidden"
-                onChange={handleFileChange}
-                required
-              />
-              <p className="text-xs text-gray-500 font-medium">
-                Bắt buộc tải lên ít nhất 1 hình ảnh/video (Tối đa 10MB/file)
-              </p>
+              <div className="flex items-start gap-2 sm:gap-3 flex-wrap">
+                {/* Upload Button */}
+                <label
+                  htmlFor="attachments"
+                  className="flex flex-col items-center justify-center gap-2 w-24 h-24 sm:w-28 sm:h-28 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 bg-white active:scale-[0.98] flex-shrink-0"
+                >
+                  <Upload className="h-6 w-6 sm:h-7 sm:w-7 text-gray-500" />
+                  <span className="text-xs text-gray-600 font-medium text-center px-1">
+                    {previewFiles.length > 0
+                      ? `${previewFiles.length} file`
+                      : "Chọn"}
+                  </span>
+                </label>
+                <Input
+                  id="attachments"
+                  type="file"
+                  multiple
+                  accept="image/*,video/*"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  required
+                />
 
-              {/* File Preview */}
-              {previewFiles.length > 0 && (
-                <div className="mt-3 sm:mt-4 space-y-2 sm:space-y-3">
-                  <Label className="text-xs sm:text-sm font-medium text-gray-700">
-                    {previewFiles.length}{" "}
-                    {previewFiles.length === 1 ? "file" : "files"} đã chọn
-                  </Label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+                {/* File Preview - Inline với upload button */}
+                {previewFiles.length > 0 && (
+                  <div className="flex gap-2 sm:gap-3 flex-wrap">
                     {previewFiles.map((preview, index) => (
                       <div
                         key={index}
-                        className="rounded-lg border border-gray-200 p-3 bg-white shadow-sm hover:shadow-md transition-shadow"
+                        className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col items-center justify-center relative"
                       >
                         {preview.type.startsWith("image/") ? (
                           <img
                             src={preview.url}
                             alt={`Preview ${index + 1}`}
-                            className="w-full h-20 sm:h-28 rounded-lg object-cover shadow-sm"
+                            className="w-full h-full object-cover rounded-lg"
                           />
                         ) : preview.type.startsWith("video/") ? (
                           <video
                             src={preview.url}
-                            className="w-full h-20 sm:h-28 rounded-lg object-cover shadow-sm"
+                            className="w-full h-full object-cover rounded-lg"
+                            controls
                           >
                             Your browser does not support video.
                           </video>
                         ) : null}
-                        <p className="mt-1 sm:mt-2 text-xs text-center text-gray-600 font-medium truncate">
-                          {preview.name}
-                        </p>
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
+              <p className="text-xs text-gray-500 font-medium">
+                Bắt buộc tải lên ít nhất 1 hình ảnh/video (Tối đa 10MB/file)
+              </p>
             </div>
           </div>
 

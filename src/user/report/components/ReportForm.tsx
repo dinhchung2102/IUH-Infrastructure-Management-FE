@@ -1000,58 +1000,60 @@ export function ReportForm() {
               {/* File Upload */}
               <div className="space-y-2">
                 <Label htmlFor="attachments">Hình ảnh/Video báo cáo *</Label>
-                <div className="flex items-center gap-4">
+                <div className="flex items-start gap-2 sm:gap-3 flex-wrap">
+                  {/* Upload Button */}
+                  <label
+                    htmlFor="attachments"
+                    className="flex flex-col items-center justify-center gap-2 w-24 h-24 sm:w-28 sm:h-28 border-2 border-dashed border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 hover:bg-gray-50 transition-all duration-200 bg-white active:scale-[0.98] flex-shrink-0"
+                  >
+                    <Upload className="h-6 w-6 sm:h-7 sm:w-7 text-gray-500" />
+                    <span className="text-xs text-gray-600 font-medium text-center px-1">
+                      {previewImages.length > 0
+                        ? `${previewImages.length} file`
+                        : "Chọn"}
+                    </span>
+                  </label>
                   <Input
                     id="attachments"
                     type="file"
                     multiple
                     accept="image/*,video/*"
-                    className="cursor-pointer"
+                    className="hidden"
                     onChange={handleImageChange}
                     required
                   />
-                  <Upload className="h-5 w-5 text-muted-foreground" />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Hỗ trợ: JPG, PNG, MP4, MOV (Tối đa 10MB mỗi file)
-                </p>
 
-                {/* Media Preview */}
-                {previewImages.length > 0 && (
-                  <div className="mt-4 space-y-2">
-                    <Label>
-                      Preview ({previewImages.length}{" "}
-                      {previewImages.length === 1 ? "file" : "files"})
-                    </Label>
-                    <div className="grid grid-cols-2 gap-2">
+                  {/* Media Preview - Inline với upload button */}
+                  {previewImages.length > 0 && (
+                    <div className="flex gap-2 sm:gap-3 flex-wrap">
                       {previewImages.map((preview, index) => (
                         <div
                           key={index}
-                          className="rounded-lg border p-2 bg-muted/30"
+                          className="w-24 h-24 sm:w-28 sm:h-28 rounded-lg border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow overflow-hidden flex flex-col items-center justify-center relative"
                         >
                           {preview.type.startsWith("image/") ? (
                             <img
                               src={preview.url}
                               alt={`Preview ${index + 1}`}
-                              className="w-full h-auto rounded object-contain"
+                              className="w-full h-full object-cover rounded-lg"
                             />
                           ) : preview.type.startsWith("video/") ? (
                             <video
                               src={preview.url}
+                              className="w-full h-full object-cover rounded-lg"
                               controls
-                              className="w-full h-auto rounded"
                             >
                               Your browser does not support video.
                             </video>
                           ) : null}
-                          <p className="mt-1 text-xs text-center text-muted-foreground truncate">
-                            {preview.name}
-                          </p>
                         </div>
                       ))}
                     </div>
-                  </div>
-                )}
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Hỗ trợ: JPG, PNG, MP4, MOV (Tối đa 10MB mỗi file)
+                </p>
               </div>
             </div>
 
