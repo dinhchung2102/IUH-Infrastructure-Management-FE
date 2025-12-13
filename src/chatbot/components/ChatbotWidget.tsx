@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Minus, Bot, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+// TabsList, TabsTrigger - commented out for now, will be used when tabs are re-enabled
+// import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import type { ChatMessage, ChatTab } from "../types/chatbot.type";
@@ -25,7 +27,7 @@ export function ChatbotWidget({ open, onOpenChange }: ChatbotWidgetProps) {
   const [activeTab, setActiveTab] = useState<ChatTab>("general");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId] = useState(() => `conv-${Date.now()}`);
+  // Note: conversationId is no longer needed - backend manages it automatically
   const [isMinimized, setIsMinimized] = useState(false);
 
   // Reset messages when tab changes
@@ -77,7 +79,7 @@ export function ChatbotWidget({ open, onOpenChange }: ChatbotWidgetProps) {
         case "general":
           response = await sendChatMessage({
             query: content,
-            conversationId,
+            // conversationId removed - auto-managed by backend
             sourceTypes: ["report", "faq", "sop", "facilities"],
           });
           break;
@@ -191,7 +193,8 @@ export function ChatbotWidget({ open, onOpenChange }: ChatbotWidgetProps) {
             onValueChange={(value) => setActiveTab(value as ChatTab)}
             className="flex-1 flex flex-col overflow-hidden"
           >
-            <TabsList className="mx-3 mt-2 grid grid-cols-5 h-auto p-1">
+            {/* TabsList hidden - only general tab available for now */}
+            {/* <TabsList className="mx-3 mt-2 grid grid-cols-5 h-auto p-1">
               <TabsTrigger value="general" className="text-xs py-1.5">
                 Tổng quát
               </TabsTrigger>
@@ -207,7 +210,7 @@ export function ChatbotWidget({ open, onOpenChange }: ChatbotWidgetProps) {
               <TabsTrigger value="similar-reports" className="text-xs py-1.5">
                 Tương tự
               </TabsTrigger>
-            </TabsList>
+            </TabsList> */}
 
             <TabsContent
               value={activeTab}

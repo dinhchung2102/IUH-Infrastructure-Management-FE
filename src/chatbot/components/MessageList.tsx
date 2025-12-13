@@ -6,6 +6,7 @@ import { Loader2, Bot, User, ExternalLink } from "lucide-react";
 import type { ChatMessage } from "../types/chatbot.type";
 import { format } from "date-fns";
 import { vi } from "date-fns/locale";
+import ReactMarkdown from "react-markdown";
 
 interface MessageListProps {
   messages: ChatMessage[];
@@ -75,6 +76,71 @@ export function MessageList({ messages }: MessageListProps) {
                   <div className="flex items-center gap-2">
                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
                     <span className="text-xs">Đang suy nghĩ...</span>
+                  </div>
+                ) : message.role === "assistant" ? (
+                  <div className="text-xs leading-relaxed">
+                    <ReactMarkdown
+                      components={{
+                        p: ({ children }) => (
+                          <p className="mb-2 last:mb-0 text-gray-900">
+                            {children}
+                          </p>
+                        ),
+                        strong: ({ children }) => (
+                          <strong className="font-semibold text-gray-900">
+                            {children}
+                          </strong>
+                        ),
+                        em: ({ children }) => (
+                          <em className="italic text-gray-700">{children}</em>
+                        ),
+                        ul: ({ children }) => (
+                          <ul className="list-disc list-inside mb-2 space-y-1 text-gray-900">
+                            {children}
+                          </ul>
+                        ),
+                        ol: ({ children }) => (
+                          <ol className="list-decimal list-inside mb-2 space-y-1 text-gray-900">
+                            {children}
+                          </ol>
+                        ),
+                        li: ({ children }) => (
+                          <li className="ml-2 text-gray-900">{children}</li>
+                        ),
+                        h1: ({ children }) => (
+                          <h1 className="text-sm font-bold mb-2 text-gray-900">
+                            {children}
+                          </h1>
+                        ),
+                        h2: ({ children }) => (
+                          <h2 className="text-xs font-bold mb-2 text-gray-900">
+                            {children}
+                          </h2>
+                        ),
+                        h3: ({ children }) => (
+                          <h3 className="text-xs font-semibold mb-1 text-gray-900">
+                            {children}
+                          </h3>
+                        ),
+                        code: ({ children }) => (
+                          <code className="bg-gray-200 text-gray-800 px-1 py-0.5 rounded text-[10px] font-mono">
+                            {children}
+                          </code>
+                        ),
+                        pre: ({ children }) => (
+                          <pre className="bg-gray-200 text-gray-800 p-2 rounded text-[10px] font-mono overflow-x-auto mb-2">
+                            {children}
+                          </pre>
+                        ),
+                        blockquote: ({ children }) => (
+                          <blockquote className="border-l-2 border-gray-400 pl-2 italic mb-2 text-gray-700">
+                            {children}
+                          </blockquote>
+                        ),
+                      }}
+                    >
+                      {message.content}
+                    </ReactMarkdown>
                   </div>
                 ) : (
                   <p className="text-xs leading-relaxed whitespace-pre-wrap">

@@ -28,9 +28,9 @@ export interface ChatSource {
 }
 
 export interface ChatRequest {
-  query: string;
-  conversationId?: string;
-  sourceTypes?: ("report" | "faq" | "sop" | "facilities")[];
+  query: string; // Required, 3-500 characters
+  sourceTypes?: string[]; // Optional: Filter by type ["faq", "general", "report", ...]
+  // Note: conversationId is not needed - automatically managed by backend based on user ID
 }
 
 // API wrapper response (outer layer)
@@ -42,13 +42,14 @@ export interface ApiWrapperResponse<T> {
   path: string;
 }
 
-// Chat response (inner data)
+// Chat response (inner data) - matches API spec
 export interface ChatResponseData {
   success: boolean;
   data: {
-    answer: string;
-    sources: ChatSource[];
-    conversationId?: string;
+    answer: string; // AI response
+    sourcesCount: number; // Number of sources used
+    // Note: sources array may still be available but not in API spec
+    sources?: ChatSource[]; // Optional - may be included by backend
   };
   meta?: {
     usage: {
@@ -63,8 +64,8 @@ export interface ChatResponse {
   success: boolean;
   data: {
     answer: string;
-    sources: ChatSource[];
-    conversationId?: string;
+    sourcesCount: number;
+    sources?: ChatSource[]; // Optional - for backward compatibility
   };
   meta?: {
     usage: {

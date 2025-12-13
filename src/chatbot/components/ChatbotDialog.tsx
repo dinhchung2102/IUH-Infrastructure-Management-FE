@@ -5,7 +5,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
+// TabsList, TabsTrigger - commented out for now, will be used when tabs are re-enabled
+// import { TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MessageList } from "./MessageList";
 import { ChatInput } from "./ChatInput";
 import type { ChatMessage, ChatTab } from "../types/chatbot.type";
@@ -29,7 +31,7 @@ export function ChatbotDialog({ open, onOpenChange }: ChatbotDialogProps) {
   const [activeTab, setActiveTab] = useState<ChatTab>("general");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [conversationId] = useState(() => `conv-${Date.now()}`);
+  // Note: conversationId is no longer needed - backend manages it automatically
 
   // Reset messages when tab changes
   useEffect(() => {
@@ -79,7 +81,7 @@ export function ChatbotDialog({ open, onOpenChange }: ChatbotDialogProps) {
         case "general":
           response = await sendChatMessage({
             query: content,
-            conversationId,
+            // conversationId removed - auto-managed by backend
             sourceTypes: ["report", "faq", "sop", "facilities"],
           });
           break;
@@ -152,13 +154,14 @@ export function ChatbotDialog({ open, onOpenChange }: ChatbotDialogProps) {
           onValueChange={(value) => setActiveTab(value as ChatTab)}
           className="flex-1 flex flex-col"
         >
-          <TabsList className="mx-6 mt-2">
+          {/* TabsList hidden - only general tab available for now */}
+          {/* <TabsList className="mx-6 mt-2">
             <TabsTrigger value="general">Tổng quát</TabsTrigger>
             <TabsTrigger value="faq">FAQ</TabsTrigger>
             <TabsTrigger value="facilities">Cơ sở vật chất</TabsTrigger>
             <TabsTrigger value="sop">Quy trình</TabsTrigger>
             <TabsTrigger value="similar-reports">Báo cáo tương tự</TabsTrigger>
-          </TabsList>
+          </TabsList> */}
 
           <TabsContent value={activeTab} className="flex-1 flex flex-col m-0">
             <MessageList messages={messages} />

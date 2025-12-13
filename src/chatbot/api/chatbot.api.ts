@@ -15,10 +15,14 @@ import type {
 /**
  * General Chat with RAG
  * Search across all knowledge base
+ *
+ * Note: conversationId is automatically managed by backend based on user ID from JWT token
+ * History is kept for 24 hours, max 10 recent messages
  */
 export const sendChatMessage = async (
   request: ChatRequest
 ): Promise<ChatResponse> => {
+  // conversationId is not needed - backend manages it automatically
   const response = await api.post<ApiWrapperResponse<ChatResponseData>>(
     "/ai/chat",
     request
@@ -29,7 +33,11 @@ export const sendChatMessage = async (
   const chatData = response.data.data;
   return {
     success: chatData.success,
-    data: chatData.data,
+    data: {
+      answer: chatData.data.answer,
+      sourcesCount: chatData.data.sourcesCount,
+      sources: chatData.data.sources, // Optional - for backward compatibility
+    },
     meta: chatData.meta,
   };
 };
