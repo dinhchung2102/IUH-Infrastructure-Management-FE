@@ -68,10 +68,10 @@ export function useAssetData({
   const fetchAssets = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       const query = {
         ...paginationRequest,
-        ...(filters.search && { keyword: filters.search }),
+        ...(filters.search && { search: filters.search }),
         ...(filters.statusFilter !== "all" && { status: filters.statusFilter }),
       };
 
@@ -103,7 +103,7 @@ export function useAssetData({
       setStatsLoading(true);
       const res = await getAssetStatsDashboard();
       console.log("[Asset Stats] API Response:", res);
-      
+
       if (!res.success || !res.data) {
         if (!res.success) {
           toast.error(res.message || "Không thể tải thống kê thiết bị.");

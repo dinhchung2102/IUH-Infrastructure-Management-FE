@@ -42,7 +42,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAssetManagement } from "../hooks";
 import type { AssetListItem } from "../hooks";
 import PaginationComponent from "@/components/PaginationComponent";
@@ -68,6 +68,7 @@ function AssetPage() {
   const [openStatsDialog, setOpenStatsDialog] = useState(false);
   const [openAddDialog, setOpenAddDialog] = useState(false);
   const [editAsset, setEditAsset] = useState<AssetListItem | null>(null);
+  const [searchInputValue, setSearchInputValue] = useState(filters.search);
 
   // Filter by type client-side (if needed, but ideally should be server-side)
   const filteredAssets = assets.filter((a) => {
@@ -77,6 +78,11 @@ function AssetPage() {
 
     return matchType;
   });
+
+  // Sync searchInputValue with filters.search when filters change externally (e.g., clear filters)
+  useEffect(() => {
+    setSearchInputValue(filters.search);
+  }, [filters.search]);
 
   const handleAddSuccess = () => {
     refetchAll();
@@ -127,11 +133,23 @@ function AssetPage() {
       <div className="flex flex-wrap gap-4 items-end">
         <div className="flex-1 min-w-[250px] space-y-2">
           <Label>Tìm kiếm</Label>
-          <form onSubmit={(e) => e.preventDefault()} className="flex gap-2">
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              handleFiltersChange({ search: searchInputValue });
+            }}
+            className="flex gap-2"
+          >
             <Input
               placeholder="Tìm kiếm theo tên thiết bị..."
-              value={filters.search}
-              onChange={(e) => handleFiltersChange({ search: e.target.value })}
+              value={searchInputValue}
+              onChange={(e) => setSearchInputValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleFiltersChange({ search: searchInputValue });
+                }
+              }}
               className="bg-white"
             />
             <Button type="submit" className="cursor-pointer">
