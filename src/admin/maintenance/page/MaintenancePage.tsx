@@ -36,6 +36,8 @@ import {
 } from "@/components/ui/table";
 import { MaintenanceCalendarDialog } from "../components/MaintenanceCalendarDialog";
 import { MaintenanceAddDialog } from "../components/MaintenanceAddDialog";
+import { MaintenanceEditDialog } from "../components/MaintenanceEditDialog";
+import { MaintenanceDetailDialog } from "../components/MaintenanceDetailDialog";
 import { useMaintenanceManagement } from "../hooks";
 import {
   getMaintenanceStatusBadge,
@@ -58,6 +60,9 @@ import type { Maintenance } from "../types/maintenance.type";
 export default function MaintenancePage() {
   const [openAdd, setOpenAdd] = useState(false);
   const [openCalendar, setOpenCalendar] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
+  const [openDetail, setOpenDetail] = useState(false);
+  const [selectedMaintenanceId, setSelectedMaintenanceId] = useState<string | null>(null);
   const [searchInput, setSearchInput] = useState("");
   const [assets, setAssets] = useState<AssetResponse[]>([]);
   const [staffList, setStaffList] = useState<StaffResponse[]>([]);
@@ -135,15 +140,19 @@ export default function MaintenancePage() {
   };
 
   const handleEdit = (maintenance: Maintenance) => {
-    // TODO: Implement edit dialog
-    console.log("Edit maintenance:", maintenance);
-    toast.info("Tính năng chỉnh sửa đang được phát triển");
+    setSelectedMaintenanceId(maintenance._id);
+    setOpenEdit(true);
   };
 
   const handleViewDetail = (maintenance: Maintenance) => {
-    // TODO: Implement detail dialog
-    console.log("View detail maintenance:", maintenance);
-    toast.info("Tính năng xem chi tiết đang được phát triển");
+    setSelectedMaintenanceId(maintenance._id);
+    setOpenDetail(true);
+  };
+
+  const handleEditFromDetail = (maintenance: Maintenance) => {
+    setOpenDetail(false);
+    setSelectedMaintenanceId(maintenance._id);
+    setOpenEdit(true);
   };
 
   // Transform maintenances to calendar events
@@ -519,6 +528,36 @@ export default function MaintenancePage() {
         open={openCalendar}
         onOpenChange={setOpenCalendar}
         events={calendarEvents}
+      />
+
+      {/* Dialog chỉnh sửa */}
+      <MaintenanceEditDialog
+        open={openEdit}
+        onOpenChange={(open) => {
+          setOpenEdit(open);
+          if (!open) {
+            setSelectedMaintenanceId(null);
+          }
+        }}
+        maintenanceId={selectedMaintenanceId}
+        onSuccess={() => {
+          refetch();
+          setOpenEdit(false);
+          setSelectedMaintenanceId(null);
+        }}
+      />
+
+      {/* Dialog xem chi tiết */}
+      <MaintenanceDetailDialog
+        open={openDetail}
+        onOpenChange={(open) => {
+          setOpenDetail(open);
+          if (!open) {
+            setSelectedMaintenanceId(null);
+          }
+        }}
+        maintenanceId={selectedMaintenanceId}
+        onEdit={handleEditFromDetail}
       />
     </div>
   );

@@ -24,10 +24,9 @@ import { toast } from "sonner";
 import { Loader2, Upload, X } from "lucide-react";
 import { createMaintenance } from "../api/maintenance.api";
 import type { CreateMaintenanceDto } from "../types/maintenance.type";
-import { getAssets } from "@/admin/asset-management/api/asset.api";
 import { getStaff } from "@/admin/staff-management/api/staff.api";
-import type { AssetResponse } from "@/admin/asset-management/api/asset.api";
 import type { StaffResponse } from "@/admin/staff-management/types/staff.type";
+import { AssetCombobox } from "./AssetCombobox";
 
 interface MaintenanceAddDialogProps {
   open: boolean;
@@ -52,13 +51,11 @@ export function MaintenanceAddDialog({
     images: [],
   });
 
-  const [assets, setAssets] = useState<AssetResponse[]>([]);
   const [staffList, setStaffList] = useState<StaffResponse[]>([]);
   const [selectedStaffIds, setSelectedStaffIds] = useState<string[]>([]);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
-  const [loadingAssets, setLoadingAssets] = useState(false);
   const [loadingStaff, setLoadingStaff] = useState(false);
 
   // Reset form when dialog opens/closes
@@ -78,7 +75,6 @@ export function MaintenanceAddDialog({
       setSelectedStaffIds([]);
       setImageFiles([]);
       setImagePreviews([]);
-      fetchAssets();
       fetchStaff();
     } else {
       // Cleanup preview URLs
@@ -92,21 +88,6 @@ export function MaintenanceAddDialog({
       imagePreviews.forEach((url) => URL.revokeObjectURL(url));
     };
   }, [imagePreviews]);
-
-  const fetchAssets = async () => {
-    try {
-      setLoadingAssets(true);
-      const response = await getAssets({ limit: 1000 });
-      if (response.success && response.data) {
-        setAssets(response.data.assets || []);
-      }
-    } catch (error) {
-      console.error("Error fetching assets:", error);
-      toast.error("Không thể tải danh sách thiết bị");
-    } finally {
-      setLoadingAssets(false);
-    }
-  };
 
   const fetchStaff = async () => {
     try {
@@ -245,22 +226,11 @@ export function MaintenanceAddDialog({
             <Label>
               Thiết bị <span className="text-red-500">*</span>
             </Label>
-            <Select
+            <AssetCombobox
               value={form.asset}
               onValueChange={(value) => setForm({ ...form, asset: value })}
-              disabled={loadingAssets}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn thiết bị" />
-              </SelectTrigger>
-              <SelectContent>
-                {assets.map((asset) => (
-                  <SelectItem key={asset._id} value={asset._id}>
-                    {asset.name} ({asset.code})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder="Chọn thiết bị"
+            />
           </div>
 
           {/* Title */}
