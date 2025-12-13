@@ -49,7 +49,7 @@ export function OtpDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border border-gray-200 shadow-xl rounded-xl mx-auto translate-x-1/2 left-1/2">
+      <DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-md bg-white border border-gray-200 shadow-xl rounded-xl mx-4 sm:mx-auto">
         <DialogHeader className="space-y-3 sm:space-y-4 text-center px-2 sm:px-6">
           <div className="mx-auto w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full flex items-center justify-center">
             <FileText className="h-6 w-6 sm:h-8 sm:w-8 text-gray-600" />
