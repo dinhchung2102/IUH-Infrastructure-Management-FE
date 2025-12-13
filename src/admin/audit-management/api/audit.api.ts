@@ -61,6 +61,28 @@ export interface AuditLogApiResponse {
   updatedAt: string;
   expiresAt?: string;
   __v?: number;
+  // Cancellation info (only present when status is CANCELLED)
+  cancelReason?: string;
+  cancelledAt?: string;
+  cancelledBy?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  // Completion info (only present when status is COMPLETED)
+  completedAt?: string;
+  completedBy?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  // Acceptance info (only present when status is IN_PROGRESS or COMPLETED)
+  acceptedAt?: string;
+  acceptedBy?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
 }
 
 export interface GetAuditLogsResponse {
@@ -303,6 +325,8 @@ export const transformAuditLogApiToUI = (
     };
   }
 
+  // cancelledBy, completedBy, acceptedBy are now always objects (not string IDs)
+
   return {
     _id: apiAuditLog._id,
     report: apiAuditLog.report
@@ -326,5 +350,15 @@ export const transformAuditLogApiToUI = (
     updatedAt: apiAuditLog.updatedAt,
     expiresAt: apiAuditLog.expiresAt,
     location: buildLocation(),
+    // Cancellation info
+    cancelReason: apiAuditLog.cancelReason,
+    cancelledAt: apiAuditLog.cancelledAt,
+    cancelledBy: apiAuditLog.cancelledBy,
+    // Completion info
+    completedAt: apiAuditLog.completedAt,
+    completedBy: apiAuditLog.completedBy,
+    // Acceptance info
+    acceptedAt: apiAuditLog.acceptedAt,
+    acceptedBy: apiAuditLog.acceptedBy,
   };
 };

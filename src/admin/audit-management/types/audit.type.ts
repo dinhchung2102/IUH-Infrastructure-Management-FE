@@ -65,6 +65,28 @@ export interface AuditLog {
     building?: string;
     zone?: string;
   };
+  // Cancellation info (only present when status is CANCELLED)
+  cancelReason?: string;
+  cancelledAt?: string;
+  cancelledBy?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  // Completion info (only present when status is COMPLETED)
+  completedAt?: string;
+  completedBy?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
+  // Acceptance info (only present when status is IN_PROGRESS or COMPLETED)
+  acceptedAt?: string;
+  acceptedBy?: {
+    _id: string;
+    fullName: string;
+    email: string;
+  };
 }
 
 export interface AuditFilters {

@@ -104,21 +104,23 @@ export function AuditDetailDialog({
 }: AuditDetailDialogProps) {
   const [imageViewerOpen, setImageViewerOpen] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [allImagesForViewer, setAllImagesForViewer] = useState<string[]>([]);
 
   if (!audit) return null;
 
-  const handleImageClick = (index: number) => {
+  const handleImageClick = (index: number, images: string[]) => {
     setSelectedImageIndex(index);
+    setAllImagesForViewer(images);
     setImageViewerOpen(true);
   };
 
-  // Combine report images and audit images with VITE_URL_UPLOADS
-  const allImages = [
-    ...(audit.report?.images || []).map(
-      (img) => `${import.meta.env.VITE_URL_UPLOADS}${img}`
-    ),
-    ...audit.images.map((img) => `${import.meta.env.VITE_URL_UPLOADS}${img}`),
-  ];
+  // Separate report images and completion images
+  const reportImages = (audit.report?.images || []).map(
+    (img) => `${import.meta.env.VITE_URL_UPLOADS}${img}`
+  );
+  const completionImages = audit.images.map(
+    (img) => `${import.meta.env.VITE_URL_UPLOADS}${img}`
+  );
 
   return (
     <>
@@ -348,6 +350,55 @@ export function AuditDetailDialog({
                   </div>
                 </div>
 
+                {/* Report Description - Only show if from report */}
+                {audit.report && (
+                  <div className="space-y-1.5 pt-6">
+                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                      Mô tả sự cố
+                    </h3>
+                    <div className="bg-muted/30 rounded-md p-2.5">
+                      <p className="text-xs leading-relaxed whitespace-pre-wrap">
+                        {audit.report.description}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Report Images - Only show if from report */}
+                {reportImages.length > 0 && (
+                  <>
+                    <div className="space-y-1.5">
+                      <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                        Hình ảnh từ báo cáo ({reportImages.length})
+                      </h3>
+                      <div className="max-h-[260px] overflow-auto pr-1">
+                        <div className="grid grid-cols-4 gap-2">
+                          {reportImages.map((image, index) => (
+                            <div
+                              key={index}
+                              className="rounded-md border overflow-hidden group relative cursor-pointer hover:border-primary transition-colors"
+                              style={{ aspectRatio: "16/9" }}
+                              onClick={() =>
+                                handleImageClick(index, reportImages)
+                              }
+                            >
+                              <img
+                                src={image}
+                                alt={`Hình ảnh báo cáo ${index + 1}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                              />
+                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
+                              <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
+                                {index + 1}/{reportImages.length}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+
                 {/* Assigned Staffs */}
                 {audit.staffs.length > 0 && (
                   <>
@@ -381,52 +432,226 @@ export function AuditDetailDialog({
                   </>
                 )}
 
-                {/* Report Description - Only show if from report */}
-                {audit.report && (
-                  <div className="space-y-1.5 pt-6">
-                    <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                      Mô tả sự cố
-                    </h3>
-                    <div className="bg-muted/30 rounded-md p-2.5">
-                      <p className="text-xs leading-relaxed whitespace-pre-wrap">
-                        {audit.report.description}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Images */}
-                {allImages.length > 0 && (
-                  <>
-                    <div className="space-y-1.5">
-                      <h3 className="text-xs font-semibold text-muted-foreground uppercase">
-                        Hình ảnh đính kèm ({allImages.length})
-                      </h3>
-                      <div className="max-h-[260px] overflow-auto pr-1">
-                        <div className="grid grid-cols-4 gap-2">
-                          {allImages.map((image, index) => (
-                            <div
-                              key={index}
-                              className="rounded-md border overflow-hidden group relative cursor-pointer hover:border-primary transition-colors"
-                              style={{ aspectRatio: "16/9" }}
-                              onClick={() => handleImageClick(index)}
-                            >
-                              <img
-                                src={image}
-                                alt={`Hình ảnh ${index + 1}`}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                              />
-                              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
-                              <div className="absolute bottom-1 right-1 bg-black/70 text-white text-[10px] px-1.5 py-0.5 rounded">
-                                {index + 1}/{allImages.length}
+                {/* Cancellation Info - Only show when status is CANCELLED */}
+                {audit.status === "CANCELLED" &&
+                  (audit.cancelReason ||
+                    audit.cancelledBy ||
+                    audit.cancelledAt) && (
+                    <>
+                      <div className="space-y-1.5 pt-6">
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase flex items-center gap-1.5">
+                          Thông tin hủy bỏ
+                        </h3>
+                        <div className="bg-red-50 border border-red-200 rounded-md p-2.5 space-y-2">
+                          {audit.cancelReason && (
+                            <div>
+                              <p className="text-[11px] text-muted-foreground mb-1">
+                                Lý do hủy:
+                              </p>
+                              <p className="text-xs text-red-800 font-medium whitespace-pre-wrap">
+                                {audit.cancelReason}
+                              </p>
+                            </div>
+                          )}
+                          {audit.cancelledBy && (
+                            <div>
+                              <p className="text-[11px] text-muted-foreground mb-1">
+                                Người hủy:
+                              </p>
+                              <div className="flex items-center gap-2">
+                                <Avatar className="h-7 w-7">
+                                  <AvatarFallback className="text-[10px]">
+                                    {getUserInitials(
+                                      audit.cancelledBy.fullName
+                                    )}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0 flex-1">
+                                  <p className="font-medium text-xs text-red-800 truncate">
+                                    {audit.cancelledBy.fullName}
+                                  </p>
+                                  <p className="text-[11px] text-red-600 truncate">
+                                    {audit.cancelledBy.email}
+                                  </p>
+                                </div>
                               </div>
                             </div>
-                          ))}
+                          )}
+                          {audit.cancelledAt && (
+                            <div>
+                              <p className="text-[11px] text-muted-foreground mb-0.5">
+                                Thời gian hủy:
+                              </p>
+                              <p className="font-medium text-xs text-red-800">
+                                {format(
+                                  new Date(audit.cancelledAt),
+                                  "dd/MM/yyyy HH:mm",
+                                  {
+                                    locale: vi,
+                                  }
+                                )}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
+
+                {/* Acceptance Info - Only show when status is IN_PROGRESS or COMPLETED */}
+                {audit.status !== "PENDING" &&
+                  (audit.acceptedBy || audit.acceptedAt) && (
+                    <>
+                      <div className="space-y-1.5 pt-6">
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                          Thông tin nhận nhiệm vụ
+                        </h3>
+                        <div className="bg-blue-50 border border-blue-200 rounded-md p-2.5">
+                          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                            {audit.acceptedBy && (
+                              <div className="flex items-center gap-2 min-w-0 flex-1">
+                                <Avatar className="h-7 w-7 flex-shrink-0">
+                                  <AvatarFallback className="text-[10px]">
+                                    {getUserInitials(audit.acceptedBy.fullName)}
+                                  </AvatarFallback>
+                                </Avatar>
+                                <div className="min-w-0 flex-1">
+                                  <p className="text-[11px] text-muted-foreground mb-0.5">
+                                    Người nhận:
+                                  </p>
+                                  <p className="font-medium text-xs text-blue-800 truncate">
+                                    {audit.acceptedBy.fullName}
+                                  </p>
+                                  <p className="text-[11px] text-blue-600 truncate">
+                                    {audit.acceptedBy.email}
+                                  </p>
+                                </div>
+                              </div>
+                            )}
+                            {audit.acceptedAt && (
+                              <div className="flex-shrink-0">
+                                <p className="text-[11px] text-muted-foreground mb-0.5">
+                                  Thời gian nhận:
+                                </p>
+                                <p className="font-medium text-xs text-blue-800 whitespace-nowrap">
+                                  {format(
+                                    new Date(audit.acceptedAt),
+                                    "dd/MM/yyyy HH:mm",
+                                    {
+                                      locale: vi,
+                                    }
+                                  )}
+                                </p>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+                {/* Completion Info - Only show when status is COMPLETED */}
+                {audit.status === "COMPLETED" &&
+                  (audit.completedBy ||
+                    audit.completedAt ||
+                    completionImages.length > 0) && (
+                    <>
+                      <div className="space-y-1.5 pt-6">
+                        <h3 className="text-xs font-semibold text-muted-foreground uppercase">
+                          Thông tin hoàn thành
+                        </h3>
+                        <div className="bg-green-50 border border-green-200 rounded-md p-2.5">
+                          <div className="flex flex-col md:flex-row gap-3">
+                            {/* Left: Completion Info */}
+                            <div className="flex-1 space-y-2 min-w-0">
+                              {audit.completedBy && (
+                                <div>
+                                  <p className="text-[11px] text-muted-foreground mb-1">
+                                    Người hoàn thành:
+                                  </p>
+                                  <div className="flex items-center gap-2">
+                                    <Avatar className="h-7 w-7">
+                                      <AvatarFallback className="text-[10px]">
+                                        {getUserInitials(
+                                          audit.completedBy.fullName
+                                        )}
+                                      </AvatarFallback>
+                                    </Avatar>
+                                    <div className="min-w-0 flex-1">
+                                      <p className="font-medium text-xs text-green-800 truncate">
+                                        {audit.completedBy.fullName}
+                                      </p>
+                                      <p className="text-[11px] text-green-600 truncate">
+                                        {audit.completedBy.email}
+                                      </p>
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+                              {audit.completedAt && (
+                                <div>
+                                  <p className="text-[11px] text-muted-foreground mb-0.5">
+                                    Thời gian hoàn thành:
+                                  </p>
+                                  <p className="font-medium text-xs text-green-800">
+                                    {format(
+                                      new Date(audit.completedAt),
+                                      "dd/MM/yyyy HH:mm",
+                                      {
+                                        locale: vi,
+                                      }
+                                    )}
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Right: Completion Images */}
+                            {completionImages.length > 0 && (
+                              <div className="flex-shrink-0">
+                                <p className="text-[11px] text-muted-foreground mb-1.5">
+                                  Hình ảnh hoàn thành ({completionImages.length}
+                                  ):
+                                </p>
+                                <div className="max-h-[200px] overflow-auto pr-1">
+                                  <div className="flex gap-2">
+                                    {completionImages.map((image, index) => (
+                                      <div
+                                        key={index}
+                                        className="rounded-md border border-green-300 overflow-hidden group relative cursor-pointer hover:border-green-500 transition-colors flex-shrink-0"
+                                        style={{
+                                          width: "80px",
+                                          height: "80px",
+                                        }}
+                                        onClick={() =>
+                                          handleImageClick(
+                                            index,
+                                            completionImages
+                                          )
+                                        }
+                                      >
+                                        <img
+                                          src={image}
+                                          alt={`Hình ảnh hoàn thành ${
+                                            index + 1
+                                          }`}
+                                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-200" />
+                                        <div className="absolute bottom-1 right-1 bg-green-700/80 text-white text-[10px] px-1 py-0.5 rounded">
+                                          {index + 1}/{completionImages.length}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </>
+                  )}
+
                 <div className="pt-8"></div>
               </div>
             </ScrollArea>
@@ -440,7 +665,7 @@ export function AuditDetailDialog({
 
       {/* Image Viewer */}
       <ImageViewer
-        images={allImages}
+        images={allImagesForViewer}
         initialIndex={selectedImageIndex}
         open={imageViewerOpen}
         onOpenChange={setImageViewerOpen}

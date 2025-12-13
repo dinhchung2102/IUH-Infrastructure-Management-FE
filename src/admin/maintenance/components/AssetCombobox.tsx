@@ -32,6 +32,7 @@ export function AssetCombobox({
 }: AssetComboboxProps) {
   const [open, setOpen] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [searchQuery, setSearchQuery] = useState(""); // Actual search query to use for API
   const [assets, setAssets] = useState<AssetResponse[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
@@ -52,17 +53,18 @@ export function AssetCombobox({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
 
-  // Fetch assets when search or page changes
+  // Fetch assets when popover opens or searchQuery/page changes (offline search)
   useEffect(() => {
     if (open) {
       fetchAssets();
     }
-  }, [open, searchValue, page]);
+  }, [open, searchQuery, page]);
 
   // Reset when dialog closes
   useEffect(() => {
     if (!open) {
       setSearchValue("");
+      setSearchQuery("");
       setPage(1);
       setAssets([]);
       setHasMore(true);
@@ -99,7 +101,7 @@ export function AssetCombobox({
       setLoading(true);
 
       const response = await getAssets({
-        keyword: searchValue || undefined,
+        search: searchQuery || undefined, // Use searchQuery instead of searchValue
         page: page,
         limit: limit,
       });
@@ -131,12 +133,26 @@ export function AssetCombobox({
     } finally {
       setLoading(false);
     }
-  }, [searchValue, page, value, selectedAsset]);
+  }, [searchQuery, page, value, selectedAsset]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchValue(e.target.value);
+    // Don't trigger search immediately - wait for Enter or button click
+  };
+
+  const handleSearch = () => {
+    setSearchQuery(searchValue.trim());
     setPage(1); // Reset to first page when searching
     setAssets([]); // Clear current assets
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      handleSearch();
+    } else if (e.key === "Escape") {
+      setOpen(false);
+    }
   };
 
   const handleSelect = (assetId: string) => {
@@ -188,19 +204,29 @@ export function AssetCombobox({
       >
         <div className="flex flex-col">
           {/* Search Input */}
-          <div className="flex items-center border-b px-3">
-            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+          <div className="flex items-center border-b px-3 gap-2">
+            <Search className="h-4 w-4 shrink-0 opacity-50" />
             <Input
               placeholder="Tìm kiếm theo tên hoặc mã thiết bị..."
               value={searchValue}
               onChange={handleSearchChange}
-              className="h-9 border-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-              onKeyDown={(e) => {
-                if (e.key === "Escape") {
-                  setOpen(false);
-                }
-              }}
+              onKeyDown={handleKeyDown}
+              className="h-9 border-0 focus-visible:ring-0 focus-visible:ring-offset-0 flex-1"
             />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={handleSearch}
+              disabled={loading}
+              className="h-8 px-2 shrink-0"
+            >
+              {loading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                "Tìm"
+              )}
+            </Button>
           </div>
 
           {/* Options List */}

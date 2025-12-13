@@ -28,11 +28,12 @@ export interface AssetResponse {
 }
 
 export interface QueryAssetDto {
-  keyword?: string;
+  search?: string; // Changed from keyword to search
   page?: number;
   limit?: number;
   status?: string;
-  zoneId?: string;
+  assetType?: string; // Added assetType
+  zone?: string; // Changed from zoneId to zone
   areaId?: string;
   sortBy?: string;
   sortOrder?: "asc" | "desc";
